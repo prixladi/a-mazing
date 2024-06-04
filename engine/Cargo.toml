@@ -9,3 +9,6 @@ crate-type = ["cdylib", "rlib"]
 
 [profile.release]
 opt-level = "s"
+
+[dependencies]
+itertools = "0.13.0"
