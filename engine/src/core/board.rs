@@ -3,15 +3,20 @@ use crate::Position;
 use super::tile::TileKind;
 
 #[derive(Debug, PartialEq)]
+pub struct TileDescriptor {
+    position: Position,
+    kind: TileKind,
+}
+
+#[derive(Debug, PartialEq)]
 pub enum BoardCreationError {
     InvalidBoardSize {
         size: usize,
     },
     NoEntrance,
-    NoExit,
-    TileOutOfBound {
-        position: Position,
-        kind: TileKind,
+    NoCheckpoint,
+    TileOutOfBounds {
+        tiles: Vec<TileDescriptor>,
     },
     OverlappingTiles {
         position: Position,
@@ -25,7 +30,7 @@ pub struct BoardCreationOptions {
     pub max_soft_wall_count: u32,
     pub walls: Vec<Position>,
     pub entrances: Vec<Position>,
-    pub exits: Vec<Position>,
+    pub checkpoints: Vec<(Position, i32)>,
 }
 
 impl BoardCreationOptions {
@@ -35,7 +40,7 @@ impl BoardCreationOptions {
             row_count,
             walls,
             entrances,
-            exits,
+            checkpoints,
             max_soft_wall_count: _,
         } = self;
 
@@ -48,38 +53,43 @@ impl BoardCreationOptions {
             return Err(BoardCreationError::NoEntrance);
         }
 
-        if exits.len() == 0 {
-            return Err(BoardCreationError::NoExit);
+        if checkpoints.len() == 0 {
+            return Err(BoardCreationError::NoCheckpoint);
         }
 
-        for (x, y) in entrances.iter() {
-            if x >= col_count || y >= row_count {
-                return Err(BoardCreationError::TileOutOfBound {
-                    position: (*x, *y),
-                    kind: TileKind::Entrance,
-                });
-            }
-        }
+        let out_of_bounds_entrances = entrances
+            .iter()
+            .filter(|(x, y)| x >= col_count || y >= row_count)
+            .map(|position| TileDescriptor {
+                position: *position,
+                kind: TileKind::Entrance,
+            });
+        let out_of_bounds_checkpoints = checkpoints
+            .iter()
+            .filter(|((x, y), _)| x >= col_count || y >= row_count)
+            .map(|(position, priority)| TileDescriptor {
+                position: *position,
+                kind: TileKind::Checkpoint { level: *priority },
+            });
+        let out_of_bounds_walls = walls
+            .iter()
+            .filter(|(x, y)| x >= col_count || y >= row_count)
+            .map(|position| TileDescriptor {
+                position: *position,
+                kind: TileKind::Wall,
+            });
 
-        for (x, y) in exits.iter() {
-            if x >= col_count || y >= row_count {
-                return Err(BoardCreationError::TileOutOfBound {
-                    position: (*x, *y),
-                    kind: TileKind::Exit,
-                });
-            }
-        }
+        let mut out_of_bounds_tiles = out_of_bounds_entrances
+            .chain(out_of_bounds_checkpoints)
+            .chain(out_of_bounds_walls)
+            .peekable();
 
-        for (x, y) in walls.iter() {
-            if x >= col_count || y >= row_count {
-                return Err(BoardCreationError::TileOutOfBound {
-                    position: (*x, *y),
-                    kind: TileKind::Wall,
-                });
-            }
+        match out_of_bounds_tiles.peek() {
+            Some(_) => Err(BoardCreationError::TileOutOfBounds {
+                tiles: out_of_bounds_tiles.collect(),
+            }),
+            None => Ok(()),
         }
-
-        Ok(())
     }
 }
 
@@ -116,14 +126,14 @@ impl Board {
             tiles[*x][*y] = TileKind::Entrance;
         }
 
-        for (x, y) in options.exits.iter() {
+        for ((x, y), priority) in options.checkpoints.iter() {
             if tiles[*x][*y] != TileKind::Empty {
                 return Err(BoardCreationError::OverlappingTiles {
                     position: (*x, *y),
-                    kinds: (tiles[*x][*y], TileKind::Exit),
+                    kinds: (tiles[*x][*y], TileKind::Checkpoint { level: *priority }),
                 });
             }
-            tiles[*x][*y] = TileKind::Exit;
+            tiles[*x][*y] = TileKind::Checkpoint { level: *priority };
         }
 
         Ok(Self {
@@ -147,116 +157,122 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_create_with_bad_data_0() {
+    fn test_create_with_invalid_board_size() {
         let board = Board::new(&BoardCreationOptions {
             col_count: 1,
             row_count: 0,
             max_soft_wall_count: 5,
             walls: vec![],
             entrances: vec![],
-            exits: vec![],
+            checkpoints: vec![],
         });
 
         assert_eq!(board, Err(BoardCreationError::InvalidBoardSize { size: 0 }))
     }
 
     #[test]
-    fn test_create_with_bad_data_1() {
+    fn test_create_without_any_entrance() {
         let board = Board::new(&BoardCreationOptions {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
             walls: vec![],
             entrances: vec![],
-            exits: vec![],
+            checkpoints: vec![],
         });
 
         assert_eq!(board, Err(BoardCreationError::NoEntrance))
     }
 
     #[test]
-    fn test_create_with_bad_data_2() {
+    fn test_create_without_any_checkpoint() {
         let board = Board::new(&BoardCreationOptions {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
             walls: vec![],
             entrances: vec![(0, 0)],
-            exits: vec![],
+            checkpoints: vec![],
         });
 
-        assert_eq!(board, Err(BoardCreationError::NoExit))
+        assert_eq!(board, Err(BoardCreationError::NoCheckpoint))
     }
 
     #[test]
-    fn test_create_with_bad_data_3() {
+    fn test_create_with_wall_out_of_bounds() {
         let board = Board::new(&BoardCreationOptions {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
             walls: vec![(5, 5)],
             entrances: vec![(0, 0)],
-            exits: vec![(1, 1)],
+            checkpoints: vec![((1, 1), 1)],
         });
 
         assert_eq!(
             board,
-            Err(BoardCreationError::TileOutOfBound {
-                position: (5, 5),
-                kind: TileKind::Wall
+            Err(BoardCreationError::TileOutOfBounds {
+                tiles: vec![TileDescriptor {
+                    position: (5, 5),
+                    kind: TileKind::Wall
+                }]
             })
         )
     }
 
     #[test]
-    fn test_create_with_bad_data_4() {
+    fn test_create_with_entrance_out_of_bounds() {
         let board = Board::new(&BoardCreationOptions {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
             walls: vec![(1, 0)],
             entrances: vec![(3, 3)],
-            exits: vec![(1, 1)],
+            checkpoints: vec![((1, 1), 1)],
         });
 
         assert_eq!(
             board,
-            Err(BoardCreationError::TileOutOfBound {
-                position: (3, 3),
-                kind: TileKind::Entrance
+            Err(BoardCreationError::TileOutOfBounds {
+                tiles: vec![TileDescriptor {
+                    position: (3, 3),
+                    kind: TileKind::Entrance
+                }]
             })
         )
     }
 
     #[test]
-    fn test_create_with_bad_data_5() {
+    fn test_create_with_checkpoint_out_of_bounds() {
         let board = Board::new(&BoardCreationOptions {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
             walls: vec![(1, 0)],
             entrances: vec![(0, 0)],
-            exits: vec![(77, 77)],
+            checkpoints: vec![((77, 77), 1)],
         });
 
         assert_eq!(
             board,
-            Err(BoardCreationError::TileOutOfBound {
-                position: (77, 77),
-                kind: TileKind::Exit
+            Err(BoardCreationError::TileOutOfBounds {
+                tiles: vec![TileDescriptor {
+                    position: (77, 77),
+                    kind: TileKind::Checkpoint { level: 1 }
+                }]
             })
         )
     }
 
     #[test]
-    fn test_create_with_bad_data_6() {
+    fn test_create_with_overlapping_wall_and_entrance() {
         let board = Board::new(&BoardCreationOptions {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
             walls: vec![(0, 0)],
             entrances: vec![(0, 0)],
-            exits: vec![(1, 1)],
+            checkpoints: vec![((1, 1), 1)],
         });
 
         assert_eq!(
@@ -269,34 +285,34 @@ mod tests {
     }
 
     #[test]
-    fn test_create_with_bad_data_7() {
+    fn test_create_with_overlapping_wall_and_checkpoint() {
         let board = Board::new(&BoardCreationOptions {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
             walls: vec![(1, 1)],
             entrances: vec![(1, 0)],
-            exits: vec![(1, 1)],
+            checkpoints: vec![((1, 1), 1)],
         });
 
         assert_eq!(
             board,
             Err(BoardCreationError::OverlappingTiles {
                 position: (1, 1),
-                kinds: (TileKind::Wall, TileKind::Exit)
+                kinds: (TileKind::Wall, TileKind::Checkpoint { level: 1 })
             })
         )
     }
 
     #[test]
-    fn test_create_with_correct_data() {
+    fn test_create_basic_board() {
         let board = Board::new(&BoardCreationOptions {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
             walls: vec![(0, 1)],
             entrances: vec![(1, 0)],
-            exits: vec![(1, 1)],
+            checkpoints: vec![((1, 1), 1)],
         });
 
         assert_eq!(
@@ -304,7 +320,39 @@ mod tests {
             Ok(Board {
                 tiles: vec![
                     vec![TileKind::Empty, TileKind::Wall],
-                    vec![TileKind::Entrance, TileKind::Exit]
+                    vec![TileKind::Entrance, TileKind::Checkpoint { level: 1 }]
+                ],
+                max_soft_wall_count: 5
+            })
+        )
+    }
+
+    #[test]
+    fn test_create_with_multiple_checkpoints() {
+        let board = Board::new(&BoardCreationOptions {
+            col_count: 3,
+            row_count: 3,
+            max_soft_wall_count: 5,
+            walls: vec![(0, 1)],
+            entrances: vec![(1, 0)],
+            checkpoints: vec![((1, 1), 1), ((2, 2), 2)],
+        });
+
+        assert_eq!(
+            board,
+            Ok(Board {
+                tiles: vec![
+                    vec![TileKind::Empty, TileKind::Wall, TileKind::Empty],
+                    vec![
+                        TileKind::Entrance,
+                        TileKind::Checkpoint { level: 1 },
+                        TileKind::Empty
+                    ],
+                    vec![
+                        TileKind::Empty,
+                        TileKind::Empty,
+                        TileKind::Checkpoint { level: 2 }
+                    ]
                 ],
                 max_soft_wall_count: 5
             })
