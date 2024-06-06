@@ -79,16 +79,16 @@ impl BoardCreationOptions {
                 kind: TileKind::Wall,
             });
 
-        let mut out_of_bounds_tiles = out_of_bounds_entrances
+        let out_of_bounds_tiles: Vec<TileDescriptor> = out_of_bounds_entrances
             .chain(out_of_bounds_checkpoints)
             .chain(out_of_bounds_walls)
-            .peekable();
+            .collect();
 
-        match out_of_bounds_tiles.peek() {
-            Some(_) => Err(BoardCreationError::TileOutOfBounds {
-                tiles: out_of_bounds_tiles.collect(),
+        match out_of_bounds_tiles.len() {
+            0 => Ok(()),
+            _ => Err(BoardCreationError::TileOutOfBounds {
+                tiles: out_of_bounds_tiles,
             }),
-            None => Ok(()),
         }
     }
 }
