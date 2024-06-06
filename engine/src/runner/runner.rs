@@ -6,45 +6,22 @@ use crate::{
 use super::run::Run;
 
 #[derive(Debug)]
-pub enum RunnerCreationError {
+pub enum RunnerError {
     TooManySoftWalls { limit: u32 },
     WallOutOfBounds { position: Position },
     OverlappingWall { position: Position },
 }
 
-pub struct Runner {
-    tiles: Vec<Vec<TileKind>>,
+pub struct Runner<'a> {
+    board: &'a Board,
     entrances: Vec<Position>,
     asc_checkpoint_levels: Vec<i32>,
 }
 
-impl Runner {
-    pub fn new(board: &Board, soft_walls: &Vec<Position>) -> Result<Self, RunnerCreationError> {
-        let tiles = board.get_tiles();
-        let max_soft_wall_count = board.get_max_soft_wall_count();
-
-        if max_soft_wall_count < soft_walls.len() as u32 {
-            return Err(RunnerCreationError::TooManySoftWalls {
-                limit: max_soft_wall_count,
-            });
-        }
-
-        let mut tiles: Vec<Vec<TileKind>> = tiles.clone();
-        for (x, y) in soft_walls {
-            if *x >= tiles.len() {
-                return Err(RunnerCreationError::WallOutOfBounds { position: (*x, *y) });
-            }
-            if *y >= tiles[*x].len() {
-                return Err(RunnerCreationError::WallOutOfBounds { position: (*x, *y) });
-            }
-            if tiles[*x][*y] != TileKind::Empty {
-                return Err(RunnerCreationError::OverlappingWall { position: (*x, *y) });
-            }
-
-            tiles[*x as usize][*y as usize] = TileKind::Wall
-        }
-
-        let entrances = tiles
+impl<'a> Runner<'a> {
+    pub fn new(board: &'a Board) -> Self {
+        let entrances = board
+            .get_tiles()
             .iter()
             .enumerate()
             .flat_map(|(x, row)| {
@@ -55,7 +32,8 @@ impl Runner {
             })
             .collect();
 
-        let mut checkpoint_levels: Vec<i32> = tiles
+        let mut checkpoint_levels: Vec<i32> = board
+            .get_tiles()
             .iter()
             .flat_map(|row| {
                 row.iter()
@@ -72,17 +50,22 @@ impl Runner {
         checkpoint_levels.sort_by(|a, b| a.cmp(b));
         checkpoint_levels.dedup();
 
-        Ok(Self {
-            tiles,
+        Self {
+            board,
             entrances,
             asc_checkpoint_levels: checkpoint_levels,
-        })
+        }
     }
 
-    pub fn run(&self) -> Option<(u32, Vec<Position>)> {
+    pub fn run(
+        &self,
+        soft_walls: &Vec<Position>,
+    ) -> Result<Option<(u32, Vec<Position>)>, RunnerError> {
+        let tiles = self.get_tile_board(soft_walls)?;
         let mut best_run: Option<Run> = None;
+
         for entrance in self.entrances.iter() {
-            let current_run = Run::execute(&self.tiles, &self.asc_checkpoint_levels, *entrance);
+            let current_run = Run::execute(&tiles, &self.asc_checkpoint_levels, *entrance);
 
             if let Some(new) = current_run {
                 best_run = match best_run {
@@ -92,7 +75,36 @@ impl Runner {
             }
         }
 
-        best_run.map(|run| (run.get_distance(), run.get_solved_path()))
+        Ok(best_run.map(|run| (run.get_distance(), run.get_solved_path())))
+    }
+
+    fn get_tile_board(
+        &self,
+        soft_walls: &Vec<Position>,
+    ) -> Result<Vec<Vec<TileKind>>, RunnerError> {
+        let max_soft_wall_count = self.board.get_max_soft_wall_count();
+        if max_soft_wall_count < soft_walls.len() as u32 {
+            return Err(RunnerError::TooManySoftWalls {
+                limit: max_soft_wall_count,
+            });
+        }
+
+        let mut tiles: Vec<Vec<TileKind>> = self.board.get_tiles().clone();
+        for (x, y) in soft_walls {
+            if *x >= tiles.len() {
+                return Err(RunnerError::WallOutOfBounds { position: (*x, *y) });
+            }
+            if *y >= tiles[*x].len() {
+                return Err(RunnerError::WallOutOfBounds { position: (*x, *y) });
+            }
+            if tiles[*x][*y] != TileKind::Empty {
+                return Err(RunnerError::OverlappingWall { position: (*x, *y) });
+            }
+
+            tiles[*x as usize][*y as usize] = TileKind::Wall
+        }
+
+        return Ok(tiles);
     }
 }
 
@@ -115,8 +127,8 @@ mod tests {
         })
         .unwrap();
 
-        let runner = Runner::new(&board, &vec![]).unwrap();
-        let result = runner.run();
+        let runner = Runner::new(&board);
+        let result = runner.run(&vec![]).unwrap();
 
         assert_eq!(
             result,
@@ -155,9 +167,9 @@ mod tests {
         })
         .unwrap();
 
-        let runner = Runner::new(
-            &board,
-            &vec![
+        let runner = Runner::new(&board);
+        let result = runner
+            .run(&vec![
                 (2, 0),
                 (2, 1),
                 (2, 2),
@@ -171,10 +183,8 @@ mod tests {
                 (4, 4),
                 (4, 3),
                 (4, 2),
-            ],
-        )
-        .unwrap();
-        let result = runner.run();
+            ])
+            .unwrap();
 
         assert_eq!(
             result,
@@ -225,9 +235,9 @@ mod tests {
         })
         .unwrap();
 
-        let runner = Runner::new(
-            &board,
-            &vec![
+        let runner = Runner::new(&board);
+        let result = runner
+            .run(&vec![
                 (2, 0),
                 (2, 1),
                 (2, 2),
@@ -236,10 +246,8 @@ mod tests {
                 (2, 5),
                 (2, 6),
                 (2, 7),
-            ],
-        )
-        .unwrap();
-        let result = runner.run();
+            ])
+            .unwrap();
 
         assert_eq!(result, None);
     }
@@ -256,9 +264,9 @@ mod tests {
         })
         .unwrap();
 
-        let runner = Runner::new(
-            &board,
-            &vec![
+        let runner = Runner::new(&board);
+        let result = runner
+            .run(&vec![
                 (2, 0),
                 (2, 1),
                 (2, 2),
@@ -272,10 +280,8 @@ mod tests {
                 (4, 4),
                 (4, 3),
                 (4, 2),
-            ],
-        )
-        .unwrap();
-        let result = runner.run();
+            ])
+            .unwrap();
 
         assert_eq!(
             result,
@@ -295,8 +301,8 @@ mod tests {
         })
         .unwrap();
 
-        let runner = Runner::new(&board, &vec![]).unwrap();
-        let result = runner.run();
+        let runner = Runner::new(&board);
+        let result = runner.run(&vec![]).unwrap();
 
         assert_eq!(
             result,
@@ -339,8 +345,8 @@ mod tests {
         })
         .unwrap();
 
-        let runner = Runner::new(&board, &vec![]).unwrap();
-        let result = runner.run();
+        let runner = Runner::new(&board);
+        let result = runner.run(&vec![]).unwrap();
 
         assert_eq!(
             result,
@@ -375,8 +381,8 @@ mod tests {
         })
         .unwrap();
 
-        let runner = Runner::new(&board, &vec![]).unwrap();
-        let result = runner.run();
+        let runner = Runner::new(&board);
+        let result = runner.run(&vec![]).unwrap();
 
         assert_eq!(
             result,
@@ -411,8 +417,8 @@ mod tests {
         })
         .unwrap();
 
-        let runner = Runner::new(&board, &vec![]).unwrap();
-        let result = runner.run();
+        let runner = Runner::new(&board);
+        let result = runner.run(&vec![]).unwrap();
 
         assert_eq!(
             result,
@@ -457,8 +463,8 @@ mod tests {
         })
         .unwrap();
 
-        let runner = Runner::new(&board, &vec![(1, 6), (1, 5)]).unwrap();
-        let result = runner.run();
+        let runner = Runner::new(&board);
+        let result = runner.run(&vec![(1, 6), (1, 5)]).unwrap();
 
         assert_eq!(
             result,
@@ -510,12 +516,10 @@ mod tests {
         })
         .unwrap();
 
-        let runner = Runner::new(
-            &board,
-            &vec![(1, 6), (1, 5), (5, 4), (3, 4), (4, 5), (4, 3)],
-        )
-        .unwrap();
-        let result = runner.run();
+        let runner = Runner::new(&board);
+        let result = runner
+            .run(&vec![(1, 6), (1, 5), (5, 4), (3, 4), (4, 5), (4, 3)])
+            .unwrap();
 
         assert_eq!(result, None)
     }
@@ -540,12 +544,10 @@ mod tests {
         })
         .unwrap();
 
-        let runner = Runner::new(
-            &board,
-            &vec![(1, 6), (1, 5), (5, 4), (3, 4), (4, 5), (4, 3)],
-        )
-        .unwrap();
-        let result = runner.run();
+        let runner = Runner::new(&board);
+        let result = runner
+            .run(&vec![(1, 6), (1, 5), (5, 4), (3, 4), (4, 5), (4, 3)])
+            .unwrap();
 
         assert_eq!(
             result,
@@ -574,5 +576,51 @@ mod tests {
                 ]
             ))
         )
+    }
+
+    #[test]
+    fn test_run_leveled_big_board() {
+        let board = Board::new(&BoardCreationOptions {
+            col_count: 210,
+            row_count: 26,
+            max_soft_wall_count: 200,
+            walls: vec![],
+            entrances: vec![(0, 0)],
+            checkpoints: vec![
+                ((4, 5), 1),
+                ((150, 20), 2),
+                ((1, 1), 3),
+                ((160, 20), 4),
+                ((1, 2), 5),
+                ((10, 25), 6),
+                ((10, 21), 6),
+                ((3, 3), 7),
+                ((120, 25), 8),
+                ((4, 4), 9),
+                ((130, 25), 10),
+                ((0, 1), 10),
+                ((200, 5), 11),
+                ((1, 21), 12),
+                ((6, 6), 13),
+                ((120, 24), 14),
+                ((7, 7), 15),
+                ((8, 19), 16),
+                ((8, 8), 17),
+                ((150, 19), 18),
+                ((200, 1), 19),
+                ((202, 1), 20),
+                ((1, 20), 20),
+                ((206, 1), 21),
+            ],
+        })
+        .unwrap();
+
+        let runner = Runner::new(&board);
+        let (distance, _) = runner
+            .run(&vec![(205, 1), (207, 1), (206, 0), (205, 2)])
+            .unwrap()
+            .unwrap();
+
+        assert_eq!(distance, 1985)
     }
 }

@@ -20,8 +20,8 @@ fn main() {
     })
     .unwrap();
 
-    let runner = Runner::new(&board, &vec![]).unwrap();
-    let result = runner.run().unwrap();
+    let runner = Runner::new(&board);
+    let result = runner.run(&vec![]).unwrap().unwrap();
 
     println!("{:?}", result.0);
 
@@ -31,44 +31,40 @@ fn main() {
         max_soft_wall_count: 200,
         walls: vec![],
         entrances: vec![(0, 0)],
-        checkpoints: vec![
-            ((1, 1), 19),
-            ((2, 1), 20),
-            ((10, 20), 23),
-            ((20, 1), 21),
-        ],
+        checkpoints: vec![((1, 1), 19), ((2, 1), 20), ((10, 20), 23), ((20, 1), 21)],
     })
     .unwrap();
 
-    let runner = Runner::new(&board, &vec![]).unwrap();
-    let result = runner.run().unwrap();
+    let runner = Runner::new(&board);
+    let result = runner.run(&vec![]).unwrap().unwrap();
     println!("{:?}", result.0);
 
-    let runner = Runner::new(&board, &vec![(19,1), (21, 1), (19, 0), (20, 2)]).unwrap();
-    let result = runner.run().unwrap();
+    let runner = Runner::new(&board);
+    let result = runner
+        .run(&vec![(19, 1), (21, 1), (19, 0), (20, 2)])
+        .unwrap()
+        .unwrap();
     println!("{:?}", result.0);
 
-        let board = Board::new(&BoardCreationOptions {
+    let board = Board::new(&BoardCreationOptions {
         col_count: 23,
         row_count: 26,
         max_soft_wall_count: 200,
         walls: vec![],
         entrances: vec![(0, 0)],
-        checkpoints: vec![
-            ((1, 1), 19),
-            ((2, 1), 20),
-            ((10, 20), 20),
-            ((20, 1), 21),
-        ],
+        checkpoints: vec![((1, 1), 19), ((2, 1), 20), ((10, 20), 20), ((20, 1), 21)],
     })
     .unwrap();
 
-    let runner = Runner::new(&board, &vec![]).unwrap();
-    let result = runner.run().unwrap();
+    let runner = Runner::new(&board);
+    let result = runner.run(&vec![]).unwrap().unwrap();
     println!("{:?}", result.0);
 
-    let runner = Runner::new(&board, &vec![(19,1), (21, 1), (19, 0), (20, 2)]).unwrap();
-    let result = runner.run().unwrap();
+    let runner = Runner::new(&board);
+    let result = runner
+        .run(&vec![(19, 1), (21, 1), (19, 0), (20, 2)])
+        .unwrap()
+        .unwrap();
     println!("{:?}", result.0);
 
     let board = Board::new(&BoardCreationOptions {
@@ -106,16 +102,19 @@ fn main() {
     })
     .unwrap();
 
-    let runner = Runner::new(&board, &vec![]).unwrap();
-    let result = runner.run().unwrap();
+    let runner = Runner::new(&board);
+    let result = runner.run(&vec![]).unwrap().unwrap();
     println!("{:?}", result.0);
 
-    let runner = Runner::new(&board, &vec![(205, 1), (207, 1), (206, 0), (205, 2)]).unwrap();
-    let result = runner.run().unwrap();
+    let runner = Runner::new(&board);
+    let result = runner
+        .run(&vec![(205, 1), (207, 1), (206, 0), (205, 2)])
+        .unwrap()
+        .unwrap();
     println!("{:?}", result.0);
 
-    let runner = Runner::new(&board, &vec![(7, 6)]).unwrap();
-    let result = runner.run().unwrap();
+    let runner = Runner::new(&board);
+    let result = runner.run(&vec![(7, 6)]).unwrap().unwrap();
     println!("{:?}", result.0);
 
     let board = Board::new(&BoardCreationOptions {
@@ -153,21 +152,24 @@ fn main() {
     })
     .unwrap();
 
-    let runner = Runner::new(&board, &vec![]).unwrap();
-    let result = runner.run().unwrap();
+    let runner = Runner::new(&board);
+    let result = runner.run(&vec![]).unwrap().unwrap();
     println!("{:?}", result.0);
 
-    let runner = Runner::new(&board, &vec![(205, 1), (207, 1), (206, 0), (205, 2)]).unwrap();
-    let result = runner.run().unwrap();
+    let runner = Runner::new(&board);
+    let result = runner
+        .run(&vec![(205, 1), (207, 1), (206, 0), (205, 2)])
+        .unwrap()
+        .unwrap();
     println!("{:?}", result.0);
 
-    let runner = Runner::new(&board, &vec![(7, 6)]).unwrap();
-    let result = runner.run().unwrap();
+    let runner = Runner::new(&board);
+    let result = runner.run(&vec![(7, 6)]).unwrap().unwrap();
     println!("{:?}", result.0);
 
-    let runner = Runner::new(
-        &board,
-        &vec![
+    let runner = Runner::new(&board);
+    let result = runner
+        .run(&vec![
             (2, 0),
             (2, 1),
             (2, 3),
@@ -178,9 +180,8 @@ fn main() {
             (4, 6),
             (4, 3),
             (4, 2),
-        ],
-    )
-    .unwrap();
-    let result = runner.run().unwrap();
+        ])
+        .unwrap()
+        .unwrap();
     println!("{:?}", result.0);
 }

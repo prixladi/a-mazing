@@ -9,7 +9,7 @@ pub struct TileDescriptor {
 }
 
 #[derive(Debug, PartialEq)]
-pub enum BoardCreationError {
+pub enum BoardError {
     InvalidBoardSize {
         size: usize,
     },
@@ -34,7 +34,7 @@ pub struct BoardCreationOptions {
 }
 
 impl BoardCreationOptions {
-    fn ensure_valid(&self) -> Result<(), BoardCreationError> {
+    fn ensure_valid(&self) -> Result<(), BoardError> {
         let Self {
             col_count,
             row_count,
@@ -46,15 +46,15 @@ impl BoardCreationOptions {
 
         let board_size = col_count * row_count;
         if board_size < 4 {
-            return Err(BoardCreationError::InvalidBoardSize { size: board_size });
+            return Err(BoardError::InvalidBoardSize { size: board_size });
         }
 
         if entrances.len() == 0 {
-            return Err(BoardCreationError::NoEntrance);
+            return Err(BoardError::NoEntrance);
         }
 
         if checkpoints.len() == 0 {
-            return Err(BoardCreationError::NoCheckpoint);
+            return Err(BoardError::NoCheckpoint);
         }
 
         let out_of_bounds_entrances = entrances
@@ -86,7 +86,7 @@ impl BoardCreationOptions {
 
         match out_of_bounds_tiles.len() {
             0 => Ok(()),
-            _ => Err(BoardCreationError::TileOutOfBounds {
+            _ => Err(BoardError::TileOutOfBounds {
                 tiles: out_of_bounds_tiles,
             }),
         }
@@ -100,7 +100,7 @@ pub struct Board {
 }
 
 impl Board {
-    pub fn new(options: &BoardCreationOptions) -> Result<Self, BoardCreationError> {
+    pub fn new(options: &BoardCreationOptions) -> Result<Self, BoardError> {
         options.ensure_valid()?;
 
         let mut tiles: Vec<Vec<TileKind>> =
@@ -108,7 +108,7 @@ impl Board {
 
         for (x, y) in options.walls.iter() {
             if tiles[*x][*y] != TileKind::Empty {
-                return Err(BoardCreationError::OverlappingTiles {
+                return Err(BoardError::OverlappingTiles {
                     position: (*x, *y),
                     kinds: (tiles[*x][*y], TileKind::Wall),
                 });
@@ -118,7 +118,7 @@ impl Board {
 
         for (x, y) in options.entrances.iter() {
             if tiles[*x][*y] != TileKind::Empty {
-                return Err(BoardCreationError::OverlappingTiles {
+                return Err(BoardError::OverlappingTiles {
                     position: (*x, *y),
                     kinds: (tiles[*x][*y], TileKind::Entrance),
                 });
@@ -128,7 +128,7 @@ impl Board {
 
         for ((x, y), priority) in options.checkpoints.iter() {
             if tiles[*x][*y] != TileKind::Empty {
-                return Err(BoardCreationError::OverlappingTiles {
+                return Err(BoardError::OverlappingTiles {
                     position: (*x, *y),
                     kinds: (tiles[*x][*y], TileKind::Checkpoint { level: *priority }),
                 });
@@ -167,7 +167,7 @@ mod tests {
             checkpoints: vec![],
         });
 
-        assert_eq!(board, Err(BoardCreationError::InvalidBoardSize { size: 0 }))
+        assert_eq!(board, Err(BoardError::InvalidBoardSize { size: 0 }))
     }
 
     #[test]
@@ -181,7 +181,7 @@ mod tests {
             checkpoints: vec![],
         });
 
-        assert_eq!(board, Err(BoardCreationError::NoEntrance))
+        assert_eq!(board, Err(BoardError::NoEntrance))
     }
 
     #[test]
@@ -195,7 +195,7 @@ mod tests {
             checkpoints: vec![],
         });
 
-        assert_eq!(board, Err(BoardCreationError::NoCheckpoint))
+        assert_eq!(board, Err(BoardError::NoCheckpoint))
     }
 
     #[test]
@@ -211,7 +211,7 @@ mod tests {
 
         assert_eq!(
             board,
-            Err(BoardCreationError::TileOutOfBounds {
+            Err(BoardError::TileOutOfBounds {
                 tiles: vec![TileDescriptor {
                     position: (5, 5),
                     kind: TileKind::Wall
@@ -233,7 +233,7 @@ mod tests {
 
         assert_eq!(
             board,
-            Err(BoardCreationError::TileOutOfBounds {
+            Err(BoardError::TileOutOfBounds {
                 tiles: vec![TileDescriptor {
                     position: (3, 3),
                     kind: TileKind::Entrance
@@ -255,7 +255,7 @@ mod tests {
 
         assert_eq!(
             board,
-            Err(BoardCreationError::TileOutOfBounds {
+            Err(BoardError::TileOutOfBounds {
                 tiles: vec![TileDescriptor {
                     position: (77, 77),
                     kind: TileKind::Checkpoint { level: 1 }
@@ -277,7 +277,7 @@ mod tests {
 
         assert_eq!(
             board,
-            Err(BoardCreationError::OverlappingTiles {
+            Err(BoardError::OverlappingTiles {
                 position: (0, 0),
                 kinds: (TileKind::Wall, TileKind::Entrance)
             })
@@ -297,7 +297,7 @@ mod tests {
 
         assert_eq!(
             board,
-            Err(BoardCreationError::OverlappingTiles {
+            Err(BoardError::OverlappingTiles {
                 position: (1, 1),
                 kinds: (TileKind::Wall, TileKind::Checkpoint { level: 1 })
             })
