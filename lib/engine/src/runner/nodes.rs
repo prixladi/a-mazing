@@ -83,7 +83,7 @@ mod tests {
     #[test]
     fn test_nodes_get_node_from_maze() {
         let nodes = Nodes::new(&vec![
-            vec![TileKind::Entrance, TileKind::Empty],
+            vec![TileKind::Entrypoint, TileKind::Empty],
             vec![TileKind::Wall, TileKind::Checkpoint { level: 1 }],
         ]);
 
@@ -96,7 +96,7 @@ mod tests {
     #[should_panic]
     fn test_nodes_get_node_out_of_bounds() {
         let nodes = Nodes::new(&vec![
-            vec![TileKind::Entrance, TileKind::Empty],
+            vec![TileKind::Entrypoint, TileKind::Empty],
             vec![TileKind::Wall, TileKind::Checkpoint { level: 1 }],
         ]);
 
@@ -106,7 +106,7 @@ mod tests {
     #[test]
     fn test_nodes_get_neighbors_on_the_edge_of_maze() {
         let nodes = Nodes::new(&vec![
-            vec![TileKind::Entrance, TileKind::Empty],
+            vec![TileKind::Entrypoint, TileKind::Empty],
             vec![TileKind::Wall, TileKind::Checkpoint { level: 1 }],
         ]);
 

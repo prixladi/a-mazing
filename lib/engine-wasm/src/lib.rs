@@ -66,7 +66,7 @@ impl Mazer {
             row_count: 2,
             max_soft_wall_count: 200,
             walls: vec![],
-            entrances: vec![(0, 0)],
+            entrypoints: vec![(0, 0)],
             checkpoints: vec![
                 ((0, 1), 1),
                 ((2, 0), 2),

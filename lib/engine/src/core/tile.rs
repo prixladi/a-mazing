@@ -1,6 +1,6 @@
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum TileKind {
-    Entrance,
+    Entrypoint,
     Empty,
     Wall,
     Checkpoint { level: i32 },

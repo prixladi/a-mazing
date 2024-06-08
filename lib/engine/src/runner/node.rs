@@ -29,8 +29,8 @@ impl Node {
         }
     }
 
-    pub fn is_entrance(&self) -> bool {
-        self.kind == TileKind::Entrance
+    pub fn is_entrypoint(&self) -> bool {
+        self.kind == TileKind::Entrypoint
     }
 
     pub fn has_distance(&self, checkpoint_level: i32) -> bool {
@@ -71,19 +71,19 @@ mod tests {
         assert_eq!(node.has_distance(1), false);
         assert_eq!(node.get_distance(1), None);
         assert_eq!(node.is_checkpoint(1), false);
-        assert_eq!(node.is_entrance(), false);
+        assert_eq!(node.is_entrypoint(), false);
     }
 
     #[test]
-    fn test_entrance_node_methods() {
-        let node = Node::new(TileKind::Entrance, (2, 2));
+    fn test_entrypoint_node_methods() {
+        let node = Node::new(TileKind::Entrypoint, (2, 2));
 
         assert_eq!(node.get_position(), (2, 2));
         assert_eq!(node.can_enter(), true);
         assert_eq!(node.has_distance(1), false);
         assert_eq!(node.get_distance(1), None);
         assert_eq!(node.is_checkpoint(1), false);
-        assert_eq!(node.is_entrance(), true);
+        assert_eq!(node.is_entrypoint(), true);
     }
 
     #[test]
@@ -96,7 +96,7 @@ mod tests {
         assert_eq!(node.get_distance(1), None);
         assert_eq!(node.is_checkpoint(1), true);
         assert_eq!(node.is_checkpoint(2), false);
-        assert_eq!(node.is_entrance(), false);
+        assert_eq!(node.is_entrypoint(), false);
     }
 
     #[test]
@@ -108,7 +108,7 @@ mod tests {
         assert_eq!(node.has_distance(1), false);
         assert_eq!(node.get_distance(1), None);
         assert_eq!(node.is_checkpoint(1), false);
-        assert_eq!(node.is_entrance(), false);
+        assert_eq!(node.is_entrypoint(), false);
     }
 
     #[test]

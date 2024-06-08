@@ -13,7 +13,7 @@ pub enum MazeError {
     InvalidMazeSize {
         size: usize,
     },
-    NoEntrance,
+    NoEntrypoint,
     NoCheckpoint,
     TileOutOfBounds {
         tiles: Vec<TileDescriptor>,
@@ -29,7 +29,7 @@ pub struct MazeOptions {
     pub row_count: usize,
     pub max_soft_wall_count: u32,
     pub walls: Vec<Position>,
-    pub entrances: Vec<Position>,
+    pub entrypoints: Vec<Position>,
     pub checkpoints: Vec<(Position, i32)>,
 }
 
@@ -39,7 +39,7 @@ impl MazeOptions {
             col_count,
             row_count,
             walls,
-            entrances,
+            entrypoints,
             checkpoints,
             max_soft_wall_count: _,
         } = self;
@@ -49,20 +49,20 @@ impl MazeOptions {
             return Err(MazeError::InvalidMazeSize { size: maze_size });
         }
 
-        if entrances.len() == 0 {
-            return Err(MazeError::NoEntrance);
+        if entrypoints.len() == 0 {
+            return Err(MazeError::NoEntrypoint);
         }
 
         if checkpoints.len() == 0 {
             return Err(MazeError::NoCheckpoint);
         }
 
-        let out_of_bounds_entrances = entrances
+        let out_of_bounds_entrypoints = entrypoints
             .iter()
             .filter(|(x, y)| x >= col_count || y >= row_count)
             .map(|position| TileDescriptor {
                 position: *position,
-                kind: TileKind::Entrance,
+                kind: TileKind::Entrypoint,
             });
         let out_of_bounds_checkpoints = checkpoints
             .iter()
@@ -79,7 +79,7 @@ impl MazeOptions {
                 kind: TileKind::Wall,
             });
 
-        let out_of_bounds_tiles: Vec<TileDescriptor> = out_of_bounds_entrances
+        let out_of_bounds_tiles: Vec<TileDescriptor> = out_of_bounds_entrypoints
             .chain(out_of_bounds_checkpoints)
             .chain(out_of_bounds_walls)
             .collect();
@@ -116,14 +116,14 @@ impl Maze {
             tiles[*x][*y] = TileKind::Wall;
         }
 
-        for (x, y) in options.entrances.iter() {
+        for (x, y) in options.entrypoints.iter() {
             if tiles[*x][*y] != TileKind::Empty {
                 return Err(MazeError::OverlappingTiles {
                     position: (*x, *y),
-                    kinds: (tiles[*x][*y], TileKind::Entrance),
+                    kinds: (tiles[*x][*y], TileKind::Entrypoint),
                 });
             }
-            tiles[*x][*y] = TileKind::Entrance;
+            tiles[*x][*y] = TileKind::Entrypoint;
         }
 
         for ((x, y), priority) in options.checkpoints.iter() {
@@ -163,7 +163,7 @@ mod tests {
             row_count: 0,
             max_soft_wall_count: 5,
             walls: vec![],
-            entrances: vec![],
+            entrypoints: vec![],
             checkpoints: vec![],
         });
 
@@ -171,17 +171,17 @@ mod tests {
     }
 
     #[test]
-    fn test_create_without_any_entrance() {
+    fn test_create_without_any_entrypoint() {
         let maze = Maze::new(&MazeOptions {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
             walls: vec![],
-            entrances: vec![],
+            entrypoints: vec![],
             checkpoints: vec![],
         });
 
-        assert_eq!(maze, Err(MazeError::NoEntrance))
+        assert_eq!(maze, Err(MazeError::NoEntrypoint))
     }
 
     #[test]
@@ -191,7 +191,7 @@ mod tests {
             row_count: 2,
             max_soft_wall_count: 5,
             walls: vec![],
-            entrances: vec![(0, 0)],
+            entrypoints: vec![(0, 0)],
             checkpoints: vec![],
         });
 
@@ -205,7 +205,7 @@ mod tests {
             row_count: 2,
             max_soft_wall_count: 5,
             walls: vec![(5, 5)],
-            entrances: vec![(0, 0)],
+            entrypoints: vec![(0, 0)],
             checkpoints: vec![((1, 1), 1)],
         });
 
@@ -221,13 +221,13 @@ mod tests {
     }
 
     #[test]
-    fn test_create_with_entrance_out_of_bounds() {
+    fn test_create_with_entrypoint_out_of_bounds() {
         let maze = Maze::new(&MazeOptions {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
             walls: vec![(1, 0)],
-            entrances: vec![(3, 3)],
+            entrypoints: vec![(3, 3)],
             checkpoints: vec![((1, 1), 1)],
         });
 
@@ -236,7 +236,7 @@ mod tests {
             Err(MazeError::TileOutOfBounds {
                 tiles: vec![TileDescriptor {
                     position: (3, 3),
-                    kind: TileKind::Entrance
+                    kind: TileKind::Entrypoint
                 }]
             })
         )
@@ -249,7 +249,7 @@ mod tests {
             row_count: 2,
             max_soft_wall_count: 5,
             walls: vec![(1, 0)],
-            entrances: vec![(0, 0)],
+            entrypoints: vec![(0, 0)],
             checkpoints: vec![((77, 77), 1)],
         });
 
@@ -265,13 +265,13 @@ mod tests {
     }
 
     #[test]
-    fn test_create_with_overlapping_wall_and_entrance() {
+    fn test_create_with_overlapping_wall_and_entrypoint() {
         let maze = Maze::new(&MazeOptions {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
             walls: vec![(0, 0)],
-            entrances: vec![(0, 0)],
+            entrypoints: vec![(0, 0)],
             checkpoints: vec![((1, 1), 1)],
         });
 
@@ -279,7 +279,7 @@ mod tests {
             maze,
             Err(MazeError::OverlappingTiles {
                 position: (0, 0),
-                kinds: (TileKind::Wall, TileKind::Entrance)
+                kinds: (TileKind::Wall, TileKind::Entrypoint)
             })
         )
     }
@@ -291,7 +291,7 @@ mod tests {
             row_count: 2,
             max_soft_wall_count: 5,
             walls: vec![(1, 1)],
-            entrances: vec![(1, 0)],
+            entrypoints: vec![(1, 0)],
             checkpoints: vec![((1, 1), 1)],
         });
 
@@ -311,7 +311,7 @@ mod tests {
             row_count: 2,
             max_soft_wall_count: 5,
             walls: vec![(0, 1)],
-            entrances: vec![(1, 0)],
+            entrypoints: vec![(1, 0)],
             checkpoints: vec![((1, 1), 1)],
         });
 
@@ -320,7 +320,7 @@ mod tests {
             Ok(Maze {
                 tiles: vec![
                     vec![TileKind::Empty, TileKind::Wall],
-                    vec![TileKind::Entrance, TileKind::Checkpoint { level: 1 }]
+                    vec![TileKind::Entrypoint, TileKind::Checkpoint { level: 1 }]
                 ],
                 max_soft_wall_count: 5
             })
@@ -334,7 +334,7 @@ mod tests {
             row_count: 3,
             max_soft_wall_count: 5,
             walls: vec![(0, 1)],
-            entrances: vec![(1, 0)],
+            entrypoints: vec![(1, 0)],
             checkpoints: vec![((1, 1), 1), ((2, 2), 2)],
         });
 
@@ -344,7 +344,7 @@ mod tests {
                 tiles: vec![
                     vec![TileKind::Empty, TileKind::Wall, TileKind::Empty],
                     vec![
-                        TileKind::Entrance,
+                        TileKind::Entrypoint,
                         TileKind::Checkpoint { level: 1 },
                         TileKind::Empty
                     ],

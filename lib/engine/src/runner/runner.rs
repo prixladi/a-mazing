@@ -14,20 +14,20 @@ pub enum RunnerError {
 
 pub struct Runner<'a> {
     maze: &'a Maze,
-    entrances: Vec<Position>,
+    entrypoints: Vec<Position>,
     asc_checkpoint_levels: Vec<i32>,
 }
 
 impl<'a> Runner<'a> {
     pub fn new(maze: &'a Maze) -> Self {
-        let entrances = maze
+        let entrypoints = maze
             .get_tiles()
             .iter()
             .enumerate()
             .flat_map(|(x, row)| {
                 row.iter()
                     .enumerate()
-                    .filter(|(_, kind)| **kind == TileKind::Entrance)
+                    .filter(|(_, kind)| **kind == TileKind::Entrypoint)
                     .map(move |(y, _)| (x, y))
             })
             .collect();
@@ -52,7 +52,7 @@ impl<'a> Runner<'a> {
 
         Self {
             maze,
-            entrances,
+            entrypoints,
             asc_checkpoint_levels: checkpoint_levels,
         }
     }
@@ -64,8 +64,8 @@ impl<'a> Runner<'a> {
         let tiles = self.get_tiles(soft_walls)?;
         let mut best_run: Option<Run> = None;
 
-        for entrance in self.entrances.iter() {
-            let current_run = Run::execute(&tiles, &self.asc_checkpoint_levels, *entrance);
+        for entrypoint in self.entrypoints.iter() {
+            let current_run = Run::execute(&tiles, &self.asc_checkpoint_levels, *entrypoint);
 
             if let Some(new) = current_run {
                 best_run = match best_run {
@@ -122,7 +122,7 @@ mod tests {
             row_count: 8,
             max_soft_wall_count: 200,
             walls: vec![],
-            entrances: vec![(0, 0)],
+            entrypoints: vec![(0, 0)],
             checkpoints: vec![((7, 7), 1)],
         })
         .unwrap();
@@ -162,7 +162,7 @@ mod tests {
             row_count: 8,
             max_soft_wall_count: 200,
             walls: vec![],
-            entrances: vec![(0, 0)],
+            entrypoints: vec![(0, 0)],
             checkpoints: vec![((7, 7), 1)],
         })
         .unwrap();
@@ -230,7 +230,7 @@ mod tests {
             row_count: 8,
             max_soft_wall_count: 200,
             walls: vec![],
-            entrances: vec![(0, 0)],
+            entrypoints: vec![(0, 0)],
             checkpoints: vec![((7, 7), 1)],
         })
         .unwrap();
@@ -253,13 +253,13 @@ mod tests {
     }
 
     #[test]
-    fn test_run_basic_with_multiple_entrances() {
+    fn test_run_basic_with_multiple_entrypoints() {
         let maze = Maze::new(&MazeOptions {
             col_count: 8,
             row_count: 8,
             max_soft_wall_count: 200,
             walls: vec![],
-            entrances: vec![(0, 0), (5, 5)],
+            entrypoints: vec![(0, 0), (5, 5)],
             checkpoints: vec![((7, 7), 1)],
         })
         .unwrap();
@@ -296,7 +296,7 @@ mod tests {
             row_count: 8,
             max_soft_wall_count: 200,
             walls: vec![],
-            entrances: vec![(0, 0)],
+            entrypoints: vec![(0, 0)],
             checkpoints: vec![((5, 5), 1), ((1, 1), 2)],
         })
         .unwrap();
@@ -334,13 +334,13 @@ mod tests {
     }
 
     #[test]
-    fn test_run_leveled_with_multiple_entrances() {
+    fn test_run_leveled_with_multiple_entrypoints() {
         let maze = Maze::new(&MazeOptions {
             col_count: 6,
             row_count: 8,
             max_soft_wall_count: 200,
             walls: vec![],
-            entrances: vec![(0, 0), (4, 4)],
+            entrypoints: vec![(0, 0), (4, 4)],
             checkpoints: vec![((5, 5), 1), ((1, 1), 2)],
         })
         .unwrap();
@@ -376,7 +376,7 @@ mod tests {
             row_count: 8,
             max_soft_wall_count: 200,
             walls: vec![],
-            entrances: vec![(0, 0)],
+            entrypoints: vec![(0, 0)],
             checkpoints: vec![((5, 5), 1), ((3, 3), 1), ((1, 1), 2)],
         })
         .unwrap();
@@ -412,7 +412,7 @@ mod tests {
             row_count: 8,
             max_soft_wall_count: 200,
             walls: vec![],
-            entrances: vec![(0, 0)],
+            entrypoints: vec![(0, 0)],
             checkpoints: vec![((0, 5), 1), ((4, 4), 1), ((5, 0), 2)],
         })
         .unwrap();
@@ -445,13 +445,13 @@ mod tests {
     }
 
     #[test]
-    fn test_run_leveled_many_entrances_checkpoints_and_walls() {
+    fn test_run_leveled_many_entrypoints_checkpoints_and_walls() {
         let maze = Maze::new(&MazeOptions {
             col_count: 9,
             row_count: 9,
             max_soft_wall_count: 200,
             walls: vec![(0, 7), (1, 7), (1, 4)],
-            entrances: vec![(0, 0), (0, 8)],
+            entrypoints: vec![(0, 0), (0, 8)],
             checkpoints: vec![
                 ((0, 6), 1),
                 ((4, 4), 2),
@@ -504,7 +504,7 @@ mod tests {
             row_count: 9,
             max_soft_wall_count: 200,
             walls: vec![(0, 7), (1, 7), (1, 4)],
-            entrances: vec![(0, 0), (0, 8)],
+            entrypoints: vec![(0, 0), (0, 8)],
             checkpoints: vec![
                 ((0, 6), 1),
                 ((4, 4), 2),
@@ -531,7 +531,7 @@ mod tests {
             row_count: 9,
             max_soft_wall_count: 200,
             walls: vec![(0, 7), (1, 7), (1, 4)],
-            entrances: vec![(0, 0), (0, 8)],
+            entrypoints: vec![(0, 0), (0, 8)],
             checkpoints: vec![
                 ((0, 6), 1),
                 ((3, 0), 2),
@@ -585,7 +585,7 @@ mod tests {
             row_count: 26,
             max_soft_wall_count: 200,
             walls: vec![],
-            entrances: vec![(0, 0)],
+            entrypoints: vec![(0, 0)],
             checkpoints: vec![
                 ((4, 5), 1),
                 ((150, 20), 2),

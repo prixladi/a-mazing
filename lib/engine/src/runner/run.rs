@@ -15,14 +15,14 @@ impl Run {
     pub fn execute(
         tiles: &Vec<Vec<TileKind>>,
         asc_checkpoint_levels: &Vec<i32>,
-        entrance_position: Position,
+        entrypoint_position: Position,
     ) -> Option<Run> {
         let mut nodes = Nodes::new(tiles);
-        let entrance_node = nodes.get_node_mut(&entrance_position);
-        entrance_node.set_distance(asc_checkpoint_levels[0], 0);
+        let entrypoint_node = nodes.get_node_mut(&entrypoint_position);
+        entrypoint_node.set_distance(asc_checkpoint_levels[0], 0);
 
         let mut queue = VecDeque::new();
-        queue.push_back((entrance_position, 0, 0));
+        queue.push_back((entrypoint_position, 0, 0));
 
         let (exit_position, distance) = loop {
             // if the queue is empty we can safely say that there is no solution to this maze
@@ -93,7 +93,7 @@ impl Run {
                     previous_level = current_level;
                     current_level = remaining_levels.pop()
                 }
-                None if current_node.is_entrance() => break,
+                None if current_node.is_entrypoint() => break,
                 _ => (),
             }
 

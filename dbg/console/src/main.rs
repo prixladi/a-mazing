@@ -9,7 +9,7 @@ fn main() {
         row_count: 2,
         max_soft_wall_count: 200,
         walls: vec![],
-        entrances: vec![(0, 0)],
+        entrypoints: vec![(0, 0)],
         checkpoints: vec![
             ((0, 1), 1),
             ((2, 0), 2),
@@ -30,7 +30,7 @@ fn main() {
         row_count: 26,
         max_soft_wall_count: 200,
         walls: vec![],
-        entrances: vec![(0, 0)],
+        entrypoints: vec![(0, 0)],
         checkpoints: vec![((1, 1), 19), ((2, 1), 20), ((10, 20), 23), ((20, 1), 21)],
     })
     .unwrap();
@@ -51,7 +51,7 @@ fn main() {
         row_count: 26,
         max_soft_wall_count: 200,
         walls: vec![],
-        entrances: vec![(0, 0)],
+        entrypoints: vec![(0, 0)],
         checkpoints: vec![((1, 1), 19), ((2, 1), 20), ((10, 20), 20), ((20, 1), 21)],
     })
     .unwrap();
@@ -72,7 +72,7 @@ fn main() {
         row_count: 26,
         max_soft_wall_count: 200,
         walls: vec![],
-        entrances: vec![(0, 0)],
+        entrypoints: vec![(0, 0)],
         checkpoints: vec![
             ((4, 5), 1),
             ((150, 20), 2),
@@ -122,7 +122,7 @@ fn main() {
         row_count: 26,
         max_soft_wall_count: 200,
         walls: vec![],
-        entrances: vec![(0, 0), (3, 4)],
+        entrypoints: vec![(0, 0), (3, 4)],
         checkpoints: vec![
             ((4, 5), 1),
             ((150, 20), 2),
