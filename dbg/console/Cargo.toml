@@ -5,4 +5,4 @@ authors = ["Ladislav Prix <elix78963@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-engine  = { path = "../engine" }
+engine  = { path = "../../lib/engine" }

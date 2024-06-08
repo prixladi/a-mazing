@@ -61,7 +61,7 @@ impl<'a> Runner<'a> {
         &self,
         soft_walls: &Vec<Position>,
     ) -> Result<Option<(u32, Vec<Position>)>, RunnerError> {
-        let tiles = self.get_tile_maze(soft_walls)?;
+        let tiles = self.get_tiles(soft_walls)?;
         let mut best_run: Option<Run> = None;
 
         for entrance in self.entrances.iter() {
@@ -78,7 +78,7 @@ impl<'a> Runner<'a> {
         Ok(best_run.map(|run| (run.get_distance(), run.get_solved_path())))
     }
 
-    fn get_tile_maze(
+    fn get_tiles(
         &self,
         soft_walls: &Vec<Position>,
     ) -> Result<Vec<Vec<TileKind>>, RunnerError> {

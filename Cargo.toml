@@ -1,6 +1,6 @@
 [workspace]
 members = [ 
-    "engine",
-    "console"
+    "lib/*",
+    "dbg/console",
 ]
 
