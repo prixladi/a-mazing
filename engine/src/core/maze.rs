@@ -9,8 +9,8 @@ pub struct TileDescriptor {
 }
 
 #[derive(Debug, PartialEq)]
-pub enum BoardError {
-    InvalidBoardSize {
+pub enum MazeError {
+    InvalidMazeSize {
         size: usize,
     },
     NoEntrance,
@@ -24,7 +24,7 @@ pub enum BoardError {
     },
 }
 
-pub struct BoardCreationOptions {
+pub struct MazeOptions {
     pub col_count: usize,
     pub row_count: usize,
     pub max_soft_wall_count: u32,
@@ -33,8 +33,8 @@ pub struct BoardCreationOptions {
     pub checkpoints: Vec<(Position, i32)>,
 }
 
-impl BoardCreationOptions {
-    fn ensure_valid(&self) -> Result<(), BoardError> {
+impl MazeOptions {
+    fn ensure_valid(&self) -> Result<(), MazeError> {
         let Self {
             col_count,
             row_count,
@@ -44,17 +44,17 @@ impl BoardCreationOptions {
             max_soft_wall_count: _,
         } = self;
 
-        let board_size = col_count * row_count;
-        if board_size < 4 {
-            return Err(BoardError::InvalidBoardSize { size: board_size });
+        let maze_size = col_count * row_count;
+        if maze_size < 4 {
+            return Err(MazeError::InvalidMazeSize { size: maze_size });
         }
 
         if entrances.len() == 0 {
-            return Err(BoardError::NoEntrance);
+            return Err(MazeError::NoEntrance);
         }
 
         if checkpoints.len() == 0 {
-            return Err(BoardError::NoCheckpoint);
+            return Err(MazeError::NoCheckpoint);
         }
 
         let out_of_bounds_entrances = entrances
@@ -86,7 +86,7 @@ impl BoardCreationOptions {
 
         match out_of_bounds_tiles.len() {
             0 => Ok(()),
-            _ => Err(BoardError::TileOutOfBounds {
+            _ => Err(MazeError::TileOutOfBounds {
                 tiles: out_of_bounds_tiles,
             }),
         }
@@ -94,13 +94,13 @@ impl BoardCreationOptions {
 }
 
 #[derive(Debug, PartialEq)]
-pub struct Board {
+pub struct Maze {
     tiles: Vec<Vec<TileKind>>,
     max_soft_wall_count: u32,
 }
 
-impl Board {
-    pub fn new(options: &BoardCreationOptions) -> Result<Self, BoardError> {
+impl Maze {
+    pub fn new(options: &MazeOptions) -> Result<Self, MazeError> {
         options.ensure_valid()?;
 
         let mut tiles: Vec<Vec<TileKind>> =
@@ -108,7 +108,7 @@ impl Board {
 
         for (x, y) in options.walls.iter() {
             if tiles[*x][*y] != TileKind::Empty {
-                return Err(BoardError::OverlappingTiles {
+                return Err(MazeError::OverlappingTiles {
                     position: (*x, *y),
                     kinds: (tiles[*x][*y], TileKind::Wall),
                 });
@@ -118,7 +118,7 @@ impl Board {
 
         for (x, y) in options.entrances.iter() {
             if tiles[*x][*y] != TileKind::Empty {
-                return Err(BoardError::OverlappingTiles {
+                return Err(MazeError::OverlappingTiles {
                     position: (*x, *y),
                     kinds: (tiles[*x][*y], TileKind::Entrance),
                 });
@@ -128,7 +128,7 @@ impl Board {
 
         for ((x, y), priority) in options.checkpoints.iter() {
             if tiles[*x][*y] != TileKind::Empty {
-                return Err(BoardError::OverlappingTiles {
+                return Err(MazeError::OverlappingTiles {
                     position: (*x, *y),
                     kinds: (tiles[*x][*y], TileKind::Checkpoint { level: *priority }),
                 });
@@ -157,8 +157,8 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_create_with_invalid_board_size() {
-        let board = Board::new(&BoardCreationOptions {
+    fn test_create_with_invalid_size() {
+        let maze = Maze::new(&MazeOptions {
             col_count: 1,
             row_count: 0,
             max_soft_wall_count: 5,
@@ -167,12 +167,12 @@ mod tests {
             checkpoints: vec![],
         });
 
-        assert_eq!(board, Err(BoardError::InvalidBoardSize { size: 0 }))
+        assert_eq!(maze, Err(MazeError::InvalidMazeSize { size: 0 }))
     }
 
     #[test]
     fn test_create_without_any_entrance() {
-        let board = Board::new(&BoardCreationOptions {
+        let maze = Maze::new(&MazeOptions {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
@@ -181,12 +181,12 @@ mod tests {
             checkpoints: vec![],
         });
 
-        assert_eq!(board, Err(BoardError::NoEntrance))
+        assert_eq!(maze, Err(MazeError::NoEntrance))
     }
 
     #[test]
     fn test_create_without_any_checkpoint() {
-        let board = Board::new(&BoardCreationOptions {
+        let maze = Maze::new(&MazeOptions {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
@@ -195,12 +195,12 @@ mod tests {
             checkpoints: vec![],
         });
 
-        assert_eq!(board, Err(BoardError::NoCheckpoint))
+        assert_eq!(maze, Err(MazeError::NoCheckpoint))
     }
 
     #[test]
     fn test_create_with_wall_out_of_bounds() {
-        let board = Board::new(&BoardCreationOptions {
+        let maze = Maze::new(&MazeOptions {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
@@ -210,8 +210,8 @@ mod tests {
         });
 
         assert_eq!(
-            board,
-            Err(BoardError::TileOutOfBounds {
+            maze,
+            Err(MazeError::TileOutOfBounds {
                 tiles: vec![TileDescriptor {
                     position: (5, 5),
                     kind: TileKind::Wall
@@ -222,7 +222,7 @@ mod tests {
 
     #[test]
     fn test_create_with_entrance_out_of_bounds() {
-        let board = Board::new(&BoardCreationOptions {
+        let maze = Maze::new(&MazeOptions {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
@@ -232,8 +232,8 @@ mod tests {
         });
 
         assert_eq!(
-            board,
-            Err(BoardError::TileOutOfBounds {
+            maze,
+            Err(MazeError::TileOutOfBounds {
                 tiles: vec![TileDescriptor {
                     position: (3, 3),
                     kind: TileKind::Entrance
@@ -244,7 +244,7 @@ mod tests {
 
     #[test]
     fn test_create_with_checkpoint_out_of_bounds() {
-        let board = Board::new(&BoardCreationOptions {
+        let maze = Maze::new(&MazeOptions {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
@@ -254,8 +254,8 @@ mod tests {
         });
 
         assert_eq!(
-            board,
-            Err(BoardError::TileOutOfBounds {
+            maze,
+            Err(MazeError::TileOutOfBounds {
                 tiles: vec![TileDescriptor {
                     position: (77, 77),
                     kind: TileKind::Checkpoint { level: 1 }
@@ -266,7 +266,7 @@ mod tests {
 
     #[test]
     fn test_create_with_overlapping_wall_and_entrance() {
-        let board = Board::new(&BoardCreationOptions {
+        let maze = Maze::new(&MazeOptions {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
@@ -276,8 +276,8 @@ mod tests {
         });
 
         assert_eq!(
-            board,
-            Err(BoardError::OverlappingTiles {
+            maze,
+            Err(MazeError::OverlappingTiles {
                 position: (0, 0),
                 kinds: (TileKind::Wall, TileKind::Entrance)
             })
@@ -286,7 +286,7 @@ mod tests {
 
     #[test]
     fn test_create_with_overlapping_wall_and_checkpoint() {
-        let board = Board::new(&BoardCreationOptions {
+        let maze = Maze::new(&MazeOptions {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
@@ -296,8 +296,8 @@ mod tests {
         });
 
         assert_eq!(
-            board,
-            Err(BoardError::OverlappingTiles {
+            maze,
+            Err(MazeError::OverlappingTiles {
                 position: (1, 1),
                 kinds: (TileKind::Wall, TileKind::Checkpoint { level: 1 })
             })
@@ -305,8 +305,8 @@ mod tests {
     }
 
     #[test]
-    fn test_create_basic_board() {
-        let board = Board::new(&BoardCreationOptions {
+    fn test_create_basic() {
+        let maze = Maze::new(&MazeOptions {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
@@ -316,8 +316,8 @@ mod tests {
         });
 
         assert_eq!(
-            board,
-            Ok(Board {
+            maze,
+            Ok(Maze {
                 tiles: vec![
                     vec![TileKind::Empty, TileKind::Wall],
                     vec![TileKind::Entrance, TileKind::Checkpoint { level: 1 }]
@@ -329,7 +329,7 @@ mod tests {
 
     #[test]
     fn test_create_with_multiple_checkpoints() {
-        let board = Board::new(&BoardCreationOptions {
+        let maze = Maze::new(&MazeOptions {
             col_count: 3,
             row_count: 3,
             max_soft_wall_count: 5,
@@ -339,8 +339,8 @@ mod tests {
         });
 
         assert_eq!(
-            board,
-            Ok(Board {
+            maze,
+            Ok(Maze {
                 tiles: vec![
                     vec![TileKind::Empty, TileKind::Wall, TileKind::Empty],
                     vec![

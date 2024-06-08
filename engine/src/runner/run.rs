@@ -25,10 +25,10 @@ impl Run {
         queue.push_back((entrance_position, 0, 0));
 
         let (exit_position, distance) = loop {
-            // if the queue is empty we can safely say that there is no solution to this board
+            // if the queue is empty we can safely say that there is no solution to this maze
             let (current_position, current_distance, current_level_index) = queue.pop_front()?;
 
-            // this means we entered checkpoint of the last layer and the board is solved
+            // this means we entered checkpoint of the last layer and the maze is solved
             if current_level_index >= asc_checkpoint_levels.len() {
                 break (current_position, current_distance);
             }
@@ -83,7 +83,7 @@ impl Run {
         loop {
             iterations_remaining -= 1;
             if iterations_remaining <= 0 {
-                panic!("Unable to get solved path for solved board run! Too many iterations.");
+                panic!("Unable to get solved path for solved maze run! Too many iterations.");
             }
 
             let current_node = best_path.last().unwrap();
@@ -100,7 +100,7 @@ impl Run {
             let neighbor = self
                 .evaluated_nodes
                 .get_lowest_distance_neighbor(&current_node.get_position(), previous_level.unwrap())
-                .expect("Expected to find lowest distance neighbor for solved board run!");
+                .expect("Expected to find lowest distance neighbor for solved maze run!");
 
             best_path.push(neighbor);
         }

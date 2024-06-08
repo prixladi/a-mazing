@@ -81,7 +81,7 @@ mod tests {
     use crate::core::tile::TileKind;
 
     #[test]
-    fn test_nodes_get_node_from_board() {
+    fn test_nodes_get_node_from_maze() {
         let nodes = Nodes::new(&vec![
             vec![TileKind::Entrance, TileKind::Empty],
             vec![TileKind::Wall, TileKind::Checkpoint { level: 1 }],
@@ -104,7 +104,7 @@ mod tests {
     }
 
     #[test]
-    fn test_nodes_get_neighbors_on_the_edge_of_board() {
+    fn test_nodes_get_neighbors_on_the_edge_of_maze() {
         let nodes = Nodes::new(&vec![
             vec![TileKind::Entrance, TileKind::Empty],
             vec![TileKind::Wall, TileKind::Checkpoint { level: 1 }],
@@ -116,7 +116,7 @@ mod tests {
     }
 
     #[test]
-    fn test_nodes_get_neighbors_in_the_center_of_board() {
+    fn test_nodes_get_neighbors_in_the_center_of_maze() {
         let nodes = Nodes::new(&vec![
             vec![TileKind::Empty, TileKind::Empty, TileKind::Empty],
             vec![TileKind::Empty, TileKind::Empty, TileKind::Empty],

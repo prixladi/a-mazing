@@ -1,10 +1,10 @@
 use engine::{
-    core::board::{Board, BoardCreationOptions},
+    core::maze::{Maze, MazeOptions},
     runner::runner::Runner,
 };
 
 fn main() {
-    let board = Board::new(&BoardCreationOptions {
+    let maze = Maze::new(&MazeOptions {
         col_count: 7,
         row_count: 2,
         max_soft_wall_count: 200,
@@ -20,12 +20,12 @@ fn main() {
     })
     .unwrap();
 
-    let runner = Runner::new(&board);
+    let runner = Runner::new(&maze);
     let result = runner.run(&vec![]).unwrap().unwrap();
 
     println!("{:?}", result.0);
 
-    let board = Board::new(&BoardCreationOptions {
+    let maze = Maze::new(&MazeOptions {
         col_count: 23,
         row_count: 26,
         max_soft_wall_count: 200,
@@ -35,18 +35,18 @@ fn main() {
     })
     .unwrap();
 
-    let runner = Runner::new(&board);
+    let runner = Runner::new(&maze);
     let result = runner.run(&vec![]).unwrap().unwrap();
     println!("{:?}", result.0);
 
-    let runner = Runner::new(&board);
+    let runner = Runner::new(&maze);
     let result = runner
         .run(&vec![(19, 1), (21, 1), (19, 0), (20, 2)])
         .unwrap()
         .unwrap();
     println!("{:?}", result.0);
 
-    let board = Board::new(&BoardCreationOptions {
+    let maze = Maze::new(&MazeOptions {
         col_count: 23,
         row_count: 26,
         max_soft_wall_count: 200,
@@ -56,18 +56,18 @@ fn main() {
     })
     .unwrap();
 
-    let runner = Runner::new(&board);
+    let runner = Runner::new(&maze);
     let result = runner.run(&vec![]).unwrap().unwrap();
     println!("{:?}", result.0);
 
-    let runner = Runner::new(&board);
+    let runner = Runner::new(&maze);
     let result = runner
         .run(&vec![(19, 1), (21, 1), (19, 0), (20, 2)])
         .unwrap()
         .unwrap();
     println!("{:?}", result.0);
 
-    let board = Board::new(&BoardCreationOptions {
+    let maze = Maze::new(&MazeOptions {
         col_count: 210,
         row_count: 26,
         max_soft_wall_count: 200,
@@ -102,22 +102,22 @@ fn main() {
     })
     .unwrap();
 
-    let runner = Runner::new(&board);
+    let runner = Runner::new(&maze);
     let result = runner.run(&vec![]).unwrap().unwrap();
     println!("{:?}", result.0);
 
-    let runner = Runner::new(&board);
+    let runner = Runner::new(&maze);
     let result = runner
         .run(&vec![(205, 1), (207, 1), (206, 0), (205, 2)])
         .unwrap()
         .unwrap();
     println!("{:?}", result.0);
 
-    let runner = Runner::new(&board);
+    let runner = Runner::new(&maze);
     let result = runner.run(&vec![(7, 6)]).unwrap().unwrap();
     println!("{:?}", result.0);
 
-    let board = Board::new(&BoardCreationOptions {
+    let maze = Maze::new(&MazeOptions {
         col_count: 210,
         row_count: 26,
         max_soft_wall_count: 200,
@@ -152,22 +152,22 @@ fn main() {
     })
     .unwrap();
 
-    let runner = Runner::new(&board);
+    let runner = Runner::new(&maze);
     let result = runner.run(&vec![]).unwrap().unwrap();
     println!("{:?}", result.0);
 
-    let runner = Runner::new(&board);
+    let runner = Runner::new(&maze);
     let result = runner
         .run(&vec![(205, 1), (207, 1), (206, 0), (205, 2)])
         .unwrap()
         .unwrap();
     println!("{:?}", result.0);
 
-    let runner = Runner::new(&board);
+    let runner = Runner::new(&maze);
     let result = runner.run(&vec![(7, 6)]).unwrap().unwrap();
     println!("{:?}", result.0);
 
-    let runner = Runner::new(&board);
+    let runner = Runner::new(&maze);
     let result = runner
         .run(&vec![
             (2, 0),

@@ -1,5 +1,5 @@
 use crate::{
-    core::{board::Board, tile::TileKind},
+    core::{maze::Maze, tile::TileKind},
     Position,
 };
 
@@ -13,14 +13,14 @@ pub enum RunnerError {
 }
 
 pub struct Runner<'a> {
-    board: &'a Board,
+    maze: &'a Maze,
     entrances: Vec<Position>,
     asc_checkpoint_levels: Vec<i32>,
 }
 
 impl<'a> Runner<'a> {
-    pub fn new(board: &'a Board) -> Self {
-        let entrances = board
+    pub fn new(maze: &'a Maze) -> Self {
+        let entrances = maze
             .get_tiles()
             .iter()
             .enumerate()
@@ -32,7 +32,7 @@ impl<'a> Runner<'a> {
             })
             .collect();
 
-        let mut checkpoint_levels: Vec<i32> = board
+        let mut checkpoint_levels: Vec<i32> = maze
             .get_tiles()
             .iter()
             .flat_map(|row| {
@@ -51,7 +51,7 @@ impl<'a> Runner<'a> {
         checkpoint_levels.dedup();
 
         Self {
-            board,
+            maze,
             entrances,
             asc_checkpoint_levels: checkpoint_levels,
         }
@@ -61,7 +61,7 @@ impl<'a> Runner<'a> {
         &self,
         soft_walls: &Vec<Position>,
     ) -> Result<Option<(u32, Vec<Position>)>, RunnerError> {
-        let tiles = self.get_tile_board(soft_walls)?;
+        let tiles = self.get_tile_maze(soft_walls)?;
         let mut best_run: Option<Run> = None;
 
         for entrance in self.entrances.iter() {
@@ -78,18 +78,18 @@ impl<'a> Runner<'a> {
         Ok(best_run.map(|run| (run.get_distance(), run.get_solved_path())))
     }
 
-    fn get_tile_board(
+    fn get_tile_maze(
         &self,
         soft_walls: &Vec<Position>,
     ) -> Result<Vec<Vec<TileKind>>, RunnerError> {
-        let max_soft_wall_count = self.board.get_max_soft_wall_count();
+        let max_soft_wall_count = self.maze.get_max_soft_wall_count();
         if max_soft_wall_count < soft_walls.len() as u32 {
             return Err(RunnerError::TooManySoftWalls {
                 limit: max_soft_wall_count,
             });
         }
 
-        let mut tiles: Vec<Vec<TileKind>> = self.board.get_tiles().clone();
+        let mut tiles: Vec<Vec<TileKind>> = self.maze.get_tiles().clone();
         for (x, y) in soft_walls {
             if *x >= tiles.len() {
                 return Err(RunnerError::WallOutOfBounds { position: (*x, *y) });
@@ -110,14 +110,14 @@ impl<'a> Runner<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::core::board::BoardCreationOptions;
+    use crate::core::maze::MazeOptions;
 
     // Note this useful idiom: importing names from outer (for mod tests) scope.
     use super::*;
 
     #[test]
     fn test_run_basic() {
-        let board = Board::new(&BoardCreationOptions {
+        let maze = Maze::new(&MazeOptions {
             col_count: 8,
             row_count: 8,
             max_soft_wall_count: 200,
@@ -127,7 +127,7 @@ mod tests {
         })
         .unwrap();
 
-        let runner = Runner::new(&board);
+        let runner = Runner::new(&maze);
         let result = runner.run(&vec![]).unwrap();
 
         assert_eq!(
@@ -157,7 +157,7 @@ mod tests {
 
     #[test]
     fn test_run_basic_with_many_walls() {
-        let board = Board::new(&BoardCreationOptions {
+        let maze = Maze::new(&MazeOptions {
             col_count: 8,
             row_count: 8,
             max_soft_wall_count: 200,
@@ -167,7 +167,7 @@ mod tests {
         })
         .unwrap();
 
-        let runner = Runner::new(&board);
+        let runner = Runner::new(&maze);
         let result = runner
             .run(&vec![
                 (2, 0),
@@ -225,7 +225,7 @@ mod tests {
 
     #[test]
     fn test_run_basic_with_inaccessible_checkpoint() {
-        let board = Board::new(&BoardCreationOptions {
+        let maze = Maze::new(&MazeOptions {
             col_count: 8,
             row_count: 8,
             max_soft_wall_count: 200,
@@ -235,7 +235,7 @@ mod tests {
         })
         .unwrap();
 
-        let runner = Runner::new(&board);
+        let runner = Runner::new(&maze);
         let result = runner
             .run(&vec![
                 (2, 0),
@@ -254,7 +254,7 @@ mod tests {
 
     #[test]
     fn test_run_basic_with_multiple_entrances() {
-        let board = Board::new(&BoardCreationOptions {
+        let maze = Maze::new(&MazeOptions {
             col_count: 8,
             row_count: 8,
             max_soft_wall_count: 200,
@@ -264,7 +264,7 @@ mod tests {
         })
         .unwrap();
 
-        let runner = Runner::new(&board);
+        let runner = Runner::new(&maze);
         let result = runner
             .run(&vec![
                 (2, 0),
@@ -291,7 +291,7 @@ mod tests {
 
     #[test]
     fn test_run_leveled() {
-        let board = Board::new(&BoardCreationOptions {
+        let maze = Maze::new(&MazeOptions {
             col_count: 6,
             row_count: 8,
             max_soft_wall_count: 200,
@@ -301,7 +301,7 @@ mod tests {
         })
         .unwrap();
 
-        let runner = Runner::new(&board);
+        let runner = Runner::new(&maze);
         let result = runner.run(&vec![]).unwrap();
 
         assert_eq!(
@@ -335,7 +335,7 @@ mod tests {
 
     #[test]
     fn test_run_leveled_with_multiple_entrances() {
-        let board = Board::new(&BoardCreationOptions {
+        let maze = Maze::new(&MazeOptions {
             col_count: 6,
             row_count: 8,
             max_soft_wall_count: 200,
@@ -345,7 +345,7 @@ mod tests {
         })
         .unwrap();
 
-        let runner = Runner::new(&board);
+        let runner = Runner::new(&maze);
         let result = runner.run(&vec![]).unwrap();
 
         assert_eq!(
@@ -371,7 +371,7 @@ mod tests {
 
     #[test]
     fn test_run_leveled_with_duplicate_checkpoints_0() {
-        let board = Board::new(&BoardCreationOptions {
+        let maze = Maze::new(&MazeOptions {
             col_count: 7,
             row_count: 8,
             max_soft_wall_count: 200,
@@ -381,7 +381,7 @@ mod tests {
         })
         .unwrap();
 
-        let runner = Runner::new(&board);
+        let runner = Runner::new(&maze);
         let result = runner.run(&vec![]).unwrap();
 
         assert_eq!(
@@ -407,7 +407,7 @@ mod tests {
 
     #[test]
     fn test_run_leveled_with_duplicate_checkpoints_1() {
-        let board = Board::new(&BoardCreationOptions {
+        let maze = Maze::new(&MazeOptions {
             col_count: 7,
             row_count: 8,
             max_soft_wall_count: 200,
@@ -417,7 +417,7 @@ mod tests {
         })
         .unwrap();
 
-        let runner = Runner::new(&board);
+        let runner = Runner::new(&maze);
         let result = runner.run(&vec![]).unwrap();
 
         assert_eq!(
@@ -446,7 +446,7 @@ mod tests {
 
     #[test]
     fn test_run_leveled_many_entrances_checkpoints_and_walls() {
-        let board = Board::new(&BoardCreationOptions {
+        let maze = Maze::new(&MazeOptions {
             col_count: 9,
             row_count: 9,
             max_soft_wall_count: 200,
@@ -463,7 +463,7 @@ mod tests {
         })
         .unwrap();
 
-        let runner = Runner::new(&board);
+        let runner = Runner::new(&maze);
         let result = runner.run(&vec![(1, 6), (1, 5)]).unwrap();
 
         assert_eq!(
@@ -499,7 +499,7 @@ mod tests {
 
     #[test]
     fn test_run_leveled_inaccessible_checkpoint() {
-        let board = Board::new(&BoardCreationOptions {
+        let maze = Maze::new(&MazeOptions {
             col_count: 9,
             row_count: 9,
             max_soft_wall_count: 200,
@@ -516,7 +516,7 @@ mod tests {
         })
         .unwrap();
 
-        let runner = Runner::new(&board);
+        let runner = Runner::new(&maze);
         let result = runner
             .run(&vec![(1, 6), (1, 5), (5, 4), (3, 4), (4, 5), (4, 3)])
             .unwrap();
@@ -526,7 +526,7 @@ mod tests {
 
     #[test]
     fn test_run_leveled_inaccessible_checkpoint_but_it_has_duplicate() {
-        let board = Board::new(&BoardCreationOptions {
+        let maze = Maze::new(&MazeOptions {
             col_count: 9,
             row_count: 9,
             max_soft_wall_count: 200,
@@ -544,7 +544,7 @@ mod tests {
         })
         .unwrap();
 
-        let runner = Runner::new(&board);
+        let runner = Runner::new(&maze);
         let result = runner
             .run(&vec![(1, 6), (1, 5), (5, 4), (3, 4), (4, 5), (4, 3)])
             .unwrap();
@@ -579,8 +579,8 @@ mod tests {
     }
 
     #[test]
-    fn test_run_leveled_big_board() {
-        let board = Board::new(&BoardCreationOptions {
+    fn test_run_leveled_big_maze() {
+        let maze = Maze::new(&MazeOptions {
             col_count: 210,
             row_count: 26,
             max_soft_wall_count: 200,
@@ -615,7 +615,7 @@ mod tests {
         })
         .unwrap();
 
-        let runner = Runner::new(&board);
+        let runner = Runner::new(&maze);
         let (distance, _) = runner
             .run(&vec![(205, 1), (207, 1), (206, 0), (205, 2)])
             .unwrap()
