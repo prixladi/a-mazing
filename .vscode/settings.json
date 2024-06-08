@@ -1,4 +1,7 @@
 {
   "editor.inlayHints.enabled": "offUnlessPressed",
-  "cSpell.words": ["Deque"]
+  "cSpell.words": [
+    "bindgen",
+    "Deque"
+  ]
 }
