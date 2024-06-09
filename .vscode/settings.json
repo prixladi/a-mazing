@@ -2,6 +2,9 @@
   "editor.inlayHints.enabled": "offUnlessPressed",
   "cSpell.words": [
     "bindgen",
-    "Deque"
+    "clsx",
+    "Deque",
+    "lucide",
+    "tailwindcss"
   ]
 }
