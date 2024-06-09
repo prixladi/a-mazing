@@ -69,19 +69,16 @@ impl<'a> Runner<'a> {
 
             if let Some(new) = current_run {
                 best_run = match best_run {
-                    Some(old) if old.get_distance() <= new.get_distance() => Some(old),
+                    Some(old) if old.get_score() <= new.get_score() => Some(old),
                     _ => Some(new),
                 };
             }
         }
 
-        Ok(best_run.map(|run| (run.get_distance(), run.get_solved_path())))
+        Ok(best_run.map(|run| (run.get_score(), run.get_solved_path())))
     }
 
-    fn get_tiles(
-        &self,
-        soft_walls: &Vec<Position>,
-    ) -> Result<Vec<Vec<TileKind>>, RunnerError> {
+    fn get_tiles(&self, soft_walls: &Vec<Position>) -> Result<Vec<Vec<TileKind>>, RunnerError> {
         let max_soft_wall_count = self.maze.get_max_soft_wall_count();
         if max_soft_wall_count < soft_walls.len() as u32 {
             return Err(RunnerError::TooManySoftWalls {

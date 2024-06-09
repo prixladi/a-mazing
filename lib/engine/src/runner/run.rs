@@ -79,7 +79,7 @@ impl Run {
         let mut previous_level = remaining_levels.pop();
         let mut current_level = remaining_levels.pop();
 
-        let mut iterations_remaining = self.get_distance() + 2;
+        let mut iterations_remaining = self.distance + 2;
         loop {
             iterations_remaining -= 1;
             if iterations_remaining <= 0 {
@@ -112,7 +112,8 @@ impl Run {
             .collect()
     }
 
-    pub fn get_distance(&self) -> u32 {
+    pub fn get_score(&self) -> u32 {
+        // now score equates to distance but in the future it could deviate with modifiers usage
         self.distance
     }
 }
