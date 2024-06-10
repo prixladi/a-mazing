@@ -1,4 +1,4 @@
-use crate::{core::tile::TileKind, Position};
+use crate::{core::tile::TileBoard, Position};
 
 use super::node::Node;
 
@@ -8,7 +8,7 @@ pub struct Nodes {
 }
 
 impl Nodes {
-    pub fn new(tiles: &Vec<Vec<TileKind>>) -> Self {
+    pub fn new(tiles: &TileBoard) -> Self {
         let nodes = tiles
             .iter()
             .enumerate()

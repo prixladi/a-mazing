@@ -1,5 +1,8 @@
 use crate::{
-    core::{maze::Maze, tile::TileKind},
+    core::{
+        maze::Maze,
+        tile::{TileBoard, TileKind},
+    },
     Position,
 };
 
@@ -14,24 +17,11 @@ pub enum RunnerError {
 
 pub struct Runner<'a> {
     maze: &'a Maze,
-    entrypoints: Vec<Position>,
-    asc_checkpoint_levels: Vec<i32>,
+    ascending_checkpoint_levels: Vec<i32>,
 }
 
 impl<'a> Runner<'a> {
     pub fn new(maze: &'a Maze) -> Self {
-        let entrypoints = maze
-            .get_tiles()
-            .iter()
-            .enumerate()
-            .flat_map(|(x, row)| {
-                row.iter()
-                    .enumerate()
-                    .filter(|(_, kind)| **kind == TileKind::Entrypoint)
-                    .map(move |(y, _)| (x, y))
-            })
-            .collect();
-
         let mut checkpoint_levels: Vec<i32> = maze
             .get_tiles()
             .iter()
@@ -52,20 +42,17 @@ impl<'a> Runner<'a> {
 
         Self {
             maze,
-            entrypoints,
-            asc_checkpoint_levels: checkpoint_levels,
+            ascending_checkpoint_levels: checkpoint_levels,
         }
     }
 
-    pub fn run(
-        &self,
-        soft_walls: &Vec<Position>,
-    ) -> Result<Option<(u32, Vec<Position>)>, RunnerError> {
-        let tiles = self.get_tiles(soft_walls)?;
+    pub fn run(&self, soft_walls: &Vec<Position>) -> Result<Option<Run>, RunnerError> {
+        let board = self.get_board_with_soft_walls(soft_walls)?;
+        let entrypoints = self.maze.get_entrypoints();
         let mut best_run: Option<Run> = None;
 
-        for entrypoint in self.entrypoints.iter() {
-            let current_run = Run::execute(&tiles, &self.asc_checkpoint_levels, *entrypoint);
+        for entrypoint in entrypoints.iter() {
+            let current_run = Run::execute(&board, &self.ascending_checkpoint_levels, *entrypoint);
 
             if let Some(new) = current_run {
                 best_run = match best_run {
@@ -75,10 +62,13 @@ impl<'a> Runner<'a> {
             }
         }
 
-        Ok(best_run.map(|run| (run.get_score(), run.get_solved_path())))
+        Ok(best_run)
     }
 
-    fn get_tiles(&self, soft_walls: &Vec<Position>) -> Result<Vec<Vec<TileKind>>, RunnerError> {
+    fn get_board_with_soft_walls(
+        &self,
+        soft_walls: &Vec<Position>,
+    ) -> Result<TileBoard, RunnerError> {
         let max_soft_wall_count = self.maze.get_max_soft_wall_count();
         if max_soft_wall_count < soft_walls.len() as u32 {
             return Err(RunnerError::TooManySoftWalls {
@@ -86,7 +76,7 @@ impl<'a> Runner<'a> {
             });
         }
 
-        let mut tiles: Vec<Vec<TileKind>> = self.maze.get_tiles().clone();
+        let mut tiles: TileBoard = self.maze.get_tiles().clone();
         for (x, y) in soft_walls {
             if *x >= tiles.len() {
                 return Err(RunnerError::WallOutOfBounds { position: (*x, *y) });
@@ -125,30 +115,29 @@ mod tests {
         .unwrap();
 
         let runner = Runner::new(&maze);
-        let result = runner.run(&vec![]).unwrap();
+        let result = runner.run(&vec![]).unwrap().unwrap();
+
+        assert_eq!(result.get_score(), 14);
 
         assert_eq!(
-            result,
-            Some((
-                14,
-                vec![
-                    (0, 0),
-                    (1, 0),
-                    (2, 0),
-                    (3, 0),
-                    (4, 0),
-                    (5, 0),
-                    (6, 0),
-                    (7, 0),
-                    (7, 1),
-                    (7, 2),
-                    (7, 3),
-                    (7, 4),
-                    (7, 5),
-                    (7, 6),
-                    (7, 7)
-                ]
-            ))
+            result.get_solved_path(),
+            vec![
+                (0, 0),
+                (1, 0),
+                (2, 0),
+                (3, 0),
+                (4, 0),
+                (5, 0),
+                (6, 0),
+                (7, 0),
+                (7, 1),
+                (7, 2),
+                (7, 3),
+                (7, 4),
+                (7, 5),
+                (7, 6),
+                (7, 7)
+            ]
         )
     }
 
@@ -181,43 +170,43 @@ mod tests {
                 (4, 3),
                 (4, 2),
             ])
+            .unwrap()
             .unwrap();
 
+        assert_eq!(result.get_score(), 26);
+
         assert_eq!(
-            result,
-            Some((
-                26,
-                vec![
-                    (0, 0),
-                    (1, 0),
-                    (1, 1),
-                    (1, 2),
-                    (1, 3),
-                    (1, 4),
-                    (1, 5),
-                    (1, 6),
-                    (1, 7),
-                    (2, 7),
-                    (3, 7),
-                    (3, 6),
-                    (3, 5),
-                    (3, 4),
-                    (3, 3),
-                    (3, 2),
-                    (3, 1),
-                    (4, 1),
-                    (5, 1),
-                    (6, 1),
-                    (7, 1),
-                    (7, 2),
-                    (7, 3),
-                    (7, 4),
-                    (7, 5),
-                    (7, 6),
-                    (7, 7)
-                ]
-            ))
-        )
+            result.get_solved_path(),
+            vec![
+                (0, 0),
+                (1, 0),
+                (1, 1),
+                (1, 2),
+                (1, 3),
+                (1, 4),
+                (1, 5),
+                (1, 6),
+                (1, 7),
+                (2, 7),
+                (3, 7),
+                (3, 6),
+                (3, 5),
+                (3, 4),
+                (3, 3),
+                (3, 2),
+                (3, 1),
+                (4, 1),
+                (5, 1),
+                (6, 1),
+                (7, 1),
+                (7, 2),
+                (7, 3),
+                (7, 4),
+                (7, 5),
+                (7, 6),
+                (7, 7)
+            ]
+        );
     }
 
     #[test]
@@ -246,7 +235,7 @@ mod tests {
             ])
             .unwrap();
 
-        assert_eq!(result, None);
+        assert!(result.is_none());
     }
 
     #[test]
@@ -278,11 +267,13 @@ mod tests {
                 (4, 3),
                 (4, 2),
             ])
+            .unwrap()
             .unwrap();
 
+        assert_eq!(result.get_score(), 4);
         assert_eq!(
-            result,
-            Some((4, vec![(5, 5), (6, 5), (7, 5), (7, 6), (7, 7)]))
+            result.get_solved_path(),
+            vec![(5, 5), (6, 5), (7, 5), (7, 6), (7, 7)]
         )
     }
 
@@ -299,35 +290,34 @@ mod tests {
         .unwrap();
 
         let runner = Runner::new(&maze);
-        let result = runner.run(&vec![]).unwrap();
+        let result = runner.run(&vec![]).unwrap().unwrap();
+
+        assert_eq!(result.get_score(), 18);
 
         assert_eq!(
-            result,
-            Some((
-                18,
-                vec![
-                    (0, 0),
-                    (1, 0),
-                    (2, 0),
-                    (3, 0),
-                    (4, 0),
-                    (5, 0),
-                    (5, 1),
-                    (5, 2),
-                    (5, 3),
-                    (5, 4),
-                    (5, 5),
-                    (4, 5),
-                    (3, 5),
-                    (2, 5),
-                    (1, 5),
-                    (1, 4),
-                    (1, 3),
-                    (1, 2),
-                    (1, 1)
-                ]
-            ))
-        )
+            result.get_solved_path(),
+            vec![
+                (0, 0),
+                (1, 0),
+                (2, 0),
+                (3, 0),
+                (4, 0),
+                (5, 0),
+                (5, 1),
+                (5, 2),
+                (5, 3),
+                (5, 4),
+                (5, 5),
+                (4, 5),
+                (3, 5),
+                (2, 5),
+                (1, 5),
+                (1, 4),
+                (1, 3),
+                (1, 2),
+                (1, 1)
+            ]
+        );
     }
 
     #[test]
@@ -343,27 +333,26 @@ mod tests {
         .unwrap();
 
         let runner = Runner::new(&maze);
-        let result = runner.run(&vec![]).unwrap();
+        let result = runner.run(&vec![]).unwrap().unwrap();
+
+        assert_eq!(result.get_score(), 10);
 
         assert_eq!(
-            result,
-            Some((
-                10,
-                vec![
-                    (4, 4),
-                    (5, 4),
-                    (5, 5),
-                    (4, 5),
-                    (3, 5),
-                    (2, 5),
-                    (1, 5),
-                    (1, 4),
-                    (1, 3),
-                    (1, 2),
-                    (1, 1)
-                ]
-            ))
-        )
+            result.get_solved_path(),
+            vec![
+                (4, 4),
+                (5, 4),
+                (5, 5),
+                (4, 5),
+                (3, 5),
+                (2, 5),
+                (1, 5),
+                (1, 4),
+                (1, 3),
+                (1, 2),
+                (1, 1)
+            ]
+        );
     }
 
     #[test]
@@ -379,26 +368,25 @@ mod tests {
         .unwrap();
 
         let runner = Runner::new(&maze);
-        let result = runner.run(&vec![]).unwrap();
+        let result = runner.run(&vec![]).unwrap().unwrap();
+
+        assert_eq!(result.get_score(), 10);
 
         assert_eq!(
-            result,
-            Some((
-                10,
-                vec![
-                    (0, 0),
-                    (1, 0),
-                    (2, 0),
-                    (3, 0),
-                    (3, 1),
-                    (3, 2),
-                    (3, 3),
-                    (2, 3),
-                    (1, 3),
-                    (1, 2),
-                    (1, 1)
-                ]
-            ))
+            result.get_solved_path(),
+            vec![
+                (0, 0),
+                (1, 0),
+                (2, 0),
+                (3, 0),
+                (3, 1),
+                (3, 2),
+                (3, 3),
+                (2, 3),
+                (1, 3),
+                (1, 2),
+                (1, 1)
+            ]
         )
     }
 
@@ -415,30 +403,29 @@ mod tests {
         .unwrap();
 
         let runner = Runner::new(&maze);
-        let result = runner.run(&vec![]).unwrap();
+        let result = runner.run(&vec![]).unwrap().unwrap();
+
+        assert_eq!(result.get_score(), 13);
 
         assert_eq!(
-            result,
-            Some((
-                13,
-                vec![
-                    (0, 0),
-                    (1, 0),
-                    (2, 0),
-                    (3, 0),
-                    (4, 0),
-                    (4, 1),
-                    (4, 2),
-                    (4, 3),
-                    (4, 4),
-                    (5, 4),
-                    (5, 3),
-                    (5, 2),
-                    (5, 1),
-                    (5, 0)
-                ]
-            ))
-        )
+            result.get_solved_path(),
+            vec![
+                (0, 0),
+                (1, 0),
+                (2, 0),
+                (3, 0),
+                (4, 0),
+                (4, 1),
+                (4, 2),
+                (4, 3),
+                (4, 4),
+                (5, 4),
+                (5, 3),
+                (5, 2),
+                (5, 1),
+                (5, 0)
+            ]
+        );
     }
 
     #[test]
@@ -461,37 +448,36 @@ mod tests {
         .unwrap();
 
         let runner = Runner::new(&maze);
-        let result = runner.run(&vec![(1, 6), (1, 5)]).unwrap();
+        let result = runner.run(&vec![(1, 6), (1, 5)]).unwrap().unwrap();
+
+        assert_eq!(result.get_score(), 20);
 
         assert_eq!(
-            result,
-            Some((
-                20,
-                vec![
-                    (0, 0),
-                    (0, 1),
-                    (0, 2),
-                    (0, 3),
-                    (0, 4),
-                    (0, 5),
-                    (0, 6),
-                    (0, 5),
-                    (0, 4),
-                    (0, 3),
-                    (1, 3),
-                    (2, 3),
-                    (3, 3),
-                    (4, 3),
-                    (4, 4),
-                    (5, 4),
-                    (5, 3),
-                    (5, 2),
-                    (5, 1),
-                    (5, 0),
-                    (6, 0)
-                ]
-            ))
-        )
+            result.get_solved_path(),
+            vec![
+                (0, 0),
+                (0, 1),
+                (0, 2),
+                (0, 3),
+                (0, 4),
+                (0, 5),
+                (0, 6),
+                (0, 5),
+                (0, 4),
+                (0, 3),
+                (1, 3),
+                (2, 3),
+                (3, 3),
+                (4, 3),
+                (4, 4),
+                (5, 4),
+                (5, 3),
+                (5, 2),
+                (5, 1),
+                (5, 0),
+                (6, 0)
+            ]
+        );
     }
 
     #[test]
@@ -518,7 +504,7 @@ mod tests {
             .run(&vec![(1, 6), (1, 5), (5, 4), (3, 4), (4, 5), (4, 3)])
             .unwrap();
 
-        assert_eq!(result, None)
+        assert!(result.is_none());
     }
 
     #[test]
@@ -544,35 +530,34 @@ mod tests {
         let runner = Runner::new(&maze);
         let result = runner
             .run(&vec![(1, 6), (1, 5), (5, 4), (3, 4), (4, 5), (4, 3)])
+            .unwrap()
             .unwrap();
 
+        assert_eq!(result.get_score(), 18);
         assert_eq!(
-            result,
-            Some((
-                18,
-                vec![
-                    (0, 0),
-                    (0, 1),
-                    (0, 2),
-                    (0, 3),
-                    (0, 4),
-                    (0, 5),
-                    (0, 6),
-                    (0, 5),
-                    (0, 4),
-                    (0, 3),
-                    (1, 3),
-                    (2, 3),
-                    (3, 3),
-                    (3, 2),
-                    (3, 1),
-                    (3, 0),
-                    (4, 0),
-                    (5, 0),
-                    (6, 0)
-                ]
-            ))
-        )
+            result.get_solved_path(),
+            vec![
+                (0, 0),
+                (0, 1),
+                (0, 2),
+                (0, 3),
+                (0, 4),
+                (0, 5),
+                (0, 6),
+                (0, 5),
+                (0, 4),
+                (0, 3),
+                (1, 3),
+                (2, 3),
+                (3, 3),
+                (3, 2),
+                (3, 1),
+                (3, 0),
+                (4, 0),
+                (5, 0),
+                (6, 0)
+            ]
+        );
     }
 
     #[test]
@@ -613,11 +598,11 @@ mod tests {
         .unwrap();
 
         let runner = Runner::new(&maze);
-        let (distance, _) = runner
+        let run = runner
             .run(&vec![(205, 1), (207, 1), (206, 0), (205, 2)])
             .unwrap()
             .unwrap();
 
-        assert_eq!(distance, 1985)
+        assert_eq!(run.get_score(), 1985)
     }
 }

@@ -57,10 +57,11 @@ impl Mazer {
         let runner = Runner::new(&self.maze);
         let result = runner.run(&walls).unwrap();
 
-        return result.map(|(score, path)| {
+        return result.map(|run| {
             MazerRunResult::new(
-                score,
-                path.iter()
+                run.get_score(),
+                run.get_solved_path()
+                    .iter()
                     .cloned()
                     .map(|(x, y)| MazerPosition::new(x, y))
                     .collect(),

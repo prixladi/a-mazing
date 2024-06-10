@@ -5,3 +5,5 @@ pub enum TileKind {
     Wall,
     Checkpoint { level: i32 },
 }
+
+pub type TileBoard = Vec<Vec<TileKind>>;

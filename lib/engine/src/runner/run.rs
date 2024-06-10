@@ -1,6 +1,6 @@
 use std::collections::VecDeque;
 
-use crate::{core::tile::TileKind, Position};
+use crate::{core::tile::TileBoard, Position};
 
 use super::nodes::Nodes;
 
@@ -13,13 +13,13 @@ pub struct Run {
 
 impl Run {
     pub fn execute(
-        tiles: &Vec<Vec<TileKind>>,
-        asc_checkpoint_levels: &Vec<i32>,
+        tiles: &TileBoard,
+        ascending_checkpoint_levels: &Vec<i32>,
         entrypoint_position: Position,
     ) -> Option<Run> {
         let mut nodes = Nodes::new(tiles);
         let entrypoint_node = nodes.get_node_mut(&entrypoint_position);
-        entrypoint_node.set_distance(asc_checkpoint_levels[0], 0);
+        entrypoint_node.set_distance(ascending_checkpoint_levels[0], 0);
 
         let mut queue = VecDeque::new();
         queue.push_back((entrypoint_position, 0, 0));
@@ -29,11 +29,11 @@ impl Run {
             let (current_position, current_distance, current_level_index) = queue.pop_front()?;
 
             // this means we entered checkpoint of the last layer and the maze is solved
-            if current_level_index >= asc_checkpoint_levels.len() {
+            if current_level_index >= ascending_checkpoint_levels.len() {
                 break (current_position, current_distance);
             }
 
-            let current_level = asc_checkpoint_levels[current_level_index];
+            let current_level = ascending_checkpoint_levels[current_level_index];
             nodes
                 .get_neighbors_positions(&current_position)
                 .iter()
@@ -50,9 +50,9 @@ impl Run {
                     if neighbor.is_checkpoint(current_level) {
                         neighbor_level_index += 1;
 
-                        // if we progress to the next level we need to set checkpoint distance for next level as a entrypoint
-                        if neighbor_level_index < asc_checkpoint_levels.len() {
-                            let next_level = asc_checkpoint_levels[neighbor_level_index];
+                        // if we progress to the next level we need to set checkpoint distance for next level as a entrypoint for that level
+                        if neighbor_level_index < ascending_checkpoint_levels.len() {
+                            let next_level = ascending_checkpoint_levels[neighbor_level_index];
                             neighbor.set_distance_if_not_set(next_level, neighbor_distance);
                         }
                     }
@@ -63,7 +63,7 @@ impl Run {
         };
 
         Some(Self {
-            asc_checkpoint_levels: asc_checkpoint_levels.clone(),
+            asc_checkpoint_levels: ascending_checkpoint_levels.clone(),
             exit_position,
             evaluated_nodes: nodes,
             distance,

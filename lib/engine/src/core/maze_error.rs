@@ -15,9 +15,7 @@ pub enum MazeError {
     },
     NoEntrypoint,
     NoCheckpoint,
-    TileOutOfBounds {
-        tiles: Vec<TileDescriptor>,
-    },
+    TileOutOfBounds(TileDescriptor),
     OverlappingTiles {
         position: Position,
         kinds: (TileKind, TileKind),
