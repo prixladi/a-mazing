@@ -1,6 +1,6 @@
 use std::collections::VecDeque;
 
-use crate::{core::tile::TileBoard, Position};
+use crate::core::tile::{Position, TileBoard};
 
 use super::nodes::Nodes;
 
@@ -15,14 +15,14 @@ impl Run {
     pub fn execute(
         tiles: &TileBoard,
         ascending_checkpoint_levels: &Vec<i32>,
-        entrypoint_position: Position,
+        entrypoint_position: &Position,
     ) -> Option<Run> {
         let mut nodes = Nodes::new(tiles);
-        let entrypoint_node = nodes.get_node_mut(&entrypoint_position);
+        let entrypoint_node = nodes.get_node_mut(entrypoint_position);
         entrypoint_node.set_distance(ascending_checkpoint_levels[0], 0);
 
         let mut queue = VecDeque::new();
-        queue.push_back((entrypoint_position, 0, 0));
+        queue.push_back((*entrypoint_position, 0, 0));
 
         let (exit_position, distance) = loop {
             // if the queue is empty we can safely say that there is no solution to this maze
@@ -109,6 +109,7 @@ impl Run {
             .iter()
             .rev()
             .map(|node| node.get_position())
+            .copied()
             .collect()
     }
 

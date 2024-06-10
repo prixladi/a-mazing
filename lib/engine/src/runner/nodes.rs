@@ -1,4 +1,4 @@
-use crate::{core::tile::TileBoard, Position};
+use crate::core::tile::{Position, TileBoard};
 
 use super::node::Node;
 
@@ -15,7 +15,7 @@ impl Nodes {
             .map(|(x, row)| {
                 row.iter()
                     .enumerate()
-                    .map(|(y, kind)| Node::new(*kind, (x, y)))
+                    .map(|(y, kind)| Node::new(*kind, Position { x, y }))
                     .collect()
             })
             .collect();
@@ -23,29 +23,29 @@ impl Nodes {
         Self { data: nodes }
     }
 
-    pub fn get_node(&self, (x, y): &Position) -> &Node {
-        &self.data[*x][*y]
+    pub fn get_node(&self, position: &Position) -> &Node {
+        &self.data[position.x][position.y]
     }
 
-    pub fn get_node_mut(&mut self, (x, y): &Position) -> &mut Node {
-        &mut self.data[*x][*y]
+    pub fn get_node_mut(&mut self, position: &Position) -> &mut Node {
+        &mut self.data[position.x][position.y]
     }
 
-    pub fn get_neighbors_positions(&self, (x, y): &Position) -> Vec<Position> {
+    pub fn get_neighbors_positions(&self, &Position { x, y }: &Position) -> Vec<Position> {
         let mut neighbors = Vec::with_capacity(4);
 
         if y + 1 < self.data[0].len() {
-            neighbors.push((*x, y + 1));
+            neighbors.push(Position { x, y: y + 1 });
         }
-        if *y > 0 {
-            neighbors.push((*x, y - 1));
+        if y > 0 {
+            neighbors.push(Position { x, y: y - 1 });
         }
 
         if x + 1 < self.data.len() {
-            neighbors.push((x + 1, *y));
+            neighbors.push(Position { x: x + 1, y });
         }
-        if *x > 0 {
-            neighbors.push((x - 1, *y));
+        if x > 0 {
+            neighbors.push(Position { x: x - 1, y });
         }
 
         return neighbors;
@@ -87,9 +87,12 @@ mod tests {
             vec![TileKind::Wall, TileKind::Checkpoint { level: 1 }],
         ]);
 
-        let node = nodes.get_node(&(1, 1));
+        let node = nodes.get_node(&Position { x: 1, y: 1 });
 
-        assert_eq!(node, &Node::new(TileKind::Checkpoint { level: 1 }, (1, 1)))
+        assert_eq!(
+            node,
+            &Node::new(TileKind::Checkpoint { level: 1 }, Position { x: 1, y: 1 })
+        )
     }
 
     #[test]
@@ -100,7 +103,7 @@ mod tests {
             vec![TileKind::Wall, TileKind::Checkpoint { level: 1 }],
         ]);
 
-        nodes.get_node(&(5, 1));
+        nodes.get_node(&Position { x: 5, y: 1 });
     }
 
     #[test]
@@ -110,9 +113,12 @@ mod tests {
             vec![TileKind::Wall, TileKind::Checkpoint { level: 1 }],
         ]);
 
-        let neighbors = nodes.get_neighbors_positions(&(0, 1));
+        let neighbors = nodes.get_neighbors_positions(&Position { x: 0, y: 1 });
 
-        assert_eq!(neighbors, vec![(0, 0), (1, 1)])
+        assert_eq!(
+            neighbors,
+            vec![Position { x: 0, y: 0 }, Position { x: 1, y: 1 }]
+        )
     }
 
     #[test]
@@ -123,8 +129,16 @@ mod tests {
             vec![TileKind::Empty, TileKind::Empty, TileKind::Empty],
         ]);
 
-        let neighbors = nodes.get_neighbors_positions(&(1, 1));
+        let neighbors = nodes.get_neighbors_positions(&Position { x: 1, y: 1 });
 
-        assert_eq!(neighbors, vec![(1, 2), (1, 0), (2, 1), (0, 1),])
+        assert_eq!(
+            neighbors,
+            vec![
+                Position { x: 1, y: 2 },
+                Position { x: 1, y: 0 },
+                Position { x: 2, y: 1 },
+                Position { x: 0, y: 1 },
+            ]
+        )
     }
 }

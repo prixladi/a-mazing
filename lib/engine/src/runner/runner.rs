@@ -1,9 +1,6 @@
-use crate::{
-    core::{
-        maze::Maze,
-        tile::{TileBoard, TileKind},
-    },
-    Position,
+use crate::core::{
+    maze::Maze,
+    tile::{Position, TileBoard, TileKind},
 };
 
 use super::run::Run;
@@ -52,7 +49,7 @@ impl<'a> Runner<'a> {
         let mut best_run: Option<Run> = None;
 
         for entrypoint in entrypoints.iter() {
-            let current_run = Run::execute(&board, &self.ascending_checkpoint_levels, *entrypoint);
+            let current_run = Run::execute(&board, &self.ascending_checkpoint_levels, entrypoint);
 
             if let Some(new) = current_run {
                 best_run = match best_run {
@@ -77,18 +74,24 @@ impl<'a> Runner<'a> {
         }
 
         let mut tiles: TileBoard = self.maze.get_tiles().clone();
-        for (x, y) in soft_walls {
-            if *x >= tiles.len() {
-                return Err(RunnerError::WallOutOfBounds { position: (*x, *y) });
+        for &Position { x, y } in soft_walls {
+            if x >= tiles.len() {
+                return Err(RunnerError::WallOutOfBounds {
+                    position: Position { x, y },
+                });
             }
-            if *y >= tiles[*x].len() {
-                return Err(RunnerError::WallOutOfBounds { position: (*x, *y) });
+            if y >= tiles[x].len() {
+                return Err(RunnerError::WallOutOfBounds {
+                    position: Position { x, y },
+                });
             }
-            if tiles[*x][*y] != TileKind::Empty {
-                return Err(RunnerError::OverlappingWall { position: (*x, *y) });
+            if tiles[x][y] != TileKind::Empty {
+                return Err(RunnerError::OverlappingWall {
+                    position: Position { x, y },
+                });
             }
 
-            tiles[*x as usize][*y as usize] = TileKind::Wall
+            tiles[x][y] = TileKind::Wall
         }
 
         return Ok(tiles);
@@ -97,7 +100,7 @@ impl<'a> Runner<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::core::maze_configuration::MazeConfiguration;
+    use crate::core::{maze_configuration::MazeConfiguration, tile::Checkpoint};
 
     // Note this useful idiom: importing names from outer (for mod tests) scope.
     use super::*;
@@ -109,8 +112,11 @@ mod tests {
             row_count: 8,
             max_soft_wall_count: 200,
             walls: vec![],
-            entrypoints: vec![(0, 0)],
-            checkpoints: vec![((7, 7), 1)],
+            entrypoints: vec![Position { x: 0, y: 0 }],
+            checkpoints: vec![Checkpoint {
+                position: Position { x: 7, y: 7 },
+                level: 1,
+            }],
         })
         .unwrap();
 
@@ -122,21 +128,21 @@ mod tests {
         assert_eq!(
             result.get_solved_path(),
             vec![
-                (0, 0),
-                (1, 0),
-                (2, 0),
-                (3, 0),
-                (4, 0),
-                (5, 0),
-                (6, 0),
-                (7, 0),
-                (7, 1),
-                (7, 2),
-                (7, 3),
-                (7, 4),
-                (7, 5),
-                (7, 6),
-                (7, 7)
+                Position { x: 0, y: 0 },
+                Position { x: 1, y: 0 },
+                Position { x: 2, y: 0 },
+                Position { x: 3, y: 0 },
+                Position { x: 4, y: 0 },
+                Position { x: 5, y: 0 },
+                Position { x: 6, y: 0 },
+                Position { x: 7, y: 0 },
+                Position { x: 7, y: 1 },
+                Position { x: 7, y: 2 },
+                Position { x: 7, y: 3 },
+                Position { x: 7, y: 4 },
+                Position { x: 7, y: 5 },
+                Position { x: 7, y: 6 },
+                Position { x: 7, y: 7 }
             ]
         )
     }
@@ -148,27 +154,30 @@ mod tests {
             row_count: 8,
             max_soft_wall_count: 200,
             walls: vec![],
-            entrypoints: vec![(0, 0)],
-            checkpoints: vec![((7, 7), 1)],
+            entrypoints: vec![Position { x: 0, y: 0 }],
+            checkpoints: vec![Checkpoint {
+                position: Position { x: 7, y: 7 },
+                level: 1,
+            }],
         })
         .unwrap();
 
         let runner = Runner::new(&maze);
         let result = runner
             .run(&vec![
-                (2, 0),
-                (2, 1),
-                (2, 2),
-                (2, 3),
-                (2, 4),
-                (2, 5),
-                (2, 6),
-                (4, 7),
-                (4, 6),
-                (4, 5),
-                (4, 4),
-                (4, 3),
-                (4, 2),
+                Position { x: 2, y: 0 },
+                Position { x: 2, y: 1 },
+                Position { x: 2, y: 2 },
+                Position { x: 2, y: 3 },
+                Position { x: 2, y: 4 },
+                Position { x: 2, y: 5 },
+                Position { x: 2, y: 6 },
+                Position { x: 4, y: 7 },
+                Position { x: 4, y: 6 },
+                Position { x: 4, y: 5 },
+                Position { x: 4, y: 4 },
+                Position { x: 4, y: 3 },
+                Position { x: 4, y: 2 },
             ])
             .unwrap()
             .unwrap();
@@ -178,33 +187,33 @@ mod tests {
         assert_eq!(
             result.get_solved_path(),
             vec![
-                (0, 0),
-                (1, 0),
-                (1, 1),
-                (1, 2),
-                (1, 3),
-                (1, 4),
-                (1, 5),
-                (1, 6),
-                (1, 7),
-                (2, 7),
-                (3, 7),
-                (3, 6),
-                (3, 5),
-                (3, 4),
-                (3, 3),
-                (3, 2),
-                (3, 1),
-                (4, 1),
-                (5, 1),
-                (6, 1),
-                (7, 1),
-                (7, 2),
-                (7, 3),
-                (7, 4),
-                (7, 5),
-                (7, 6),
-                (7, 7)
+                Position { x: 0, y: 0 },
+                Position { x: 1, y: 0 },
+                Position { x: 1, y: 1 },
+                Position { x: 1, y: 2 },
+                Position { x: 1, y: 3 },
+                Position { x: 1, y: 4 },
+                Position { x: 1, y: 5 },
+                Position { x: 1, y: 6 },
+                Position { x: 1, y: 7 },
+                Position { x: 2, y: 7 },
+                Position { x: 3, y: 7 },
+                Position { x: 3, y: 6 },
+                Position { x: 3, y: 5 },
+                Position { x: 3, y: 4 },
+                Position { x: 3, y: 3 },
+                Position { x: 3, y: 2 },
+                Position { x: 3, y: 1 },
+                Position { x: 4, y: 1 },
+                Position { x: 5, y: 1 },
+                Position { x: 6, y: 1 },
+                Position { x: 7, y: 1 },
+                Position { x: 7, y: 2 },
+                Position { x: 7, y: 3 },
+                Position { x: 7, y: 4 },
+                Position { x: 7, y: 5 },
+                Position { x: 7, y: 6 },
+                Position { x: 7, y: 7 }
             ]
         );
     }
@@ -216,22 +225,25 @@ mod tests {
             row_count: 8,
             max_soft_wall_count: 200,
             walls: vec![],
-            entrypoints: vec![(0, 0)],
-            checkpoints: vec![((7, 7), 1)],
+            entrypoints: vec![Position { x: 0, y: 0 }],
+            checkpoints: vec![Checkpoint {
+                position: Position { x: 7, y: 7 },
+                level: 1,
+            }],
         })
         .unwrap();
 
         let runner = Runner::new(&maze);
         let result = runner
             .run(&vec![
-                (2, 0),
-                (2, 1),
-                (2, 2),
-                (2, 3),
-                (2, 4),
-                (2, 5),
-                (2, 6),
-                (2, 7),
+                Position { x: 2, y: 0 },
+                Position { x: 2, y: 1 },
+                Position { x: 2, y: 2 },
+                Position { x: 2, y: 3 },
+                Position { x: 2, y: 4 },
+                Position { x: 2, y: 5 },
+                Position { x: 2, y: 6 },
+                Position { x: 2, y: 7 },
             ])
             .unwrap();
 
@@ -245,27 +257,30 @@ mod tests {
             row_count: 8,
             max_soft_wall_count: 200,
             walls: vec![],
-            entrypoints: vec![(0, 0), (5, 5)],
-            checkpoints: vec![((7, 7), 1)],
+            entrypoints: vec![Position { x: 0, y: 0 }, Position { x: 5, y: 5 }],
+            checkpoints: vec![Checkpoint {
+                position: Position { x: 7, y: 7 },
+                level: 1,
+            }],
         })
         .unwrap();
 
         let runner = Runner::new(&maze);
         let result = runner
             .run(&vec![
-                (2, 0),
-                (2, 1),
-                (2, 2),
-                (2, 3),
-                (2, 4),
-                (2, 5),
-                (2, 6),
-                (4, 7),
-                (4, 6),
-                (4, 5),
-                (4, 4),
-                (4, 3),
-                (4, 2),
+                Position { x: 2, y: 0 },
+                Position { x: 2, y: 1 },
+                Position { x: 2, y: 2 },
+                Position { x: 2, y: 3 },
+                Position { x: 2, y: 4 },
+                Position { x: 2, y: 5 },
+                Position { x: 2, y: 6 },
+                Position { x: 4, y: 7 },
+                Position { x: 4, y: 6 },
+                Position { x: 4, y: 5 },
+                Position { x: 4, y: 4 },
+                Position { x: 4, y: 3 },
+                Position { x: 4, y: 2 },
             ])
             .unwrap()
             .unwrap();
@@ -273,7 +288,13 @@ mod tests {
         assert_eq!(result.get_score(), 4);
         assert_eq!(
             result.get_solved_path(),
-            vec![(5, 5), (6, 5), (7, 5), (7, 6), (7, 7)]
+            vec![
+                Position { x: 5, y: 5 },
+                Position { x: 6, y: 5 },
+                Position { x: 7, y: 5 },
+                Position { x: 7, y: 6 },
+                Position { x: 7, y: 7 }
+            ]
         )
     }
 
@@ -284,8 +305,17 @@ mod tests {
             row_count: 8,
             max_soft_wall_count: 200,
             walls: vec![],
-            entrypoints: vec![(0, 0)],
-            checkpoints: vec![((5, 5), 1), ((1, 1), 2)],
+            entrypoints: vec![Position { x: 0, y: 0 }],
+            checkpoints: vec![
+                Checkpoint {
+                    position: Position { x: 5, y: 5 },
+                    level: 1,
+                },
+                Checkpoint {
+                    position: Position { x: 1, y: 1 },
+                    level: 2,
+                },
+            ],
         })
         .unwrap();
 
@@ -297,25 +327,25 @@ mod tests {
         assert_eq!(
             result.get_solved_path(),
             vec![
-                (0, 0),
-                (1, 0),
-                (2, 0),
-                (3, 0),
-                (4, 0),
-                (5, 0),
-                (5, 1),
-                (5, 2),
-                (5, 3),
-                (5, 4),
-                (5, 5),
-                (4, 5),
-                (3, 5),
-                (2, 5),
-                (1, 5),
-                (1, 4),
-                (1, 3),
-                (1, 2),
-                (1, 1)
+                Position { x: 0, y: 0 },
+                Position { x: 1, y: 0 },
+                Position { x: 2, y: 0 },
+                Position { x: 3, y: 0 },
+                Position { x: 4, y: 0 },
+                Position { x: 5, y: 0 },
+                Position { x: 5, y: 1 },
+                Position { x: 5, y: 2 },
+                Position { x: 5, y: 3 },
+                Position { x: 5, y: 4 },
+                Position { x: 5, y: 5 },
+                Position { x: 4, y: 5 },
+                Position { x: 3, y: 5 },
+                Position { x: 2, y: 5 },
+                Position { x: 1, y: 5 },
+                Position { x: 1, y: 4 },
+                Position { x: 1, y: 3 },
+                Position { x: 1, y: 2 },
+                Position { x: 1, y: 1 }
             ]
         );
     }
@@ -327,8 +357,17 @@ mod tests {
             row_count: 8,
             max_soft_wall_count: 200,
             walls: vec![],
-            entrypoints: vec![(0, 0), (4, 4)],
-            checkpoints: vec![((5, 5), 1), ((1, 1), 2)],
+            entrypoints: vec![Position { x: 0, y: 0 }, Position { x: 4, y: 4 }],
+            checkpoints: vec![
+                Checkpoint {
+                    position: Position { x: 5, y: 5 },
+                    level: 1,
+                },
+                Checkpoint {
+                    position: Position { x: 1, y: 1 },
+                    level: 2,
+                },
+            ],
         })
         .unwrap();
 
@@ -340,17 +379,17 @@ mod tests {
         assert_eq!(
             result.get_solved_path(),
             vec![
-                (4, 4),
-                (5, 4),
-                (5, 5),
-                (4, 5),
-                (3, 5),
-                (2, 5),
-                (1, 5),
-                (1, 4),
-                (1, 3),
-                (1, 2),
-                (1, 1)
+                Position { x: 4, y: 4 },
+                Position { x: 5, y: 4 },
+                Position { x: 5, y: 5 },
+                Position { x: 4, y: 5 },
+                Position { x: 3, y: 5 },
+                Position { x: 2, y: 5 },
+                Position { x: 1, y: 5 },
+                Position { x: 1, y: 4 },
+                Position { x: 1, y: 3 },
+                Position { x: 1, y: 2 },
+                Position { x: 1, y: 1 }
             ]
         );
     }
@@ -362,8 +401,21 @@ mod tests {
             row_count: 8,
             max_soft_wall_count: 200,
             walls: vec![],
-            entrypoints: vec![(0, 0)],
-            checkpoints: vec![((5, 5), 1), ((3, 3), 1), ((1, 1), 2)],
+            entrypoints: vec![Position { x: 0, y: 0 }],
+            checkpoints: vec![
+                Checkpoint {
+                    position: Position { x: 5, y: 5 },
+                    level: 1,
+                },
+                Checkpoint {
+                    position: Position { x: 3, y: 3 },
+                    level: 1,
+                },
+                Checkpoint {
+                    position: Position { x: 1, y: 1 },
+                    level: 2,
+                },
+            ],
         })
         .unwrap();
 
@@ -375,17 +427,17 @@ mod tests {
         assert_eq!(
             result.get_solved_path(),
             vec![
-                (0, 0),
-                (1, 0),
-                (2, 0),
-                (3, 0),
-                (3, 1),
-                (3, 2),
-                (3, 3),
-                (2, 3),
-                (1, 3),
-                (1, 2),
-                (1, 1)
+                Position { x: 0, y: 0 },
+                Position { x: 1, y: 0 },
+                Position { x: 2, y: 0 },
+                Position { x: 3, y: 0 },
+                Position { x: 3, y: 1 },
+                Position { x: 3, y: 2 },
+                Position { x: 3, y: 3 },
+                Position { x: 2, y: 3 },
+                Position { x: 1, y: 3 },
+                Position { x: 1, y: 2 },
+                Position { x: 1, y: 1 }
             ]
         )
     }
@@ -397,8 +449,21 @@ mod tests {
             row_count: 8,
             max_soft_wall_count: 200,
             walls: vec![],
-            entrypoints: vec![(0, 0)],
-            checkpoints: vec![((0, 5), 1), ((4, 4), 1), ((5, 0), 2)],
+            entrypoints: vec![Position { x: 0, y: 0 }],
+            checkpoints: vec![
+                Checkpoint {
+                    position: Position { x: 0, y: 5 },
+                    level: 1,
+                },
+                Checkpoint {
+                    position: Position { x: 4, y: 4 },
+                    level: 1,
+                },
+                Checkpoint {
+                    position: Position { x: 5, y: 0 },
+                    level: 2,
+                },
+            ],
         })
         .unwrap();
 
@@ -410,20 +475,20 @@ mod tests {
         assert_eq!(
             result.get_solved_path(),
             vec![
-                (0, 0),
-                (1, 0),
-                (2, 0),
-                (3, 0),
-                (4, 0),
-                (4, 1),
-                (4, 2),
-                (4, 3),
-                (4, 4),
-                (5, 4),
-                (5, 3),
-                (5, 2),
-                (5, 1),
-                (5, 0)
+                Position { x: 0, y: 0 },
+                Position { x: 1, y: 0 },
+                Position { x: 2, y: 0 },
+                Position { x: 3, y: 0 },
+                Position { x: 4, y: 0 },
+                Position { x: 4, y: 1 },
+                Position { x: 4, y: 2 },
+                Position { x: 4, y: 3 },
+                Position { x: 4, y: 4 },
+                Position { x: 5, y: 4 },
+                Position { x: 5, y: 3 },
+                Position { x: 5, y: 2 },
+                Position { x: 5, y: 1 },
+                Position { x: 5, y: 0 }
             ]
         );
     }
@@ -434,48 +499,73 @@ mod tests {
             col_count: 9,
             row_count: 9,
             max_soft_wall_count: 200,
-            walls: vec![(0, 7), (1, 7), (1, 4)],
-            entrypoints: vec![(0, 0), (0, 8)],
+            walls: vec![
+                Position { x: 0, y: 7 },
+                Position { x: 1, y: 7 },
+                Position { x: 1, y: 4 },
+            ],
+            entrypoints: vec![Position { x: 0, y: 0 }, Position { x: 0, y: 8 }],
             checkpoints: vec![
-                ((0, 6), 1),
-                ((4, 4), 2),
-                ((5, 0), 3),
-                ((4, 0), 3),
-                ((6, 0), 4),
-                ((0, 1), 4),
+                Checkpoint {
+                    position: Position { x: 0, y: 6 },
+                    level: 1,
+                },
+                Checkpoint {
+                    position: Position { x: 4, y: 4 },
+                    level: 2,
+                },
+                Checkpoint {
+                    position: Position { x: 5, y: 0 },
+                    level: 3,
+                },
+                Checkpoint {
+                    position: Position { x: 4, y: 0 },
+                    level: 3,
+                },
+                Checkpoint {
+                    position: Position { x: 6, y: 0 },
+                    level: 4,
+                },
+                Checkpoint {
+                    position: Position { x: 0, y: 1 },
+                    level: 4,
+                },
             ],
         })
         .unwrap();
 
         let runner = Runner::new(&maze);
-        let result = runner.run(&vec![(1, 6), (1, 5)]).unwrap().unwrap();
+        let result = runner
+            .run(&vec![Position { x: 1, y: 6 }, Position { x: 1, y: 5 }])
+            .unwrap()
+            .unwrap();
 
         assert_eq!(result.get_score(), 20);
 
         assert_eq!(
             result.get_solved_path(),
             vec![
-                (0, 0),
-                (0, 1),
-                (0, 2),
-                (0, 3),
-                (0, 4),
-                (0, 5),
-                (0, 6),
-                (0, 5),
-                (0, 4),
-                (0, 3),
-                (1, 3),
-                (2, 3),
-                (3, 3),
-                (4, 3),
-                (4, 4),
-                (5, 4),
-                (5, 3),
-                (5, 2),
-                (5, 1),
-                (5, 0),
-                (6, 0)
+                Position { x: 0, y: 0 },
+                Position { x: 0, y: 1 },
+                Position { x: 0, y: 2 },
+                Position { x: 0, y: 3 },
+                Position { x: 0, y: 4 },
+                Position { x: 0, y: 5 },
+                Position { x: 0, y: 6 },
+                Position { x: 0, y: 5 },
+                Position { x: 0, y: 4 },
+                Position { x: 0, y: 3 },
+                Position { x: 1, y: 3 },
+                Position { x: 2, y: 3 },
+                Position { x: 3, y: 3 },
+                Position { x: 4, y: 3 },
+                Position { x: 4, y: 4 },
+                Position { x: 5, y: 4 },
+                Position { x: 5, y: 3 },
+                Position { x: 5, y: 2 },
+                Position { x: 5, y: 1 },
+                Position { x: 5, y: 0 },
+                Position { x: 6, y: 0 }
             ]
         );
     }
@@ -486,22 +576,51 @@ mod tests {
             col_count: 9,
             row_count: 9,
             max_soft_wall_count: 200,
-            walls: vec![(0, 7), (1, 7), (1, 4)],
-            entrypoints: vec![(0, 0), (0, 8)],
+            walls: vec![
+                Position { x: 0, y: 7 },
+                Position { x: 1, y: 7 },
+                Position { x: 1, y: 4 },
+            ],
+            entrypoints: vec![Position { x: 0, y: 0 }, Position { x: 0, y: 8 }],
             checkpoints: vec![
-                ((0, 6), 1),
-                ((4, 4), 2),
-                ((5, 0), 3),
-                ((4, 0), 3),
-                ((6, 0), 4),
-                ((0, 1), 4),
+                Checkpoint {
+                    position: Position { x: 0, y: 6 },
+                    level: 1,
+                },
+                Checkpoint {
+                    position: Position { x: 4, y: 4 },
+                    level: 2,
+                },
+                Checkpoint {
+                    position: Position { x: 5, y: 0 },
+                    level: 3,
+                },
+                Checkpoint {
+                    position: Position { x: 4, y: 0 },
+                    level: 3,
+                },
+                Checkpoint {
+                    position: Position { x: 6, y: 0 },
+                    level: 4,
+                },
+                Checkpoint {
+                    position: Position { x: 0, y: 1 },
+                    level: 4,
+                },
             ],
         })
         .unwrap();
 
         let runner = Runner::new(&maze);
         let result = runner
-            .run(&vec![(1, 6), (1, 5), (5, 4), (3, 4), (4, 5), (4, 3)])
+            .run(&vec![
+                Position { x: 1, y: 6 },
+                Position { x: 1, y: 5 },
+                Position { x: 5, y: 4 },
+                Position { x: 3, y: 4 },
+                Position { x: 4, y: 5 },
+                Position { x: 4, y: 3 },
+            ])
             .unwrap();
 
         assert!(result.is_none());
@@ -513,23 +632,55 @@ mod tests {
             col_count: 9,
             row_count: 9,
             max_soft_wall_count: 200,
-            walls: vec![(0, 7), (1, 7), (1, 4)],
-            entrypoints: vec![(0, 0), (0, 8)],
+            walls: vec![
+                Position { x: 0, y: 7 },
+                Position { x: 1, y: 7 },
+                Position { x: 1, y: 4 },
+            ],
+            entrypoints: vec![Position { x: 0, y: 0 }, Position { x: 0, y: 8 }],
             checkpoints: vec![
-                ((0, 6), 1),
-                ((3, 0), 2),
-                ((4, 4), 2),
-                ((5, 0), 3),
-                ((4, 0), 3),
-                ((6, 0), 4),
-                ((0, 1), 4),
+                Checkpoint {
+                    position: Position { x: 0, y: 6 },
+                    level: 1,
+                },
+                Checkpoint {
+                    position: Position { x: 3, y: 0 },
+                    level: 2,
+                },
+                Checkpoint {
+                    position: Position { x: 4, y: 4 },
+                    level: 2,
+                },
+                Checkpoint {
+                    position: Position { x: 5, y: 0 },
+                    level: 3,
+                },
+                Checkpoint {
+                    position: Position { x: 4, y: 0 },
+                    level: 3,
+                },
+                Checkpoint {
+                    position: Position { x: 6, y: 0 },
+                    level: 4,
+                },
+                Checkpoint {
+                    position: Position { x: 0, y: 1 },
+                    level: 4,
+                },
             ],
         })
         .unwrap();
 
         let runner = Runner::new(&maze);
         let result = runner
-            .run(&vec![(1, 6), (1, 5), (5, 4), (3, 4), (4, 5), (4, 3)])
+            .run(&vec![
+                Position { x: 1, y: 6 },
+                Position { x: 1, y: 5 },
+                Position { x: 5, y: 4 },
+                Position { x: 3, y: 4 },
+                Position { x: 4, y: 5 },
+                Position { x: 4, y: 3 },
+            ])
             .unwrap()
             .unwrap();
 
@@ -537,25 +688,25 @@ mod tests {
         assert_eq!(
             result.get_solved_path(),
             vec![
-                (0, 0),
-                (0, 1),
-                (0, 2),
-                (0, 3),
-                (0, 4),
-                (0, 5),
-                (0, 6),
-                (0, 5),
-                (0, 4),
-                (0, 3),
-                (1, 3),
-                (2, 3),
-                (3, 3),
-                (3, 2),
-                (3, 1),
-                (3, 0),
-                (4, 0),
-                (5, 0),
-                (6, 0)
+                Position { x: 0, y: 0 },
+                Position { x: 0, y: 1 },
+                Position { x: 0, y: 2 },
+                Position { x: 0, y: 3 },
+                Position { x: 0, y: 4 },
+                Position { x: 0, y: 5 },
+                Position { x: 0, y: 6 },
+                Position { x: 0, y: 5 },
+                Position { x: 0, y: 4 },
+                Position { x: 0, y: 3 },
+                Position { x: 1, y: 3 },
+                Position { x: 2, y: 3 },
+                Position { x: 3, y: 3 },
+                Position { x: 3, y: 2 },
+                Position { x: 3, y: 1 },
+                Position { x: 3, y: 0 },
+                Position { x: 4, y: 0 },
+                Position { x: 5, y: 0 },
+                Position { x: 6, y: 0 }
             ]
         );
     }
@@ -567,39 +718,116 @@ mod tests {
             row_count: 26,
             max_soft_wall_count: 200,
             walls: vec![],
-            entrypoints: vec![(0, 0)],
+            entrypoints: vec![Position { x: 0, y: 0 }],
             checkpoints: vec![
-                ((4, 5), 1),
-                ((150, 20), 2),
-                ((1, 1), 3),
-                ((160, 20), 4),
-                ((1, 2), 5),
-                ((10, 25), 6),
-                ((10, 21), 6),
-                ((3, 3), 7),
-                ((120, 25), 8),
-                ((4, 4), 9),
-                ((130, 25), 10),
-                ((0, 1), 10),
-                ((200, 5), 11),
-                ((1, 21), 12),
-                ((6, 6), 13),
-                ((120, 24), 14),
-                ((7, 7), 15),
-                ((8, 19), 16),
-                ((8, 8), 17),
-                ((150, 19), 18),
-                ((200, 1), 19),
-                ((202, 1), 20),
-                ((1, 20), 20),
-                ((206, 1), 21),
+                Checkpoint {
+                    position: Position { x: 4, y: 5 },
+                    level: 1,
+                },
+                Checkpoint {
+                    position: Position { x: 150, y: 20 },
+                    level: 2,
+                },
+                Checkpoint {
+                    position: Position { x: 1, y: 1 },
+                    level: 3,
+                },
+                Checkpoint {
+                    position: Position { x: 160, y: 20 },
+                    level: 4,
+                },
+                Checkpoint {
+                    position: Position { x: 1, y: 2 },
+                    level: 5,
+                },
+                Checkpoint {
+                    position: Position { x: 10, y: 25 },
+                    level: 6,
+                },
+                Checkpoint {
+                    position: Position { x: 10, y: 21 },
+                    level: 6,
+                },
+                Checkpoint {
+                    position: Position { x: 3, y: 3 },
+                    level: 7,
+                },
+                Checkpoint {
+                    position: Position { x: 120, y: 25 },
+                    level: 8,
+                },
+                Checkpoint {
+                    position: Position { x: 4, y: 4 },
+                    level: 9,
+                },
+                Checkpoint {
+                    position: Position { x: 130, y: 25 },
+                    level: 10,
+                },
+                Checkpoint {
+                    position: Position { x: 0, y: 1 },
+                    level: 10,
+                },
+                Checkpoint {
+                    position: Position { x: 200, y: 5 },
+                    level: 11,
+                },
+                Checkpoint {
+                    position: Position { x: 1, y: 21 },
+                    level: 12,
+                },
+                Checkpoint {
+                    position: Position { x: 6, y: 6 },
+                    level: 13,
+                },
+                Checkpoint {
+                    position: Position { x: 120, y: 24 },
+                    level: 14,
+                },
+                Checkpoint {
+                    position: Position { x: 7, y: 7 },
+                    level: 15,
+                },
+                Checkpoint {
+                    position: Position { x: 8, y: 19 },
+                    level: 16,
+                },
+                Checkpoint {
+                    position: Position { x: 8, y: 8 },
+                    level: 17,
+                },
+                Checkpoint {
+                    position: Position { x: 150, y: 19 },
+                    level: 18,
+                },
+                Checkpoint {
+                    position: Position { x: 200, y: 1 },
+                    level: 19,
+                },
+                Checkpoint {
+                    position: Position { x: 202, y: 1 },
+                    level: 20,
+                },
+                Checkpoint {
+                    position: Position { x: 1, y: 20 },
+                    level: 20,
+                },
+                Checkpoint {
+                    position: Position { x: 206, y: 1 },
+                    level: 21,
+                },
             ],
         })
         .unwrap();
 
         let runner = Runner::new(&maze);
         let run = runner
-            .run(&vec![(205, 1), (207, 1), (206, 0), (205, 2)])
+            .run(&vec![
+                Position { x: 205, y: 1 },
+                Position { x: 207, y: 1 },
+                Position { x: 206, y: 0 },
+                Position { x: 205, y: 2 },
+            ])
             .unwrap()
             .unwrap();
 

@@ -1,6 +1,8 @@
-use crate::Position;
-
-use super::{maze_configuration::MazeConfiguration, maze_error::MazeError, tile::TileBoard};
+use super::{
+    maze_configuration::MazeConfiguration,
+    maze_error::MazeError,
+    tile::{Position, TileBoard},
+};
 
 pub struct Maze {
     board: TileBoard,
@@ -35,7 +37,7 @@ impl Maze {
 
 #[cfg(test)]
 mod tests {
-    use crate::core::tile::TileKind;
+    use crate::core::tile::{Checkpoint, TileKind};
 
     // Note this useful idiom: importing names from outer (for mod tests) scope.
     use super::*;
@@ -46,9 +48,12 @@ mod tests {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 7,
-            walls: vec![(0, 10)],
-            entrypoints: vec![(1, 0)],
-            checkpoints: vec![((1, 1), 1)],
+            walls: vec![Position { x: 0, y: 10 }],
+            entrypoints: vec![Position { x: 1, y: 0 }],
+            checkpoints: vec![Checkpoint {
+                position: Position { x: 1, y: 1 },
+                level: 1,
+            }],
         });
 
         assert!(maze.is_err());
@@ -60,9 +65,12 @@ mod tests {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 7,
-            walls: vec![(0, 1)],
-            entrypoints: vec![(1, 0)],
-            checkpoints: vec![((1, 1), 1)],
+            walls: vec![Position { x: 0, y: 1 }],
+            entrypoints: vec![Position { x: 1, y: 0 }],
+            checkpoints: vec![Checkpoint {
+                position: Position { x: 1, y: 1 },
+                level: 1,
+            }],
         });
 
         assert_eq!(
@@ -85,9 +93,18 @@ mod tests {
             col_count: 3,
             row_count: 3,
             max_soft_wall_count: 5,
-            walls: vec![(0, 1)],
-            entrypoints: vec![(1, 0)],
-            checkpoints: vec![((1, 1), 1), ((2, 2), 2)],
+            walls: vec![Position { x: 0, y: 1 }],
+            entrypoints: vec![Position { x: 1, y: 0 }],
+            checkpoints: vec![
+                Checkpoint {
+                    position: Position { x: 1, y: 1 },
+                    level: 1,
+                },
+                Checkpoint {
+                    position: Position { x: 2, y: 2 },
+                    level: 2,
+                },
+            ],
         });
 
         assert_eq!(

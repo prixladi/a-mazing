@@ -1,6 +1,4 @@
-use crate::Position;
-
-use super::tile::TileKind;
+use super::tile::{Position, TileKind};
 
 #[derive(Debug, PartialEq)]
 pub struct TileDescriptor {

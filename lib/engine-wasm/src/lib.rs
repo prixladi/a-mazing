@@ -2,10 +2,14 @@ mod models;
 mod utils;
 
 use engine::{
-    core::{maze::Maze, maze_configuration::MazeConfiguration},
+    core::{
+        maze::Maze,
+        maze_configuration::MazeConfiguration,
+        tile::{Checkpoint, Position},
+    },
     runner::runner::Runner,
 };
-use models::{MazerOptions, MazerPosition, MazerRunResult};
+use models::{MazerConfiguration, MazerPosition, MazerRunResult};
 use utils::set_panic_hook;
 use wasm_bindgen::prelude::*;
 
@@ -16,29 +20,41 @@ pub struct Mazer {
 
 #[wasm_bindgen]
 impl Mazer {
-    pub fn new(options: MazerOptions) -> Mazer {
+    pub fn new(configuration: MazerConfiguration) -> Mazer {
         set_panic_hook();
 
         let maze = Maze::new(&MazeConfiguration {
-            col_count: options.get_col_count(),
-            row_count: options.get_row_count(),
-            max_soft_wall_count: options.get_max_soft_wall_count(),
-            walls: options
+            col_count: configuration.get_col_count(),
+            row_count: configuration.get_row_count(),
+            max_soft_wall_count: configuration.get_max_soft_wall_count(),
+            walls: configuration
                 .get_walls()
                 .iter()
-                .map(|pos| (pos.get_x(), pos.get_y()))
+                .map(|pos| Position {
+                    x: pos.get_x(),
+                    y: pos.get_y(),
+                })
                 .collect(),
-            entrypoints: options
+            entrypoints: configuration
                 .get_entrypoints()
                 .iter()
-                .map(|pos| (pos.get_x(), pos.get_y()))
+                .map(|pos| Position {
+                    x: pos.get_x(),
+                    y: pos.get_y(),
+                })
                 .collect(),
-            checkpoints: options
+            checkpoints: configuration
                 .get_checkpoints()
                 .iter()
                 .map(|checkpoint| {
-                    let position = checkpoint.get_position();
-                    ((position.get_x(), position.get_y()), checkpoint.get_level())
+                    let pos = checkpoint.get_position();
+                    Checkpoint {
+                        position: Position {
+                            x: pos.get_x(),
+                            y: pos.get_y(),
+                        },
+                        level: checkpoint.get_level(),
+                    }
                 })
                 .collect(),
         })
@@ -51,7 +67,10 @@ impl Mazer {
     pub fn run(&self, soft_walls: Vec<MazerPosition>) -> Option<MazerRunResult> {
         let walls = soft_walls
             .iter()
-            .map(|pos| (pos.get_x(), pos.get_y()))
+            .map(|pos| Position {
+                x: pos.get_x(),
+                y: pos.get_y(),
+            })
             .collect();
 
         let runner = Runner::new(&self.maze);
@@ -63,7 +82,7 @@ impl Mazer {
                 run.get_solved_path()
                     .iter()
                     .cloned()
-                    .map(|(x, y)| MazerPosition::new(x, y))
+                    .map(|Position { x, y }| MazerPosition::new(x, y))
                     .collect(),
             )
         });

@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::{core::tile::TileKind, Position};
+use crate::core::tile::{Position, TileKind};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Node {
@@ -45,18 +45,16 @@ impl Node {
         self.distances.insert(checkpoint_level, distance);
     }
 
-    
     pub fn set_distance_if_not_set(&mut self, checkpoint_level: i32, distance: u32) {
         if !self.has_distance(checkpoint_level) {
             self.set_distance(checkpoint_level, distance);
         }
     }
 
-    pub fn get_position(&self) -> Position {
-        self.position
+    pub fn get_position(&self) -> &Position {
+        &self.position
     }
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -64,9 +62,9 @@ mod tests {
 
     #[test]
     fn test_empty_node_methods() {
-        let node = Node::new(TileKind::Empty, (1, 1));
+        let node = Node::new(TileKind::Empty, Position { x: 1, y: 1 });
 
-        assert_eq!(node.get_position(), (1, 1));
+        assert_eq!(node.get_position(), &Position { x: 1, y: 1 });
         assert_eq!(node.can_enter(), true);
         assert_eq!(node.has_distance(1), false);
         assert_eq!(node.get_distance(1), None);
@@ -76,9 +74,9 @@ mod tests {
 
     #[test]
     fn test_entrypoint_node_methods() {
-        let node = Node::new(TileKind::Entrypoint, (2, 2));
+        let node = Node::new(TileKind::Entrypoint, Position { x: 2, y: 2 });
 
-        assert_eq!(node.get_position(), (2, 2));
+        assert_eq!(node.get_position(), &Position { x: 2, y: 2 });
         assert_eq!(node.can_enter(), true);
         assert_eq!(node.has_distance(1), false);
         assert_eq!(node.get_distance(1), None);
@@ -88,9 +86,9 @@ mod tests {
 
     #[test]
     fn test_checkpoint_node_methods() {
-        let node = Node::new(TileKind::Checkpoint { level: 1 }, (2, 2));
+        let node = Node::new(TileKind::Checkpoint { level: 1 }, Position { x: 2, y: 2 });
 
-        assert_eq!(node.get_position(), (2, 2));
+        assert_eq!(node.get_position(), &Position { x: 2, y: 2 });
         assert_eq!(node.can_enter(), true);
         assert_eq!(node.has_distance(1), false);
         assert_eq!(node.get_distance(1), None);
@@ -101,9 +99,9 @@ mod tests {
 
     #[test]
     fn test_node_wall_node_methods() {
-        let node = Node::new(TileKind::Wall, (2, 2));
+        let node = Node::new(TileKind::Wall, Position { x: 2, y: 2 });
 
-        assert_eq!(node.get_position(), (2, 2));
+        assert_eq!(node.get_position(), &Position { x: 2, y: 2 });
         assert_eq!(node.can_enter(), false);
         assert_eq!(node.has_distance(1), false);
         assert_eq!(node.get_distance(1), None);
@@ -113,11 +111,11 @@ mod tests {
 
     #[test]
     fn test_node_distance_mutation_methods() {
-        let mut node = Node::new(TileKind::Empty, (2, 2));
+        let mut node = Node::new(TileKind::Empty, Position { x: 2, y: 2 });
 
         assert_eq!(node.has_distance(1), false);
         assert_eq!(node.get_distance(1), None);
-        node.set_distance(1,5);
+        node.set_distance(1, 5);
         assert_eq!(node.has_distance(1), true);
         assert_eq!(node.get_distance(1), Some(5));
         assert_eq!(node.has_distance(2), false);

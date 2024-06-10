@@ -1,8 +1,6 @@
-use crate::Position;
-
 use super::{
     maze_error::{MazeError, TileDescriptor},
-    tile::{TileBoard, TileKind},
+    tile::{Checkpoint, Position, TileBoard, TileKind},
 };
 
 #[derive(Debug, PartialEq)]
@@ -12,7 +10,7 @@ pub struct MazeConfiguration {
     pub max_soft_wall_count: u32,
     pub walls: Vec<Position>,
     pub entrypoints: Vec<Position>,
-    pub checkpoints: Vec<(Position, i32)>,
+    pub checkpoints: Vec<Checkpoint>,
 }
 
 impl MazeConfiguration {
@@ -32,56 +30,57 @@ impl MazeConfiguration {
 
         let mut board: TileBoard = vec![vec![TileKind::Empty; self.row_count]; self.col_count];
 
-        for (x, y) in self.walls.iter() {
-            if *x >= self.col_count || *y >= self.row_count {
+        for &Position { x, y } in self.walls.iter() {
+            if x >= self.col_count || y >= self.row_count {
                 return Err(MazeError::TileOutOfBounds(TileDescriptor {
-                    position: (*x, *y),
+                    position: Position { x, y },
                     kind: TileKind::Wall,
                 }));
             }
 
-            if board[*x][*y] != TileKind::Empty {
+            if board[x][y] != TileKind::Empty {
                 return Err(MazeError::OverlappingTiles {
-                    position: (*x, *y),
-                    kinds: (board[*x][*y], TileKind::Wall),
+                    position: Position { x, y },
+                    kinds: (board[x][y], TileKind::Wall),
                 });
             }
-            board[*x][*y] = TileKind::Wall;
+            board[x][y] = TileKind::Wall;
         }
 
-        for (x, y) in self.entrypoints.iter() {
-            if *x >= self.col_count || *y >= self.row_count {
+        for &Position { x, y } in self.entrypoints.iter() {
+            if x >= self.col_count || y >= self.row_count {
                 return Err(MazeError::TileOutOfBounds(TileDescriptor {
-                    position: (*x, *y),
+                    position: Position { x, y },
                     kind: TileKind::Entrypoint,
                 }));
             }
 
-            if board[*x][*y] != TileKind::Empty {
+            if board[x][y] != TileKind::Empty {
                 return Err(MazeError::OverlappingTiles {
-                    position: (*x, *y),
-                    kinds: (board[*x][*y], TileKind::Entrypoint),
+                    position: Position { x, y },
+                    kinds: (board[x][y], TileKind::Entrypoint),
                 });
             }
 
-            board[*x][*y] = TileKind::Entrypoint;
+            board[x][y] = TileKind::Entrypoint;
         }
 
-        for ((x, y), priority) in self.checkpoints.iter() {
-            if *x >= self.col_count || *y >= self.row_count {
+        for Checkpoint { position, level } in self.checkpoints.iter().cloned() {
+            let Position { x, y } = position;
+            if x >= self.col_count || y >= self.row_count {
                 return Err(MazeError::TileOutOfBounds(TileDescriptor {
-                    position: (*x, *y),
-                    kind: TileKind::Checkpoint { level: *priority },
+                    position: Position { x, y },
+                    kind: TileKind::Checkpoint { level },
                 }));
             }
 
-            if board[*x][*y] != TileKind::Empty {
+            if board[x][y] != TileKind::Empty {
                 return Err(MazeError::OverlappingTiles {
-                    position: (*x, *y),
-                    kinds: (board[*x][*y], TileKind::Checkpoint { level: *priority }),
+                    position: Position { x, y },
+                    kinds: (board[x][y], TileKind::Checkpoint { level }),
                 });
             }
-            board[*x][*y] = TileKind::Checkpoint { level: *priority };
+            board[x][y] = TileKind::Checkpoint { level };
         }
 
         Ok(board)
@@ -134,7 +133,7 @@ mod tests {
             row_count: 2,
             max_soft_wall_count: 5,
             walls: vec![],
-            entrypoints: vec![(0, 0)],
+            entrypoints: vec![Position { x: 0, y: 0 }],
             checkpoints: vec![],
         };
 
@@ -149,9 +148,12 @@ mod tests {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
-            walls: vec![(5, 5)],
-            entrypoints: vec![(0, 0)],
-            checkpoints: vec![((1, 1), 1)],
+            walls: vec![Position { x: 5, y: 5 }],
+            entrypoints: vec![Position { x: 0, y: 0 }],
+            checkpoints: vec![Checkpoint {
+                position: Position { x: 1, y: 1 },
+                level: 1,
+            }],
         };
 
         let board = configuration.validate_and_convert_to_board();
@@ -159,7 +161,7 @@ mod tests {
         assert_eq!(
             board,
             Err(MazeError::TileOutOfBounds(TileDescriptor {
-                position: (5, 5),
+                position: Position { x: 5, y: 5 },
                 kind: TileKind::Wall
             }))
         )
@@ -171,9 +173,12 @@ mod tests {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
-            walls: vec![(1, 0)],
-            entrypoints: vec![(3, 3)],
-            checkpoints: vec![((1, 1), 1)],
+            walls: vec![Position { x: 1, y: 0 }],
+            entrypoints: vec![Position { x: 3, y: 3 }],
+            checkpoints: vec![Checkpoint {
+                position: Position { x: 1, y: 1 },
+                level: 1,
+            }],
         };
 
         let board = configuration.validate_and_convert_to_board();
@@ -181,7 +186,7 @@ mod tests {
         assert_eq!(
             board,
             Err(MazeError::TileOutOfBounds(TileDescriptor {
-                position: (3, 3),
+                position: Position { x: 3, y: 3 },
                 kind: TileKind::Entrypoint
             }))
         )
@@ -193,9 +198,12 @@ mod tests {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
-            walls: vec![(1, 0)],
-            entrypoints: vec![(0, 0)],
-            checkpoints: vec![((77, 77), 1)],
+            walls: vec![Position { x: 1, y: 0 }],
+            entrypoints: vec![Position { x: 0, y: 0 }],
+            checkpoints: vec![Checkpoint {
+                position: Position { x: 77, y: 77 },
+                level: 1,
+            }],
         };
 
         let board = configuration.validate_and_convert_to_board();
@@ -203,7 +211,7 @@ mod tests {
         assert_eq!(
             board,
             Err(MazeError::TileOutOfBounds(TileDescriptor {
-                position: (77, 77),
+                position: Position { x: 77, y: 77 },
                 kind: TileKind::Checkpoint { level: 1 }
             }))
         )
@@ -215,9 +223,12 @@ mod tests {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
-            walls: vec![(0, 0)],
-            entrypoints: vec![(0, 0)],
-            checkpoints: vec![((1, 1), 1)],
+            walls: vec![Position { x: 0, y: 0 }],
+            entrypoints: vec![Position { x: 0, y: 0 }],
+            checkpoints: vec![Checkpoint {
+                position: Position { x: 1, y: 1 },
+                level: 1,
+            }],
         };
 
         let board = configuration.validate_and_convert_to_board();
@@ -225,7 +236,7 @@ mod tests {
         assert_eq!(
             board,
             Err(MazeError::OverlappingTiles {
-                position: (0, 0),
+                position: Position { x: 0, y: 0 },
                 kinds: (TileKind::Wall, TileKind::Entrypoint)
             })
         )
@@ -237,9 +248,12 @@ mod tests {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
-            walls: vec![(1, 1)],
-            entrypoints: vec![(1, 0)],
-            checkpoints: vec![((1, 1), 1)],
+            walls: vec![Position { x: 1, y: 1 }],
+            entrypoints: vec![Position { x: 1, y: 0 }],
+            checkpoints: vec![Checkpoint {
+                position: Position { x: 1, y: 1 },
+                level: 1,
+            }],
         };
 
         let board = configuration.validate_and_convert_to_board();
@@ -247,7 +261,7 @@ mod tests {
         assert_eq!(
             board,
             Err(MazeError::OverlappingTiles {
-                position: (1, 1),
+                position: Position { x: 1, y: 1 },
                 kinds: (TileKind::Wall, TileKind::Checkpoint { level: 1 })
             })
         )
@@ -259,9 +273,18 @@ mod tests {
             col_count: 3,
             row_count: 3,
             max_soft_wall_count: 5,
-            walls: vec![(0, 1)],
-            entrypoints: vec![(1, 0)],
-            checkpoints: vec![((1, 1), 1), ((2, 2), 2)],
+            walls: vec![Position { x: 0, y: 1 }],
+            entrypoints: vec![Position { x: 1, y: 0 }],
+            checkpoints: vec![
+                Checkpoint {
+                    position: Position { x: 1, y: 1 },
+                    level: 1,
+                },
+                Checkpoint {
+                    position: Position { x: 2, y: 2 },
+                    level: 2,
+                },
+            ],
         };
 
         let board = configuration.validate_and_convert_to_board();
