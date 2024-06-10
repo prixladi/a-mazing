@@ -22,7 +22,7 @@ impl Maze {
         })
     }
 
-    pub fn get_tiles(&self) -> &TileBoard {
+    pub fn get_board(&self) -> &TileBoard {
         &self.board
     }
 
@@ -79,7 +79,7 @@ mod tests {
         );
 
         assert_eq!(
-            maze.as_ref().map(|maze| maze.get_tiles()),
+            maze.as_ref().map(|maze| maze.get_board()),
             Ok(&vec![
                 vec![TileKind::Empty, TileKind::Wall],
                 vec![TileKind::Entrypoint, TileKind::Checkpoint { level: 1 }]
@@ -113,7 +113,7 @@ mod tests {
         );
 
         assert_eq!(
-            maze.as_ref().map(|maze| maze.get_tiles()),
+            maze.as_ref().map(|maze| maze.get_board()),
             Ok(&vec![
                 vec![TileKind::Empty, TileKind::Wall, TileKind::Empty],
                 vec![

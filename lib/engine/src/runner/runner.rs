@@ -17,7 +17,7 @@ pub struct Runner<'a> {
 impl<'a> Runner<'a> {
     pub fn new(maze: &'a Maze) -> Self {
         let mut checkpoint_levels: Vec<i32> = maze
-            .get_tiles()
+            .get_board()
             .iter()
             .flat_map(|row| {
                 row.iter()
@@ -41,7 +41,7 @@ impl<'a> Runner<'a> {
     }
 
     pub fn run(&self, soft_walls: &Vec<Position>) -> Result<Option<Run>, RunnerError> {
-        let board = self.get_board_with_soft_walls(soft_walls)?;
+        let board = get_board_with_soft_walls(&self.maze, soft_walls)?;
         let entrypoints = self.maze.get_entrypoints();
         let mut best_run: Option<Run> = None;
 
@@ -58,41 +58,41 @@ impl<'a> Runner<'a> {
 
         Ok(best_run)
     }
+}
 
-    fn get_board_with_soft_walls(
-        &self,
-        soft_walls: &Vec<Position>,
-    ) -> Result<TileBoard, RunnerError> {
-        let max_soft_wall_count = self.maze.get_max_soft_wall_count();
-        if max_soft_wall_count < soft_walls.len() as u32 {
-            return Err(RunnerError::TooManySoftWalls {
-                limit: max_soft_wall_count,
+fn get_board_with_soft_walls(
+    maze: &Maze,
+    soft_walls: &Vec<Position>,
+) -> Result<TileBoard, RunnerError> {
+    let max_soft_wall_count = maze.get_max_soft_wall_count();
+    if max_soft_wall_count < soft_walls.len() as u32 {
+        return Err(RunnerError::TooManySoftWalls {
+            limit: max_soft_wall_count,
+        });
+    }
+
+    let mut tiles: TileBoard = maze.get_board().clone();
+    for &Position { x, y } in soft_walls {
+        if x >= tiles.len() {
+            return Err(RunnerError::WallOutOfBounds {
+                position: Position { x, y },
+            });
+        }
+        if y >= tiles[x].len() {
+            return Err(RunnerError::WallOutOfBounds {
+                position: Position { x, y },
+            });
+        }
+        if tiles[x][y] != TileKind::Empty {
+            return Err(RunnerError::OverlappingWall {
+                position: Position { x, y },
             });
         }
 
-        let mut tiles: TileBoard = self.maze.get_tiles().clone();
-        for &Position { x, y } in soft_walls {
-            if x >= tiles.len() {
-                return Err(RunnerError::WallOutOfBounds {
-                    position: Position { x, y },
-                });
-            }
-            if y >= tiles[x].len() {
-                return Err(RunnerError::WallOutOfBounds {
-                    position: Position { x, y },
-                });
-            }
-            if tiles[x][y] != TileKind::Empty {
-                return Err(RunnerError::OverlappingWall {
-                    position: Position { x, y },
-                });
-            }
-
-            tiles[x][y] = TileKind::Wall
-        }
-
-        return Ok(tiles);
+        tiles[x][y] = TileKind::Wall
     }
+
+    return Ok(tiles);
 }
 
 #[cfg(test)]
