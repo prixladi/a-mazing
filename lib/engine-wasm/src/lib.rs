@@ -2,7 +2,7 @@ mod models;
 mod utils;
 
 use engine::{
-    core::maze::{Maze, MazeOptions},
+    core::{maze::Maze, maze_configuration::MazeConfiguration},
     runner::runner::Runner,
 };
 use models::{MazerOptions, MazerPosition, MazerRunResult};
@@ -19,7 +19,7 @@ impl Mazer {
     pub fn new(options: MazerOptions) -> Mazer {
         set_panic_hook();
 
-        let maze = Maze::new(&MazeOptions {
+        let maze = Maze::new(&MazeConfiguration {
             col_count: options.get_col_count(),
             row_count: options.get_row_count(),
             max_soft_wall_count: options.get_max_soft_wall_count(),

@@ -1,97 +1,4 @@
-use crate::Position;
-
-use super::tile::TileKind;
-
-#[derive(Debug, PartialEq)]
-pub struct TileDescriptor {
-    position: Position,
-    kind: TileKind,
-}
-
-#[derive(Debug, PartialEq)]
-pub enum MazeError {
-    InvalidMazeSize {
-        size: usize,
-    },
-    NoEntrypoint,
-    NoCheckpoint,
-    TileOutOfBounds {
-        tiles: Vec<TileDescriptor>,
-    },
-    OverlappingTiles {
-        position: Position,
-        kinds: (TileKind, TileKind),
-    },
-}
-
-pub struct MazeOptions {
-    pub col_count: usize,
-    pub row_count: usize,
-    pub max_soft_wall_count: u32,
-    pub walls: Vec<Position>,
-    pub entrypoints: Vec<Position>,
-    pub checkpoints: Vec<(Position, i32)>,
-}
-
-impl MazeOptions {
-    fn ensure_valid(&self) -> Result<(), MazeError> {
-        let Self {
-            col_count,
-            row_count,
-            walls,
-            entrypoints,
-            checkpoints,
-            max_soft_wall_count: _,
-        } = self;
-
-        let maze_size = col_count * row_count;
-        if maze_size < 4 {
-            return Err(MazeError::InvalidMazeSize { size: maze_size });
-        }
-
-        if entrypoints.len() == 0 {
-            return Err(MazeError::NoEntrypoint);
-        }
-
-        if checkpoints.len() == 0 {
-            return Err(MazeError::NoCheckpoint);
-        }
-
-        let out_of_bounds_entrypoints = entrypoints
-            .iter()
-            .filter(|(x, y)| x >= col_count || y >= row_count)
-            .map(|position| TileDescriptor {
-                position: *position,
-                kind: TileKind::Entrypoint,
-            });
-        let out_of_bounds_checkpoints = checkpoints
-            .iter()
-            .filter(|((x, y), _)| x >= col_count || y >= row_count)
-            .map(|(position, priority)| TileDescriptor {
-                position: *position,
-                kind: TileKind::Checkpoint { level: *priority },
-            });
-        let out_of_bounds_walls = walls
-            .iter()
-            .filter(|(x, y)| x >= col_count || y >= row_count)
-            .map(|position| TileDescriptor {
-                position: *position,
-                kind: TileKind::Wall,
-            });
-
-        let out_of_bounds_tiles: Vec<TileDescriptor> = out_of_bounds_entrypoints
-            .chain(out_of_bounds_checkpoints)
-            .chain(out_of_bounds_walls)
-            .collect();
-
-        match out_of_bounds_tiles.len() {
-            0 => Ok(()),
-            _ => Err(MazeError::TileOutOfBounds {
-                tiles: out_of_bounds_tiles,
-            }),
-        }
-    }
-}
+use super::{maze_configuration::MazeConfiguration, maze_error::MazeError, tile::TileKind};
 
 #[derive(Debug, PartialEq)]
 pub struct Maze {
@@ -100,8 +7,8 @@ pub struct Maze {
 }
 
 impl Maze {
-    pub fn new(options: &MazeOptions) -> Result<Self, MazeError> {
-        options.ensure_valid()?;
+    pub fn new(options: &MazeConfiguration) -> Result<Self, MazeError> {
+        options.validate()?;
 
         let mut tiles: Vec<Vec<TileKind>> =
             vec![vec![TileKind::Empty; options.row_count]; options.col_count];
@@ -153,12 +60,14 @@ impl Maze {
 
 #[cfg(test)]
 mod tests {
+    use crate::core::maze_error::TileDescriptor;
+
     // Note this useful idiom: importing names from outer (for mod tests) scope.
     use super::*;
 
     #[test]
     fn test_create_with_invalid_size() {
-        let maze = Maze::new(&MazeOptions {
+        let maze = Maze::new(&MazeConfiguration {
             col_count: 1,
             row_count: 0,
             max_soft_wall_count: 5,
@@ -172,7 +81,7 @@ mod tests {
 
     #[test]
     fn test_create_without_any_entrypoint() {
-        let maze = Maze::new(&MazeOptions {
+        let maze = Maze::new(&MazeConfiguration {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
@@ -186,7 +95,7 @@ mod tests {
 
     #[test]
     fn test_create_without_any_checkpoint() {
-        let maze = Maze::new(&MazeOptions {
+        let maze = Maze::new(&MazeConfiguration {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
@@ -200,7 +109,7 @@ mod tests {
 
     #[test]
     fn test_create_with_wall_out_of_bounds() {
-        let maze = Maze::new(&MazeOptions {
+        let maze = Maze::new(&MazeConfiguration {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
@@ -222,7 +131,7 @@ mod tests {
 
     #[test]
     fn test_create_with_entrypoint_out_of_bounds() {
-        let maze = Maze::new(&MazeOptions {
+        let maze = Maze::new(&MazeConfiguration {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
@@ -244,7 +153,7 @@ mod tests {
 
     #[test]
     fn test_create_with_checkpoint_out_of_bounds() {
-        let maze = Maze::new(&MazeOptions {
+        let maze = Maze::new(&MazeConfiguration {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
@@ -266,7 +175,7 @@ mod tests {
 
     #[test]
     fn test_create_with_overlapping_wall_and_entrypoint() {
-        let maze = Maze::new(&MazeOptions {
+        let maze = Maze::new(&MazeConfiguration {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
@@ -286,7 +195,7 @@ mod tests {
 
     #[test]
     fn test_create_with_overlapping_wall_and_checkpoint() {
-        let maze = Maze::new(&MazeOptions {
+        let maze = Maze::new(&MazeConfiguration {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
@@ -306,7 +215,7 @@ mod tests {
 
     #[test]
     fn test_create_basic() {
-        let maze = Maze::new(&MazeOptions {
+        let maze = Maze::new(&MazeConfiguration {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
@@ -329,7 +238,7 @@ mod tests {
 
     #[test]
     fn test_create_with_multiple_checkpoints() {
-        let maze = Maze::new(&MazeOptions {
+        let maze = Maze::new(&MazeConfiguration {
             col_count: 3,
             row_count: 3,
             max_soft_wall_count: 5,

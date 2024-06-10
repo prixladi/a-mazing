@@ -1,10 +1,10 @@
 use engine::{
-    core::maze::{Maze, MazeOptions},
+    core::{maze::Maze, maze_configuration::MazeConfiguration},
     runner::runner::Runner,
 };
 
 fn main() {
-    let maze = Maze::new(&MazeOptions {
+    let maze = Maze::new(&MazeConfiguration {
         col_count: 7,
         row_count: 2,
         max_soft_wall_count: 200,
@@ -25,7 +25,7 @@ fn main() {
 
     println!("{:?}", result.0);
 
-    let maze = Maze::new(&MazeOptions {
+    let maze = Maze::new(&MazeConfiguration {
         col_count: 23,
         row_count: 26,
         max_soft_wall_count: 200,
@@ -46,7 +46,7 @@ fn main() {
         .unwrap();
     println!("{:?}", result.0);
 
-    let maze = Maze::new(&MazeOptions {
+    let maze = Maze::new(&MazeConfiguration {
         col_count: 23,
         row_count: 26,
         max_soft_wall_count: 200,
@@ -67,7 +67,7 @@ fn main() {
         .unwrap();
     println!("{:?}", result.0);
 
-    let maze = Maze::new(&MazeOptions {
+    let maze = Maze::new(&MazeConfiguration {
         col_count: 210,
         row_count: 26,
         max_soft_wall_count: 200,
@@ -117,7 +117,7 @@ fn main() {
     let result = runner.run(&vec![(7, 6)]).unwrap().unwrap();
     println!("{:?}", result.0);
 
-    let maze = Maze::new(&MazeOptions {
+    let maze = Maze::new(&MazeConfiguration {
         col_count: 210,
         row_count: 26,
         max_soft_wall_count: 200,
