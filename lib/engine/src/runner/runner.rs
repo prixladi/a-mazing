@@ -1,7 +1,4 @@
-use crate::core::{
-    maze::Maze,
-    tile::{Position, TileBoard, TileKind},
-};
+use crate::core::{Maze, Position, TileBoard, TileKind};
 
 use super::run::Run;
 
@@ -100,7 +97,7 @@ impl<'a> Runner<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::core::{maze_configuration::MazeConfiguration, tile::Checkpoint};
+    use crate::core::{Checkpoint, MazeConfiguration};
 
     // Note this useful idiom: importing names from outer (for mod tests) scope.
     use super::*;

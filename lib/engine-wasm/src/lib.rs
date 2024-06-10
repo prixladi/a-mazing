@@ -2,12 +2,8 @@ mod models;
 mod utils;
 
 use engine::{
-    core::{
-        maze::Maze,
-        maze_configuration::MazeConfiguration,
-        tile::{Checkpoint, Position},
-    },
-    runner::runner::Runner,
+    core::{Checkpoint, Maze, MazeConfiguration, Position},
+    runner::Runner,
 };
 use models::{MazerConfiguration, MazerPosition, MazerRunResult};
 use utils::set_panic_hook;

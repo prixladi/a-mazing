@@ -1,10 +1,6 @@
 use engine::{
-    core::{
-        maze::Maze,
-        maze_configuration::MazeConfiguration,
-        tile::{Checkpoint, Position},
-    },
-    runner::runner::Runner,
+    core::{Checkpoint, Maze, MazeConfiguration, Position},
+    runner::Runner,
 };
 
 fn main() {

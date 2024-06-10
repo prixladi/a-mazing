@@ -1,4 +1,9 @@
-pub mod tile;
-pub mod maze;
-pub mod maze_configuration;
-pub mod maze_error;
+mod tile;
+mod maze;
+mod maze_configuration;
+mod maze_error;
+
+pub use maze::Maze;
+pub use maze_configuration::MazeConfiguration;
+pub use maze_error::*;
+pub use tile::*;

@@ -1,4 +1,4 @@
-use crate::core::tile::{Position, TileBoard};
+use crate::core::{Position, TileBoard};
 
 use super::node::Node;
 
@@ -78,7 +78,7 @@ impl Nodes {
 mod tests {
     use super::*;
 
-    use crate::core::tile::TileKind;
+    use crate::core::TileKind;
 
     #[test]
     fn test_nodes_get_node_from_maze() {
