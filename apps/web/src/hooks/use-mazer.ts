@@ -1,6 +1,6 @@
 import init, {
   Mazer,
-  MazerOptions,
+  MazerConfiguration,
   MazerPosition,
   MazerCheckpoint,
 } from 'engine';
@@ -31,7 +31,7 @@ export const useMazer = (mazeState: MazeState) => {
         }
       );
 
-      const options = MazerOptions.new(
+      const options = MazerConfiguration.new(
         mazeState.colCount,
         mazeState.rowCount,
         999,
