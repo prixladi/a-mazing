@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Position, Tile, TileType } from '~/types/maze';
+import { Position, Tile, TileKind } from '~/types/maze';
 import { MazeTileContent } from './maze-tile-content';
 
 type Props = {
@@ -8,7 +8,7 @@ type Props = {
   x: number;
   y: number;
   tileOnHover?: Tile;
-  onClick: (position: Position, type: TileType) => any;
+  onClick: (position: Position, type: TileKind) => any;
 };
 
 const MazeTileComponent: React.FC<Props> = ({
@@ -21,10 +21,10 @@ const MazeTileComponent: React.FC<Props> = ({
   return (
     <>
       <div
-        onClick={() => onClick([x, y], tile.type)}
+        onClick={() => onClick([x, y], tile.kind)}
         className='w-10 h-10 group'
       >
-        {tileOnHover && tile.type == 'Empty' ? (
+        {tileOnHover && tile.kind == 'Empty' ? (
           <>
             <div className='h-full w-full block group-hover:hidden bg-slate-100'>
               <MazeTileContent tile={tile} />

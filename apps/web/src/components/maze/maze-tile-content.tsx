@@ -6,13 +6,13 @@ import { Tile } from '~/types/maze';
 type Props = { tile: Tile };
 
 export const MazeTileContent: React.FC<Props> = ({ tile }) => {
-  if (tile.type === 'Entrypoint') return <EntrypointTile />;
-  if (tile.type === 'Exit') return <ExitTile />;
-  if (tile.type === 'Wall') return <WallTile />;
-  if (tile.type === 'SoftWall') return <SoftWallTile />;
-  if (tile.type === 'Checkpoint') return <CheckpointTile level={tile.level} />;
-  if (tile.type === 'Empty') return <EmptyTile />;
-  throw new Error(`Unable to render content for '${tile.type}' tile.`);
+  if (tile.kind === 'Entrypoint') return <EntrypointTile />;
+  if (tile.kind === 'Exit') return <ExitTile />;
+  if (tile.kind === 'Wall') return <WallTile />;
+  if (tile.kind === 'SoftWall') return <SoftWallTile />;
+  if (tile.kind === 'Checkpoint') return <CheckpointTile level={tile.level} />;
+  if (tile.kind === 'Empty') return <EmptyTile />;
+  throw new Error(`Unable to render content for '${tile.kind}' tile.`);
 };
 
 const EntrypointTile: React.FC = () => (

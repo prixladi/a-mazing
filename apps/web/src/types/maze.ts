@@ -1,6 +1,6 @@
 export type Position = [number, number];
 
-export type TileType =
+export type TileKind =
   | 'Empty'
   | 'Wall'
   | 'SoftWall'
@@ -9,8 +9,8 @@ export type TileType =
   | 'Exit';
 
 export type Tile =
-  | { type: Exclude<TileType, 'Checkpoint'> }
-  | { type: Extract<TileType, 'Checkpoint'>; level: number };
+  | { kind: Exclude<TileKind, 'Checkpoint'> }
+  | { kind: Extract<TileKind, 'Checkpoint'>; level: number };
   
 export type TileBoard = Tile[][];
 

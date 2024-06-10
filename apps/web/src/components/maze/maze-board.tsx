@@ -1,11 +1,11 @@
 import React from 'react';
-import { Position, Tile, TileBoard, TileType } from '~/types/maze';
+import { Position, Tile, TileBoard, TileKind } from '~/types/maze';
 import { MazeTile } from './maze-tile';
 
 type Props = {
   tiles: TileBoard;
   tileOnHover?: Tile;
-  onTileClick: (position: Position, type: TileType) => any;
+  onTileClick: (position: Position, kind: TileKind) => any;
 };
 
 export const MazeBoard: React.FC<Props> = ({

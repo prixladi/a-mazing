@@ -4,11 +4,11 @@ import { useCallback} from 'react';
 
 import { MazeBoard } from '~/components/maze';
 import { useMaze } from '~/hooks/use-maze';
-import { Position, Tile, TileType } from '~/types/maze';
+import { Position, Tile, TileKind } from '~/types/maze';
 
 import { useMazer } from '~/hooks/use-mazer';
 
-const tileOnHover: Tile = { type: 'SoftWall' };
+const tileOnHover: Tile = { kind: 'SoftWall' };
 
 export default function Home() {
   const { mazeState, mazeTiles, setTileOnPosition } = useMaze({
@@ -38,11 +38,11 @@ export default function Home() {
   const { score } = useMazer(mazeState);
 
   const onTileClick = useCallback(
-    (position: Position, type: TileType) => {
-      if (type === 'Empty')
-        return setTileOnPosition(position, { type: 'SoftWall' });
-      if (type === 'SoftWall')
-        return setTileOnPosition(position, { type: 'Empty' });
+    (position: Position, kind: TileKind) => {
+      if (kind === 'Empty')
+        return setTileOnPosition(position, { kind: 'SoftWall' });
+      if (kind === 'SoftWall')
+        return setTileOnPosition(position, { kind: 'Empty' });
     },
     [setTileOnPosition]
   );

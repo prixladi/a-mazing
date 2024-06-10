@@ -10,19 +10,19 @@ export const useMaze = (initialState: MazeState) => {
     for (let x = 0; x < mazeState.colCount; x++) {
       const row: Tile[] = [];
       for (let y = 0; y < mazeState.rowCount; y++) {
-        row.push({ type: 'Empty' });
+        row.push({ kind: 'Empty' });
       }
       tileBoard.push(row);
     }
 
     for (let [x, y] of mazeState.walls) {
-      tileBoard[x][y] = { type: 'Wall' };
+      tileBoard[x][y] = { kind: 'Wall' };
     }
     for (let [x, y] of mazeState.softWalls) {
-      tileBoard[x][y] = { type: 'SoftWall' };
+      tileBoard[x][y] = { kind: 'SoftWall' };
     }
     for (let [x, y] of mazeState.entrypoints) {
-      tileBoard[x][y] = { type: 'Entrypoint' };
+      tileBoard[x][y] = { kind: 'Entrypoint' };
     }
 
     const sortedCheckpoints = mazeState.checkpoints
@@ -38,7 +38,7 @@ export const useMaze = (initialState: MazeState) => {
       for (let {
         position: [x, y],
       } of exitCheckpoints) {
-        tileBoard[x][y] = { type: 'Exit' };
+        tileBoard[x][y] = { kind: 'Exit' };
       }
 
       const otherCheckpoints = sortedCheckpoints.filter(
@@ -48,7 +48,7 @@ export const useMaze = (initialState: MazeState) => {
         level,
         position: [x, y],
       } of otherCheckpoints) {
-        tileBoard[x][y] = { type: 'Checkpoint', level };
+        tileBoard[x][y] = { kind: 'Checkpoint', level };
       }
     }
     return tileBoard;
@@ -69,11 +69,11 @@ export const useMaze = (initialState: MazeState) => {
         (position) => position[0] !== x || position[1] !== y
       );
 
-      if (tile.type === 'Wall') walls.push([x, y]);
-      if (tile.type === 'Entrypoint') entrypoints.push([x, y]);
-      if (tile.type === 'Checkpoint')
+      if (tile.kind === 'Wall') walls.push([x, y]);
+      if (tile.kind === 'Entrypoint') entrypoints.push([x, y]);
+      if (tile.kind === 'Checkpoint')
         checkpoints.push({ position: [x, y], level: tile.level });
-      if (tile.type === 'SoftWall') softWalls.push([x, y]);
+      if (tile.kind === 'SoftWall') softWalls.push([x, y]);
 
       return {
         ...oldOptions,
