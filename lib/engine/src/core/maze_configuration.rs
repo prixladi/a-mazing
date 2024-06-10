@@ -14,7 +14,7 @@ pub struct MazeConfiguration {
 }
 
 impl MazeConfiguration {
-    pub fn validate_and_convert_to_board(&self) -> Result<TileBoard, MazeError> {
+    pub(crate) fn validate_and_convert_to_board(&self) -> Result<TileBoard, MazeError> {
         let maze_size = self.col_count * self.row_count;
         if maze_size < 4 {
             return Err(MazeError::InvalidMazeSize { size: maze_size });

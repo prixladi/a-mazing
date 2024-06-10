@@ -12,7 +12,7 @@ pub struct Run {
 }
 
 impl Run {
-    pub fn execute(
+    pub(crate) fn execute(
         tiles: &TileBoard,
         ascending_checkpoint_levels: &Vec<i32>,
         entrypoint_position: &Position,

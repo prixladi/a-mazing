@@ -3,14 +3,14 @@ use std::collections::HashMap;
 use crate::core::{Position, TileKind};
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct Node {
+pub(crate) struct Node {
     kind: TileKind,
     distances: HashMap<i32, u32>,
     position: Position,
 }
 
 impl Node {
-    pub fn new(kind: TileKind, position: Position) -> Self {
+    pub(crate) fn new(kind: TileKind, position: Position) -> Self {
         Self {
             kind,
             position,
@@ -18,40 +18,40 @@ impl Node {
         }
     }
 
-    pub fn can_enter(&self) -> bool {
+    pub(crate) fn can_enter(&self) -> bool {
         self.kind != TileKind::Wall
     }
 
-    pub fn is_checkpoint(&self, checkpoint_level: i32) -> bool {
+    pub(crate) fn is_checkpoint(&self, checkpoint_level: i32) -> bool {
         match self.kind {
             TileKind::Checkpoint { level } if level == checkpoint_level => true,
             _ => false,
         }
     }
 
-    pub fn is_entrypoint(&self) -> bool {
+    pub(crate) fn is_entrypoint(&self) -> bool {
         self.kind == TileKind::Entrypoint
     }
 
-    pub fn has_distance(&self, checkpoint_level: i32) -> bool {
+    pub(crate) fn has_distance(&self, checkpoint_level: i32) -> bool {
         self.distances.contains_key(&checkpoint_level)
     }
 
-    pub fn get_distance(&self, checkpoint_level: i32) -> Option<u32> {
+    pub(crate) fn get_distance(&self, checkpoint_level: i32) -> Option<u32> {
         self.distances.get(&checkpoint_level).copied()
     }
 
-    pub fn set_distance(&mut self, checkpoint_level: i32, distance: u32) {
+    pub(crate) fn set_distance(&mut self, checkpoint_level: i32, distance: u32) {
         self.distances.insert(checkpoint_level, distance);
     }
 
-    pub fn set_distance_if_not_set(&mut self, checkpoint_level: i32, distance: u32) {
+    pub(crate) fn set_distance_if_not_set(&mut self, checkpoint_level: i32, distance: u32) {
         if !self.has_distance(checkpoint_level) {
             self.set_distance(checkpoint_level, distance);
         }
     }
 
-    pub fn get_position(&self) -> &Position {
+    pub(crate) fn get_position(&self) -> &Position {
         &self.position
     }
 }

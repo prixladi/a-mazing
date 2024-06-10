@@ -3,12 +3,12 @@ use crate::core::{Position, TileBoard};
 use super::node::Node;
 
 #[derive(Debug, Clone)]
-pub struct Nodes {
+pub(crate) struct Nodes {
     data: Vec<Vec<Node>>,
 }
 
 impl Nodes {
-    pub fn new(tiles: &TileBoard) -> Self {
+    pub(crate) fn new(tiles: &TileBoard) -> Self {
         let nodes = tiles
             .iter()
             .enumerate()
@@ -23,15 +23,15 @@ impl Nodes {
         Self { data: nodes }
     }
 
-    pub fn get_node(&self, position: &Position) -> &Node {
+    pub(crate) fn get_node(&self, position: &Position) -> &Node {
         &self.data[position.x][position.y]
     }
 
-    pub fn get_node_mut(&mut self, position: &Position) -> &mut Node {
+    pub(crate) fn get_node_mut(&mut self, position: &Position) -> &mut Node {
         &mut self.data[position.x][position.y]
     }
 
-    pub fn get_neighbors_positions(&self, &Position { x, y }: &Position) -> Vec<Position> {
+    pub(crate) fn get_neighbors_positions(&self, &Position { x, y }: &Position) -> Vec<Position> {
         let mut neighbors = Vec::with_capacity(4);
 
         if y + 1 < self.data[0].len() {
@@ -51,7 +51,7 @@ impl Nodes {
         return neighbors;
     }
 
-    pub fn get_lowest_distance_neighbor(
+    pub(crate) fn get_lowest_distance_neighbor(
         &self,
         position: &Position,
         checkpoint_level: i32,
