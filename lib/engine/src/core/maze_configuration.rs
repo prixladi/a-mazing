@@ -8,9 +8,9 @@ pub struct MazeConfiguration {
     pub col_count: usize,
     pub row_count: usize,
     pub max_soft_wall_count: u32,
-    pub walls: Vec<Position>,
     pub entrypoints: Vec<Position>,
     pub checkpoints: Vec<Checkpoint>,
+    pub walls: Vec<Position>,
 }
 
 impl MazeConfiguration {
@@ -29,23 +29,6 @@ impl MazeConfiguration {
         }
 
         let mut board: TileBoard = vec![vec![TileKind::Empty; self.row_count]; self.col_count];
-
-        for &Position { x, y } in self.walls.iter() {
-            if x >= self.col_count || y >= self.row_count {
-                return Err(MazeError::TileOutOfBounds(TileDescriptor {
-                    position: Position { x, y },
-                    kind: TileKind::Wall,
-                }));
-            }
-
-            if board[x][y] != TileKind::Empty {
-                return Err(MazeError::OverlappingTiles {
-                    position: Position { x, y },
-                    kinds: (board[x][y], TileKind::Wall),
-                });
-            }
-            board[x][y] = TileKind::Wall;
-        }
 
         for &Position { x, y } in self.entrypoints.iter() {
             if x >= self.col_count || y >= self.row_count {
@@ -81,6 +64,23 @@ impl MazeConfiguration {
                 });
             }
             board[x][y] = TileKind::Checkpoint { level };
+        }
+        
+        for &Position { x, y } in self.walls.iter() {
+            if x >= self.col_count || y >= self.row_count {
+                return Err(MazeError::TileOutOfBounds(TileDescriptor {
+                    position: Position { x, y },
+                    kind: TileKind::Wall,
+                }));
+            }
+
+            if board[x][y] != TileKind::Empty {
+                return Err(MazeError::OverlappingTiles {
+                    position: Position { x, y },
+                    kinds: (board[x][y], TileKind::Wall),
+                });
+            }
+            board[x][y] = TileKind::Wall;
         }
 
         Ok(board)

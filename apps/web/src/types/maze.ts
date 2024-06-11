@@ -1,24 +1,16 @@
-export type Position = [number, number];
+import { Position } from './tile';
 
-export type TileKind =
-  | 'Empty'
-  | 'Wall'
-  | 'SoftWall'
-  | 'Entrypoint'
-  | 'Checkpoint'
-  | 'Exit';
-
-export type Tile =
-  | { kind: Exclude<TileKind, 'Checkpoint'> }
-  | { kind: Extract<TileKind, 'Checkpoint'>; level: number };
-  
-export type TileBoard = Tile[][];
-
-export type MazeState = {
+export type MazeConfiguration = {
   colCount: number;
   rowCount: number;
+  maxSoftWallCount: number;
   walls: Position[];
-  softWalls:  Position[];
   entrypoints: Position[];
   checkpoints: { position: Position; level: number }[];
 };
+
+export type MazeMutations = {
+  softWalls: Position[];
+};
+
+export type MazeState = MazeConfiguration & MazeMutations;

@@ -1,45 +1,46 @@
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 
-import { Position, Tile, TileKind } from '~/types/maze';
+import { Position, Tile, TileKind } from '~/types/tile';
 import { MazeTileContent } from './maze-tile-content';
+
 
 type Props = {
   tile: Tile;
   x: number;
   y: number;
-  tileOnHover?: Tile;
-  onClick: (position: Position, type: TileKind) => any;
+  tileOnHover?: (tileKind: TileKind) => Tile | null;
+  onClick: (position: Position, tileKind: TileKind) => any;
 };
 
-const MazeTileComponent: React.FC<Props> = ({
-  tile,
-  x,
-  y,
-  tileOnHover,
-  onClick,
-}) => {
+
+const MazeTileComponent: React.FC<Props> = ({ tile, x, y, ...props }) => {
+  const onClick = useCallback(
+    () => props.onClick([x, y], tile.kind),
+    [x, y, tile.kind, props.onClick]
+  );
+
+  const tileOnHover = useMemo(
+    () => (props.tileOnHover ? props.tileOnHover(tile.kind) : undefined),
+    [props.tileOnHover, tile.kind]
+  );
+  
   return (
-    <>
-      <div
-        onClick={() => onClick([x, y], tile.kind)}
-        className='w-10 h-10 group'
-      >
-        {tileOnHover && tile.kind == 'Empty' ? (
-          <>
-            <div className='h-full w-full block group-hover:hidden bg-slate-100'>
-              <MazeTileContent tile={tile} />
-            </div>
-            <div className='opacity-30 h-full w-full hidden group-hover:block bg-slate-100'>
-              <MazeTileContent tile={tileOnHover} />
-            </div>
-          </>
-        ) : (
-          <div className='h-full w-full bg-slate-100'>
-          <MazeTileContent tile={tile} />
+    <div onClick={onClick} className='w-10 h-10 group'>
+      {tileOnHover ? (
+        <>
+          <div className='h-full w-full block group-hover:hidden bg-slate-100'>
+            <MazeTileContent tile={tile} />
           </div>
-        )}
-      </div>
-    </>
+          <div className='opacity-30 h-full w-full hidden group-hover:block bg-slate-100'>
+            <MazeTileContent tile={tileOnHover} />
+          </div>
+        </>
+      ) : (
+        <div className='h-full w-full bg-slate-100'>
+          <MazeTileContent tile={tile} />
+        </div>
+      )}
+    </div>
   );
 };
 

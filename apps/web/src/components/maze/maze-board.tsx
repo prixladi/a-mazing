@@ -1,10 +1,10 @@
 import React from 'react';
-import { Position, Tile, TileBoard, TileKind } from '~/types/maze';
+import { Position, Tile, MazeTileBoard, TileKind } from '~/types/tile';
 import { MazeTile } from './maze-tile';
 
 type Props = {
-  tiles: TileBoard;
-  tileOnHover?: Tile;
+  tiles: MazeTileBoard;
+  tileOnHover?: (tileKind: TileKind) => Tile | null;
   onTileClick: (position: Position, kind: TileKind) => any;
 };
 

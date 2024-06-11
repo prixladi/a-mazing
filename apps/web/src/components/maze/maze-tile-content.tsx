@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { LogIn, LogOut } from 'lucide-react';
 
-import { Tile } from '~/types/maze';
+import { Tile } from '~/types/tile';
 
 type Props = { tile: Tile };
 

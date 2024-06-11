@@ -7,9 +7,9 @@ pub struct MazerConfiguration {
     col_count: usize,
     row_count: usize,
     max_soft_wall_count: u32,
-    walls: Vec<MazerPosition>,
-    entrypoints: Vec<MazerPosition>,
     checkpoints: Vec<MazerCheckpoint>,
+    entrypoints: Vec<MazerPosition>,
+    walls: Vec<MazerPosition>,
 }
 
 #[wasm_bindgen]
@@ -49,11 +49,6 @@ impl MazerConfiguration {
         self.max_soft_wall_count
     }
 
-    #[wasm_bindgen(getter, js_name = walls)]
-    pub fn get_walls(&self) -> Vec<MazerPosition> {
-        self.walls.clone()
-    }
-
     #[wasm_bindgen(getter, js_name = entrypoints)]
     pub fn get_entrypoints(&self) -> Vec<MazerPosition> {
         self.entrypoints.clone()
@@ -62,6 +57,11 @@ impl MazerConfiguration {
     #[wasm_bindgen(getter, js_name = checkpoints)]
     pub fn get_checkpoints(&self) -> Vec<MazerCheckpoint> {
         self.checkpoints.clone()
+    }
+
+    #[wasm_bindgen(getter, js_name = walls)]
+    pub fn get_walls(&self) -> Vec<MazerPosition> {
+        self.walls.clone()
     }
 }
 

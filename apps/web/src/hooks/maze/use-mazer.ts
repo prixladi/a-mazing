@@ -6,13 +6,15 @@ import init, {
 } from 'engine';
 import { useEffect, useRef, useState } from 'react';
 
-import { MazeState } from '~/types/maze';
+import { MazeConfiguration, MazeMutations } from '~/types/maze';
 
-export const useMazer = (mazeState: MazeState) => {
+export const useMazer = (
+  mazeConfiguration: MazeConfiguration,
+  mazeMutations: MazeMutations
+) => {
   const initStarted = useRef(false);
 
   const [mazer, setMazer] = useState<Mazer | null>(null);
-
   const [score, setScore] = useState<number | null>(null);
 
   useEffect(() => {
@@ -20,11 +22,13 @@ export const useMazer = (mazeState: MazeState) => {
     initStarted.current = true;
 
     init().then(() => {
-      const walls = mazeState.walls.map(([x, y]) => MazerPosition.new(x, y));
-      const entrypoints = mazeState.entrypoints.map(([x, y]) =>
+      const walls = mazeConfiguration.walls.map(([x, y]) =>
         MazerPosition.new(x, y)
       );
-      const checkpoints = mazeState.checkpoints.map(
+      const entrypoints = mazeConfiguration.entrypoints.map(([x, y]) =>
+        MazerPosition.new(x, y)
+      );
+      const checkpoints = mazeConfiguration.checkpoints.map(
         ({ position: [x, y], level }) => {
           const position = MazerPosition.new(x, y);
           return MazerCheckpoint.new(position, level);
@@ -32,9 +36,9 @@ export const useMazer = (mazeState: MazeState) => {
       );
 
       const options = MazerConfiguration.new(
-        mazeState.colCount,
-        mazeState.rowCount,
-        999,
+        mazeConfiguration.colCount,
+        mazeConfiguration.rowCount,
+        mazeConfiguration.maxSoftWallCount,
         entrypoints,
         checkpoints,
         walls
@@ -48,12 +52,12 @@ export const useMazer = (mazeState: MazeState) => {
   useEffect(() => {
     if (!mazer) return;
 
-    const softWalls = mazeState.softWalls.map(([x, y]) =>
+    const softWalls = mazeMutations.softWalls.map(([x, y]) =>
       MazerPosition.new(x, y)
     );
     const result = mazer.run(softWalls);
     setScore(result?.score ?? null);
-  }, [JSON.stringify(mazeState), mazer]);
+  }, [JSON.stringify(mazeMutations), mazer]);
 
   return { score };
 };
