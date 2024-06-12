@@ -1,19 +1,18 @@
+use thiserror::Error;
+
 use super::tile::{Position, TileKind};
 
-#[derive(Debug, PartialEq)]
-pub struct TileDescriptor {
-    pub position: Position,
-    pub kind: TileKind,
-}
-
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Error)]
 pub enum MazeError {
-    InvalidMazeSize {
-        size: usize,
-    },
+    #[error("Maze must have at least 4 tiles, got {size}")]
+    InvalidMazeSize { size: usize },
+    #[error("Maze required at least one entrypoint")]
     NoEntrypoint,
+    #[error("Maze required at least one checkpoint")]
     NoCheckpoint,
-    TileOutOfBounds(TileDescriptor),
+    #[error("Tile is out of bounds at position {0}")]
+    TileOutOfBounds(Position, TileKind),
+    #[error("Tiles are overlapping at position {position}")]
     OverlappingTiles {
         position: Position,
         kinds: (TileKind, TileKind),

@@ -1,5 +1,5 @@
 use super::{
-    maze_error::{MazeError, TileDescriptor},
+    maze_error::MazeError,
     tile::{Checkpoint, Position, TileBoard, TileKind},
 };
 
@@ -32,10 +32,10 @@ impl MazeConfiguration {
 
         for &Position { x, y } in self.entrypoints.iter() {
             if x >= self.col_count || y >= self.row_count {
-                return Err(MazeError::TileOutOfBounds(TileDescriptor {
-                    position: Position { x, y },
-                    kind: TileKind::Entrypoint,
-                }));
+                return Err(MazeError::TileOutOfBounds(
+                    Position { x, y },
+                    TileKind::Entrypoint,
+                ));
             }
 
             if board[x][y] != TileKind::Empty {
@@ -51,10 +51,10 @@ impl MazeConfiguration {
         for Checkpoint { position, level } in self.checkpoints.iter().cloned() {
             let Position { x, y } = position;
             if x >= self.col_count || y >= self.row_count {
-                return Err(MazeError::TileOutOfBounds(TileDescriptor {
-                    position: Position { x, y },
-                    kind: TileKind::Checkpoint { level },
-                }));
+                return Err(MazeError::TileOutOfBounds(
+                    Position { x, y },
+                    TileKind::Checkpoint { level },
+                ));
             }
 
             if board[x][y] != TileKind::Empty {
@@ -68,10 +68,10 @@ impl MazeConfiguration {
 
         for &Position { x, y } in self.walls.iter() {
             if x >= self.col_count || y >= self.row_count {
-                return Err(MazeError::TileOutOfBounds(TileDescriptor {
-                    position: Position { x, y },
-                    kind: TileKind::Wall,
-                }));
+                return Err(MazeError::TileOutOfBounds(
+                    Position { x, y },
+                    TileKind::Wall,
+                ));
             }
 
             if board[x][y] != TileKind::Empty {
@@ -160,10 +160,10 @@ mod tests {
 
         assert_eq!(
             board,
-            Err(MazeError::TileOutOfBounds(TileDescriptor {
-                position: Position { x: 5, y: 5 },
-                kind: TileKind::Wall
-            }))
+            Err(MazeError::TileOutOfBounds(
+                Position { x: 5, y: 5 },
+                TileKind::Wall
+            ))
         )
     }
 
@@ -185,10 +185,10 @@ mod tests {
 
         assert_eq!(
             board,
-            Err(MazeError::TileOutOfBounds(TileDescriptor {
-                position: Position { x: 3, y: 3 },
-                kind: TileKind::Entrypoint
-            }))
+            Err(MazeError::TileOutOfBounds(
+                Position { x: 3, y: 3 },
+                TileKind::Entrypoint
+            ))
         )
     }
 
@@ -210,10 +210,10 @@ mod tests {
 
         assert_eq!(
             board,
-            Err(MazeError::TileOutOfBounds(TileDescriptor {
-                position: Position { x: 77, y: 77 },
-                kind: TileKind::Checkpoint { level: 1 }
-            }))
+            Err(MazeError::TileOutOfBounds(
+                Position { x: 77, y: 77 },
+                TileKind::Checkpoint { level: 1 }
+            ))
         )
     }
 

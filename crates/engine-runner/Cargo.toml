@@ -9,3 +9,4 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 engine-core  = { path = "../engine-core" }
+thiserror = "1.0.61"

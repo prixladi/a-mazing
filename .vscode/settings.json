@@ -5,6 +5,7 @@
     "clsx",
     "Deque",
     "lucide",
-    "tailwindcss"
+    "tailwindcss",
+    "thiserror"
   ]
 }

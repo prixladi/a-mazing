@@ -1,13 +1,8 @@
 use engine_core::{Maze, Position, TileBoard, TileKind};
 
-use super::run::Run;
+use crate::runner_error::RunnerError;
 
-#[derive(Debug)]
-pub enum RunnerError {
-    TooManySoftWalls { limit: u32 },
-    WallOutOfBounds { position: Position },
-    OverlappingWall { position: Position },
-}
+use super::run::Run;
 
 pub struct Runner<'a> {
     maze: &'a Maze,
@@ -97,13 +92,15 @@ fn get_board_with_soft_walls(
 
 #[cfg(test)]
 mod tests {
+    use std::error::Error;
+
     use engine_core::{Checkpoint, MazeConfiguration};
 
     // Note this useful idiom: importing names from outer (for mod tests) scope.
     use super::*;
 
     #[test]
-    fn test_run_basic() {
+    fn test_run_basic() -> Result<(), Box<dyn Error>> {
         let maze = Maze::new(&MazeConfiguration {
             col_count: 8,
             row_count: 8,
@@ -114,17 +111,16 @@ mod tests {
                 position: Position { x: 7, y: 7 },
                 level: 1,
             }],
-        })
-        .unwrap();
+        })?;
 
         let runner = Runner::new(&maze);
-        let result = runner.run(&vec![]).unwrap().unwrap();
+        let result = runner.run(&vec![])?;
 
-        assert_eq!(result.get_score(), 14);
+        assert_eq!(result.as_ref().map(|res| res.get_score()), Some(14));
 
         assert_eq!(
-            result.get_solved_path(),
-            vec![
+            result.map(|res| res.get_solved_path()),
+            Some(vec![
                 Position { x: 0, y: 0 },
                 Position { x: 1, y: 0 },
                 Position { x: 2, y: 0 },
@@ -140,12 +136,14 @@ mod tests {
                 Position { x: 7, y: 5 },
                 Position { x: 7, y: 6 },
                 Position { x: 7, y: 7 }
-            ]
-        )
+            ])
+        );
+
+        Ok(())
     }
 
     #[test]
-    fn test_run_basic_with_many_walls() {
+    fn test_run_basic_with_many_walls() -> Result<(), Box<dyn Error>> {
         let maze = Maze::new(&MazeConfiguration {
             col_count: 8,
             row_count: 8,
@@ -156,34 +154,30 @@ mod tests {
                 position: Position { x: 7, y: 7 },
                 level: 1,
             }],
-        })
-        .unwrap();
+        })?;
 
         let runner = Runner::new(&maze);
-        let result = runner
-            .run(&vec![
-                Position { x: 2, y: 0 },
-                Position { x: 2, y: 1 },
-                Position { x: 2, y: 2 },
-                Position { x: 2, y: 3 },
-                Position { x: 2, y: 4 },
-                Position { x: 2, y: 5 },
-                Position { x: 2, y: 6 },
-                Position { x: 4, y: 7 },
-                Position { x: 4, y: 6 },
-                Position { x: 4, y: 5 },
-                Position { x: 4, y: 4 },
-                Position { x: 4, y: 3 },
-                Position { x: 4, y: 2 },
-            ])
-            .unwrap()
-            .unwrap();
+        let result = runner.run(&vec![
+            Position { x: 2, y: 0 },
+            Position { x: 2, y: 1 },
+            Position { x: 2, y: 2 },
+            Position { x: 2, y: 3 },
+            Position { x: 2, y: 4 },
+            Position { x: 2, y: 5 },
+            Position { x: 2, y: 6 },
+            Position { x: 4, y: 7 },
+            Position { x: 4, y: 6 },
+            Position { x: 4, y: 5 },
+            Position { x: 4, y: 4 },
+            Position { x: 4, y: 3 },
+            Position { x: 4, y: 2 },
+        ])?;
 
-        assert_eq!(result.get_score(), 26);
+        assert_eq!(result.as_ref().map(|res| res.get_score()), Some(26));
 
         assert_eq!(
-            result.get_solved_path(),
-            vec![
+            result.map(|res| res.get_solved_path()),
+            Some(vec![
                 Position { x: 0, y: 0 },
                 Position { x: 1, y: 0 },
                 Position { x: 1, y: 1 },
@@ -211,12 +205,14 @@ mod tests {
                 Position { x: 7, y: 5 },
                 Position { x: 7, y: 6 },
                 Position { x: 7, y: 7 }
-            ]
+            ])
         );
+
+        Ok(())
     }
 
     #[test]
-    fn test_run_basic_with_inaccessible_checkpoint() {
+    fn test_run_basic_with_inaccessible_checkpoint() -> Result<(), Box<dyn Error>> {
         let maze = Maze::new(&MazeConfiguration {
             col_count: 8,
             row_count: 8,
@@ -227,28 +223,27 @@ mod tests {
                 position: Position { x: 7, y: 7 },
                 level: 1,
             }],
-        })
-        .unwrap();
+        })?;
 
         let runner = Runner::new(&maze);
-        let result = runner
-            .run(&vec![
-                Position { x: 2, y: 0 },
-                Position { x: 2, y: 1 },
-                Position { x: 2, y: 2 },
-                Position { x: 2, y: 3 },
-                Position { x: 2, y: 4 },
-                Position { x: 2, y: 5 },
-                Position { x: 2, y: 6 },
-                Position { x: 2, y: 7 },
-            ])
-            .unwrap();
+        let result = runner.run(&vec![
+            Position { x: 2, y: 0 },
+            Position { x: 2, y: 1 },
+            Position { x: 2, y: 2 },
+            Position { x: 2, y: 3 },
+            Position { x: 2, y: 4 },
+            Position { x: 2, y: 5 },
+            Position { x: 2, y: 6 },
+            Position { x: 2, y: 7 },
+        ])?;
 
         assert!(result.is_none());
+
+        Ok(())
     }
 
     #[test]
-    fn test_run_basic_with_multiple_entrypoints() {
+    fn test_run_basic_with_multiple_entrypoints() -> Result<(), Box<dyn Error>> {
         let maze = Maze::new(&MazeConfiguration {
             col_count: 8,
             row_count: 8,
@@ -259,44 +254,42 @@ mod tests {
                 position: Position { x: 7, y: 7 },
                 level: 1,
             }],
-        })
-        .unwrap();
+        })?;
 
         let runner = Runner::new(&maze);
-        let result = runner
-            .run(&vec![
-                Position { x: 2, y: 0 },
-                Position { x: 2, y: 1 },
-                Position { x: 2, y: 2 },
-                Position { x: 2, y: 3 },
-                Position { x: 2, y: 4 },
-                Position { x: 2, y: 5 },
-                Position { x: 2, y: 6 },
-                Position { x: 4, y: 7 },
-                Position { x: 4, y: 6 },
-                Position { x: 4, y: 5 },
-                Position { x: 4, y: 4 },
-                Position { x: 4, y: 3 },
-                Position { x: 4, y: 2 },
-            ])
-            .unwrap()
-            .unwrap();
+        let result = runner.run(&vec![
+            Position { x: 2, y: 0 },
+            Position { x: 2, y: 1 },
+            Position { x: 2, y: 2 },
+            Position { x: 2, y: 3 },
+            Position { x: 2, y: 4 },
+            Position { x: 2, y: 5 },
+            Position { x: 2, y: 6 },
+            Position { x: 4, y: 7 },
+            Position { x: 4, y: 6 },
+            Position { x: 4, y: 5 },
+            Position { x: 4, y: 4 },
+            Position { x: 4, y: 3 },
+            Position { x: 4, y: 2 },
+        ])?;
 
-        assert_eq!(result.get_score(), 4);
+        assert_eq!(result.as_ref().map(|res| res.get_score()), Some(4));
         assert_eq!(
-            result.get_solved_path(),
-            vec![
+            result.as_ref().map(|res| res.get_solved_path()),
+            Some(vec![
                 Position { x: 5, y: 5 },
                 Position { x: 6, y: 5 },
                 Position { x: 7, y: 5 },
                 Position { x: 7, y: 6 },
                 Position { x: 7, y: 7 }
-            ]
-        )
+            ])
+        );
+
+        Ok(())
     }
 
     #[test]
-    fn test_run_leveled() {
+    fn test_run_leveled() -> Result<(), Box<dyn Error>> {
         let maze = Maze::new(&MazeConfiguration {
             col_count: 6,
             row_count: 8,
@@ -313,17 +306,16 @@ mod tests {
                     level: 2,
                 },
             ],
-        })
-        .unwrap();
+        })?;
 
         let runner = Runner::new(&maze);
-        let result = runner.run(&vec![]).unwrap().unwrap();
+        let result = runner.run(&vec![])?;
 
-        assert_eq!(result.get_score(), 18);
+        assert_eq!(result.as_ref().map(|res| res.get_score()), Some(18));
 
         assert_eq!(
-            result.get_solved_path(),
-            vec![
+            result.as_ref().map(|res| res.get_solved_path()),
+            Some(vec![
                 Position { x: 0, y: 0 },
                 Position { x: 1, y: 0 },
                 Position { x: 2, y: 0 },
@@ -343,12 +335,14 @@ mod tests {
                 Position { x: 1, y: 3 },
                 Position { x: 1, y: 2 },
                 Position { x: 1, y: 1 }
-            ]
+            ])
         );
+
+        Ok(())
     }
 
     #[test]
-    fn test_run_leveled_with_multiple_entrypoints() {
+    fn test_run_leveled_with_multiple_entrypoints() -> Result<(), Box<dyn Error>> {
         let maze = Maze::new(&MazeConfiguration {
             col_count: 6,
             row_count: 8,
@@ -365,17 +359,16 @@ mod tests {
                     level: 2,
                 },
             ],
-        })
-        .unwrap();
+        })?;
 
         let runner = Runner::new(&maze);
-        let result = runner.run(&vec![]).unwrap().unwrap();
+        let result = runner.run(&vec![])?;
 
-        assert_eq!(result.get_score(), 10);
+        assert_eq!(result.as_ref().map(|res| res.get_score()), Some(10));
 
         assert_eq!(
-            result.get_solved_path(),
-            vec![
+            result.as_ref().map(|res| res.get_solved_path()),
+            Some(vec![
                 Position { x: 4, y: 4 },
                 Position { x: 5, y: 4 },
                 Position { x: 5, y: 5 },
@@ -387,12 +380,14 @@ mod tests {
                 Position { x: 1, y: 3 },
                 Position { x: 1, y: 2 },
                 Position { x: 1, y: 1 }
-            ]
+            ])
         );
+
+        Ok(())
     }
 
     #[test]
-    fn test_run_leveled_with_duplicate_checkpoints_0() {
+    fn test_run_leveled_with_duplicate_checkpoints_0() -> Result<(), Box<dyn Error>> {
         let maze = Maze::new(&MazeConfiguration {
             col_count: 7,
             row_count: 8,
@@ -413,17 +408,16 @@ mod tests {
                     level: 2,
                 },
             ],
-        })
-        .unwrap();
+        })?;
 
         let runner = Runner::new(&maze);
-        let result = runner.run(&vec![]).unwrap().unwrap();
+        let result = runner.run(&vec![])?;
 
-        assert_eq!(result.get_score(), 10);
+        assert_eq!(result.as_ref().map(|res| res.get_score()), Some(10));
 
         assert_eq!(
-            result.get_solved_path(),
-            vec![
+            result.as_ref().map(|res| res.get_solved_path()),
+            Some(vec![
                 Position { x: 0, y: 0 },
                 Position { x: 1, y: 0 },
                 Position { x: 2, y: 0 },
@@ -435,12 +429,14 @@ mod tests {
                 Position { x: 1, y: 3 },
                 Position { x: 1, y: 2 },
                 Position { x: 1, y: 1 }
-            ]
-        )
+            ])
+        );
+
+        Ok(())
     }
 
     #[test]
-    fn test_run_leveled_with_duplicate_checkpoints_1() {
+    fn test_run_leveled_with_duplicate_checkpoints_1() -> Result<(), Box<dyn Error>> {
         let maze = Maze::new(&MazeConfiguration {
             col_count: 7,
             row_count: 8,
@@ -461,17 +457,16 @@ mod tests {
                     level: 2,
                 },
             ],
-        })
-        .unwrap();
+        })?;
 
         let runner = Runner::new(&maze);
-        let result = runner.run(&vec![]).unwrap().unwrap();
+        let result = runner.run(&vec![])?;
 
-        assert_eq!(result.get_score(), 13);
+        assert_eq!(result.as_ref().map(|res| res.get_score()), Some(13));
 
         assert_eq!(
-            result.get_solved_path(),
-            vec![
+            result.as_ref().map(|res| res.get_solved_path()),
+            Some(vec![
                 Position { x: 0, y: 0 },
                 Position { x: 1, y: 0 },
                 Position { x: 2, y: 0 },
@@ -486,12 +481,14 @@ mod tests {
                 Position { x: 5, y: 2 },
                 Position { x: 5, y: 1 },
                 Position { x: 5, y: 0 }
-            ]
+            ])
         );
+
+        Ok(())
     }
 
     #[test]
-    fn test_run_leveled_many_entrypoints_checkpoints_and_walls() {
+    fn test_run_leveled_many_entrypoints_checkpoints_and_walls() -> Result<(), Box<dyn Error>> {
         let maze = Maze::new(&MazeConfiguration {
             col_count: 9,
             row_count: 9,
@@ -528,20 +525,16 @@ mod tests {
                     level: 4,
                 },
             ],
-        })
-        .unwrap();
+        })?;
 
         let runner = Runner::new(&maze);
-        let result = runner
-            .run(&vec![Position { x: 1, y: 6 }, Position { x: 1, y: 5 }])
-            .unwrap()
-            .unwrap();
+        let result = runner.run(&vec![Position { x: 1, y: 6 }, Position { x: 1, y: 5 }])?;
 
-        assert_eq!(result.get_score(), 20);
+        assert_eq!(result.as_ref().map(|res| res.get_score()), Some(20));
 
         assert_eq!(
-            result.get_solved_path(),
-            vec![
+            result.as_ref().map(|res| res.get_solved_path()),
+            Some(vec![
                 Position { x: 0, y: 0 },
                 Position { x: 0, y: 1 },
                 Position { x: 0, y: 2 },
@@ -563,12 +556,14 @@ mod tests {
                 Position { x: 5, y: 1 },
                 Position { x: 5, y: 0 },
                 Position { x: 6, y: 0 }
-            ]
+            ])
         );
+
+        Ok(())
     }
 
     #[test]
-    fn test_run_leveled_inaccessible_checkpoint() {
+    fn test_run_leveled_inaccessible_checkpoint() -> Result<(), Box<dyn Error>> {
         let maze = Maze::new(&MazeConfiguration {
             col_count: 9,
             row_count: 9,
@@ -605,26 +600,26 @@ mod tests {
                     level: 4,
                 },
             ],
-        })
-        .unwrap();
+        })?;
 
         let runner = Runner::new(&maze);
-        let result = runner
-            .run(&vec![
-                Position { x: 1, y: 6 },
-                Position { x: 1, y: 5 },
-                Position { x: 5, y: 4 },
-                Position { x: 3, y: 4 },
-                Position { x: 4, y: 5 },
-                Position { x: 4, y: 3 },
-            ])
-            .unwrap();
+        let result = runner.run(&vec![
+            Position { x: 1, y: 6 },
+            Position { x: 1, y: 5 },
+            Position { x: 5, y: 4 },
+            Position { x: 3, y: 4 },
+            Position { x: 4, y: 5 },
+            Position { x: 4, y: 3 },
+        ])?;
 
         assert!(result.is_none());
+
+        Ok(())
     }
 
     #[test]
-    fn test_run_leveled_inaccessible_checkpoint_but_it_has_duplicate() {
+    fn test_run_leveled_inaccessible_checkpoint_but_it_has_duplicate() -> Result<(), Box<dyn Error>>
+    {
         let maze = Maze::new(&MazeConfiguration {
             col_count: 9,
             row_count: 9,
@@ -665,26 +660,23 @@ mod tests {
                     level: 4,
                 },
             ],
-        })
-        .unwrap();
+        })?;
 
         let runner = Runner::new(&maze);
-        let result = runner
-            .run(&vec![
-                Position { x: 1, y: 6 },
-                Position { x: 1, y: 5 },
-                Position { x: 5, y: 4 },
-                Position { x: 3, y: 4 },
-                Position { x: 4, y: 5 },
-                Position { x: 4, y: 3 },
-            ])
-            .unwrap()
-            .unwrap();
+        let result = runner.run(&vec![
+            Position { x: 1, y: 6 },
+            Position { x: 1, y: 5 },
+            Position { x: 5, y: 4 },
+            Position { x: 3, y: 4 },
+            Position { x: 4, y: 5 },
+            Position { x: 4, y: 3 },
+        ])?;
 
-        assert_eq!(result.get_score(), 18);
+        assert_eq!(result.as_ref().map(|res| res.get_score()), Some(18));
+
         assert_eq!(
-            result.get_solved_path(),
-            vec![
+            result.as_ref().map(|res| res.get_solved_path()),
+            Some(vec![
                 Position { x: 0, y: 0 },
                 Position { x: 0, y: 1 },
                 Position { x: 0, y: 2 },
@@ -704,12 +696,14 @@ mod tests {
                 Position { x: 4, y: 0 },
                 Position { x: 5, y: 0 },
                 Position { x: 6, y: 0 }
-            ]
+            ])
         );
+
+        Ok(())
     }
 
     #[test]
-    fn test_run_leveled_big_maze() {
+    fn test_run_leveled_big_maze() -> Result<(), Box<dyn Error>> {
         let maze = Maze::new(&MazeConfiguration {
             col_count: 210,
             row_count: 26,
@@ -814,20 +808,18 @@ mod tests {
                     level: 21,
                 },
             ],
-        })
-        .unwrap();
+        })?;
 
         let runner = Runner::new(&maze);
-        let run = runner
-            .run(&vec![
-                Position { x: 205, y: 1 },
-                Position { x: 207, y: 1 },
-                Position { x: 206, y: 0 },
-                Position { x: 205, y: 2 },
-            ])
-            .unwrap()
-            .unwrap();
+        let result = runner.run(&vec![
+            Position { x: 205, y: 1 },
+            Position { x: 207, y: 1 },
+            Position { x: 206, y: 0 },
+            Position { x: 205, y: 2 },
+        ])?;
 
-        assert_eq!(run.get_score(), 1985)
+        assert_eq!(result.as_ref().map(|res| res.get_score()), Some(1985));
+
+        Ok(())
     }
 }
