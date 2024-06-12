@@ -1,3 +1,5 @@
+use crate::constants::MIN_MAZE_SIZE;
+
 use super::{
     maze_error::MazeError,
     tile::{Checkpoint, Position, TileBoard, TileKind},
@@ -17,7 +19,10 @@ impl MazeConfiguration {
     pub(crate) fn validate_and_convert_to_board(&self) -> Result<TileBoard, MazeError> {
         let maze_size = self.col_count * self.row_count;
         if maze_size < 4 {
-            return Err(MazeError::InvalidMazeSize { size: maze_size });
+            return Err(MazeError::InvalidMazeSize {
+                size: maze_size,
+                min: MIN_MAZE_SIZE,
+            });
         }
 
         if self.entrypoints.len() == 0 {
@@ -89,7 +94,7 @@ impl MazeConfiguration {
 
 #[cfg(test)]
 mod tests {
-    use crate::tile::TileKind;
+    use crate::{constants::MIN_MAZE_SIZE, tile::TileKind};
 
     // Note this useful idiom: importing names from outer (for mod tests) scope.
     use super::*;
@@ -107,7 +112,13 @@ mod tests {
 
         let board = configuration.validate_and_convert_to_board();
 
-        assert_eq!(board, Err(MazeError::InvalidMazeSize { size: 0 }))
+        assert_eq!(
+            board,
+            Err(MazeError::InvalidMazeSize {
+                size: 0,
+                min: MIN_MAZE_SIZE
+            })
+        )
     }
 
     #[test]

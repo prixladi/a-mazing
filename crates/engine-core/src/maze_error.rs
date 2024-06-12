@@ -4,8 +4,8 @@ use super::tile::{Position, TileKind};
 
 #[derive(Debug, PartialEq, Error)]
 pub enum MazeError {
-    #[error("Maze must have at least 4 tiles, got {size}")]
-    InvalidMazeSize { size: usize },
+    #[error("Maze must have at least {min} tiles, got {size}")]
+    InvalidMazeSize { size: usize, min: usize },
     #[error("Maze required at least one entrypoint")]
     NoEntrypoint,
     #[error("Maze required at least one checkpoint")]
