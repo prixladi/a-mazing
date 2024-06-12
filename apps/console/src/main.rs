@@ -1,7 +1,5 @@
-use engine::{
-    core::{Checkpoint, Maze, MazeConfiguration, Position},
-    runner::Runner,
-};
+use engine_core::{Checkpoint, Maze, MazeConfiguration, Position};
+use engine_runner::Runner;
 
 fn main() {
     let maze = Maze::new(&MazeConfiguration {

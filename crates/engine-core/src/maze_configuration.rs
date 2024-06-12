@@ -65,7 +65,7 @@ impl MazeConfiguration {
             }
             board[x][y] = TileKind::Checkpoint { level };
         }
-        
+
         for &Position { x, y } in self.walls.iter() {
             if x >= self.col_count || y >= self.row_count {
                 return Err(MazeError::TileOutOfBounds(TileDescriptor {
@@ -89,7 +89,7 @@ impl MazeConfiguration {
 
 #[cfg(test)]
 mod tests {
-    use crate::core::tile::TileKind;
+    use crate::tile::TileKind;
 
     // Note this useful idiom: importing names from outer (for mod tests) scope.
     use super::*;
@@ -237,7 +237,7 @@ mod tests {
             board,
             Err(MazeError::OverlappingTiles {
                 position: Position { x: 0, y: 0 },
-                kinds: (TileKind::Wall, TileKind::Entrypoint)
+                kinds: (TileKind::Entrypoint, TileKind::Wall)
             })
         )
     }
@@ -262,7 +262,7 @@ mod tests {
             board,
             Err(MazeError::OverlappingTiles {
                 position: Position { x: 1, y: 1 },
-                kinds: (TileKind::Wall, TileKind::Checkpoint { level: 1 })
+                kinds: (TileKind::Checkpoint { level: 1 }, TileKind::Wall)
             })
         )
     }

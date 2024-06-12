@@ -37,7 +37,7 @@ impl Maze {
 
 #[cfg(test)]
 mod tests {
-    use crate::core::tile::{Checkpoint, TileKind};
+    use crate::tile::{Checkpoint, TileKind};
 
     // Note this useful idiom: importing names from outer (for mod tests) scope.
     use super::*;

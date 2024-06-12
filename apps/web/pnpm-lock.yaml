@@ -8,12 +8,12 @@ dependencies:
   clsx:
     specifier: ^2.1.1
     version: 2.1.1
-  engine:
-    specifier: file:../../lib/engine-wasm/pkg
-    version: file:../../lib/engine-wasm/pkg
   lucide-react:
     specifier: ^0.390.0
     version: 0.390.0(react@18.3.1)
+  mazer:
+    specifier: file:../mazer/pkg
+    version: file:../mazer/pkg
   next:
     specifier: 14.2.3
     version: 14.2.3(react-dom@18.3.1)(react@18.3.1)
@@ -2862,7 +2862,7 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  file:../../lib/engine-wasm/pkg:
-    resolution: {directory: ../../lib/engine-wasm/pkg, type: directory}
-    name: engine-wasm
+  file:../mazer/pkg:
+    resolution: {directory: ../mazer/pkg, type: directory}
+    name: mazer
     dev: false

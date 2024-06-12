@@ -9,8 +9,8 @@ import { Position, TileKind } from '~/types/tile';
 import { MazeConfiguration } from '~/types/maze';
 
 const config: MazeConfiguration = {
-  colCount: 50,
-  rowCount: 50,
+  colCount: 15,
+  rowCount: 10,
   walls: [
     [5, 5],
     [7, 7],

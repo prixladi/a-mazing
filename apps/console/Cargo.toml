@@ -5,4 +5,5 @@ authors = ["Ladislav Prix <elix78963@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-engine  = { path = "../../lib/engine" }
+engine-core  = { path = "../../crates/engine-core" }
+engine-runner  = { path = "../../crates/engine-runner" }

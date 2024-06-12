@@ -1,6 +1,6 @@
 use std::collections::VecDeque;
 
-use crate::core::{Position, TileBoard};
+use engine_core::{Position, TileBoard};
 
 use super::nodes::Nodes;
 

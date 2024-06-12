@@ -1,8 +1,9 @@
 [workspace]
 members = [ 
-    "lib/*",
-    "dbg/console",
+    "crates/*",
+    "apps/*",
 ]
+exclude = ["apps/web"]
 
 [profile.dev]
 opt-level = 0

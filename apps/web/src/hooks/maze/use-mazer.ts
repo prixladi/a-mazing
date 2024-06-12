@@ -3,7 +3,7 @@ import init, {
   MazerConfiguration,
   MazerPosition,
   MazerCheckpoint,
-} from 'engine';
+} from 'mazer';
 import { useEffect, useRef, useState } from 'react';
 
 import { MazeConfiguration, MazeMutations } from '~/types/maze';

@@ -1,10 +1,9 @@
 mod models;
 mod utils;
 
-use engine::{
-    core::{Checkpoint, Maze, MazeConfiguration, Position},
-    runner::Runner,
-};
+use engine_core::{Checkpoint, Maze, MazeConfiguration, Position};
+use engine_runner::Runner;
+
 use models::{MazerConfiguration, MazerPosition, MazerRunResult};
 use utils::set_panic_hook;
 use wasm_bindgen::prelude::*;

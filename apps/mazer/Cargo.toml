@@ -1,5 +1,5 @@
 [package]
-name = "engine-wasm"
+name = "mazer"
 version = "0.1.0"
 authors = ["Ladislav Prix <elix78963@gmail.com>"]
 edition = "2018"
@@ -13,7 +13,8 @@ default = ["console_error_panic_hook"]
 [dependencies]
 wasm-bindgen = "0.2.84"
 console_error_panic_hook = { version = "0.1.7", optional = true }
-engine  = { path = "../engine" }
+engine-core  = { path = "../../crates/engine-core" }
+engine-runner  = { path = "../../crates/engine-runner" }
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.34"

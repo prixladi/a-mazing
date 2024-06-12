@@ -1,8 +1,11 @@
 [package]
-name = "engine"
+name = "engine-runner"
 version = "0.1.0"
 authors = ["Ladislav Prix <elix78963@gmail.com>"]
 edition = "2018"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+engine-core  = { path = "../engine-core" }

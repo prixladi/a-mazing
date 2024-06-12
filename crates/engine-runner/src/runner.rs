@@ -1,4 +1,4 @@
-use crate::core::{Maze, Position, TileBoard, TileKind};
+use engine_core::{Maze, Position, TileBoard, TileKind};
 
 use super::run::Run;
 
@@ -97,7 +97,7 @@ fn get_board_with_soft_walls(
 
 #[cfg(test)]
 mod tests {
-    use crate::core::{Checkpoint, MazeConfiguration};
+    use engine_core::{Checkpoint, MazeConfiguration};
 
     // Note this useful idiom: importing names from outer (for mod tests) scope.
     use super::*;

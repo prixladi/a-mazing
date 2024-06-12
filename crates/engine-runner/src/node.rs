@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::core::{Position, TileKind};
+use engine_core::{Position, TileKind};
 
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) struct Node {
