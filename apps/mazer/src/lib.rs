@@ -1,8 +1,8 @@
 mod models;
 mod utils;
 
-use engine_core::{Checkpoint, Maze, MazeConfiguration, Position};
-use engine_runner::Runner;
+use maze_core::{Checkpoint, Maze, MazeConfiguration, Position};
+use maze_runner::MazeRunner;
 
 use models::{MazerConfiguration, MazerPosition, MazerRunResult};
 use utils::set_panic_hook;
@@ -68,10 +68,10 @@ impl Mazer {
             })
             .collect();
 
-        let runner = Runner::new(&self.maze);
+        let runner = MazeRunner::new(&self.maze);
         let result = runner.run(&walls).unwrap();
 
-        return result.map(|run| {
+        result.map(|run| {
             MazerRunResult::new(
                 run.get_score(),
                 run.get_solved_path()
@@ -80,6 +80,6 @@ impl Mazer {
                     .map(|Position { x, y }| MazerPosition::new(x, y))
                     .collect(),
             )
-        });
+        })
     }
 }

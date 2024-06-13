@@ -1,4 +1,4 @@
-use engine_core::Position;
+use maze_core::Position;
 use thiserror::Error;
 
 #[derive(Debug, Error)]

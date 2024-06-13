@@ -1,22 +1,22 @@
 use std::collections::VecDeque;
 
-use engine_core::{Position, TileBoard};
+use maze_core::{Position, TileBoard};
 
 use super::nodes::Nodes;
 
-pub struct Run {
+pub struct MazeRun {
     asc_checkpoint_levels: Vec<i32>,
     exit_position: Position,
     evaluated_nodes: Nodes,
     distance: u32,
 }
 
-impl Run {
+impl MazeRun {
     pub(crate) fn execute(
         tiles: &TileBoard,
         ascending_checkpoint_levels: &Vec<i32>,
         entrypoint_position: &Position,
-    ) -> Option<Run> {
+    ) -> Option<MazeRun> {
         let mut nodes = Nodes::new(tiles);
         let entrypoint_node = nodes.get_node_mut(entrypoint_position);
         entrypoint_node.set_distance(ascending_checkpoint_levels[0], 0);
@@ -86,7 +86,10 @@ impl Run {
                 panic!("Unable to get solved path for solved maze run! Too many iterations.");
             }
 
-            let current_node = best_path.last().unwrap();
+            let current_node = best_path
+                .last()
+                // this unwrap will never panic because best_path path will always have at least one element
+                .unwrap();
 
             match current_level {
                 Some(level) if current_node.is_checkpoint(level) => {

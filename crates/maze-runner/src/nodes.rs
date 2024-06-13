@@ -1,4 +1,4 @@
-use engine_core::{Position, TileBoard};
+use maze_core::{Position, TileBoard};
 
 use super::node::Node;
 
@@ -78,7 +78,7 @@ impl Nodes {
 mod tests {
     use super::*;
 
-    use engine_core::TileKind;
+    use maze_core::TileKind;
 
     #[test]
     fn test_nodes_get_node_from_maze() {

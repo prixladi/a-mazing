@@ -1,5 +1,5 @@
-use engine_core::{Checkpoint, Maze, MazeConfiguration, Position};
-use engine_runner::Runner;
+use maze_core::{Checkpoint, Maze, MazeConfiguration, Position};
+use maze_runner::MazeRunner;
 
 fn main() {
     let maze = Maze::new(&MazeConfiguration {
@@ -33,7 +33,7 @@ fn main() {
     })
     .unwrap();
 
-    let runner = Runner::new(&maze);
+    let runner = MazeRunner::new(&maze);
     let result = runner.run(&vec![]).unwrap().unwrap();
 
     println!("{:?}", result.get_score());
@@ -65,11 +65,11 @@ fn main() {
     })
     .unwrap();
 
-    let runner = Runner::new(&maze);
+    let runner = MazeRunner::new(&maze);
     let result = runner.run(&vec![]).unwrap().unwrap();
     println!("{:?}", result.get_score());
 
-    let runner = Runner::new(&maze);
+    let runner = MazeRunner::new(&maze);
     let result = runner
         .run(&vec![
             Position { x: 19, y: 1 },
@@ -108,11 +108,11 @@ fn main() {
     })
     .unwrap();
 
-    let runner = Runner::new(&maze);
+    let runner = MazeRunner::new(&maze);
     let result = runner.run(&vec![]).unwrap().unwrap();
     println!("{:?}", result.get_score());
 
-    let runner = Runner::new(&maze);
+    let runner = MazeRunner::new(&maze);
     let result = runner
         .run(&vec![
             Position { x: 19, y: 1 },
@@ -231,11 +231,11 @@ fn main() {
     })
     .unwrap();
 
-    let runner = Runner::new(&maze);
+    let runner = MazeRunner::new(&maze);
     let result = runner.run(&vec![]).unwrap().unwrap();
     println!("{:?}", result.get_score());
 
-    let runner = Runner::new(&maze);
+    let runner = MazeRunner::new(&maze);
     let result = runner
         .run(&vec![
             Position { x: 205, y: 1 },
@@ -247,7 +247,7 @@ fn main() {
         .unwrap();
     println!("{:?}", result.get_score());
 
-    let runner = Runner::new(&maze);
+    let runner = MazeRunner::new(&maze);
     let result = runner.run(&vec![Position { x: 7, y: 6 }]).unwrap().unwrap();
     println!("{:?}", result.get_score());
 
@@ -358,11 +358,11 @@ fn main() {
     })
     .unwrap();
 
-    let runner = Runner::new(&maze);
+    let runner = MazeRunner::new(&maze);
     let result = runner.run(&vec![]).unwrap().unwrap();
     println!("{:?}", result.get_score());
 
-    let runner = Runner::new(&maze);
+    let runner = MazeRunner::new(&maze);
     let result = runner
         .run(&vec![
             Position { x: 205, y: 1 },
@@ -374,11 +374,11 @@ fn main() {
         .unwrap();
     println!("{:?}", result.get_score());
 
-    let runner = Runner::new(&maze);
+    let runner = MazeRunner::new(&maze);
     let result = runner.run(&vec![Position { x: 7, y: 6 }]).unwrap().unwrap();
     println!("{:?}", result.get_score());
 
-    let runner = Runner::new(&maze);
+    let runner = MazeRunner::new(&maze);
     let result = runner
         .run(&vec![
             Position { x: 2, y: 0 },

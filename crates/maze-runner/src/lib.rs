@@ -4,4 +4,4 @@ mod run;
 mod runner;
 mod runner_error;
 
-pub use runner::Runner;
+pub use runner::MazeRunner;

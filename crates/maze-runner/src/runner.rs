@@ -1,15 +1,15 @@
-use engine_core::{Maze, Position, TileBoard, TileKind};
+use maze_core::{Maze, Position, TileBoard, TileKind};
 
 use crate::runner_error::RunnerError;
 
-use super::run::Run;
+use super::run::MazeRun;
 
-pub struct Runner<'a> {
+pub struct MazeRunner<'a> {
     maze: &'a Maze,
     ascending_checkpoint_levels: Vec<i32>,
 }
 
-impl<'a> Runner<'a> {
+impl<'a> MazeRunner<'a> {
     pub fn new(maze: &'a Maze) -> Self {
         let mut checkpoint_levels: Vec<i32> = maze
             .get_board()
@@ -35,13 +35,13 @@ impl<'a> Runner<'a> {
         }
     }
 
-    pub fn run(&self, soft_walls: &Vec<Position>) -> Result<Option<Run>, RunnerError> {
+    pub fn run(&self, soft_walls: &Vec<Position>) -> Result<Option<MazeRun>, RunnerError> {
         let board = get_board_with_soft_walls(&self.maze, soft_walls)?;
         let entrypoints = self.maze.get_entrypoints();
-        let mut best_run: Option<Run> = None;
+        let mut best_run: Option<MazeRun> = None;
 
         for entrypoint in entrypoints.iter() {
-            let current_run = Run::execute(&board, &self.ascending_checkpoint_levels, entrypoint);
+            let current_run = MazeRun::execute(&board, &self.ascending_checkpoint_levels, entrypoint);
 
             if let Some(new) = current_run {
                 best_run = match best_run {
@@ -87,14 +87,14 @@ fn get_board_with_soft_walls(
         tiles[x][y] = TileKind::Wall
     }
 
-    return Ok(tiles);
+    Ok(tiles)
 }
 
 #[cfg(test)]
 mod tests {
     use std::error::Error;
 
-    use engine_core::{Checkpoint, MazeConfiguration};
+    use maze_core::{Checkpoint, MazeConfiguration};
 
     // Note this useful idiom: importing names from outer (for mod tests) scope.
     use super::*;
@@ -113,7 +113,7 @@ mod tests {
             }],
         })?;
 
-        let runner = Runner::new(&maze);
+        let runner = MazeRunner::new(&maze);
         let result = runner.run(&vec![])?;
 
         assert_eq!(result.as_ref().map(|res| res.get_score()), Some(14));
@@ -156,7 +156,7 @@ mod tests {
             }],
         })?;
 
-        let runner = Runner::new(&maze);
+        let runner = MazeRunner::new(&maze);
         let result = runner.run(&vec![
             Position { x: 2, y: 0 },
             Position { x: 2, y: 1 },
@@ -225,7 +225,7 @@ mod tests {
             }],
         })?;
 
-        let runner = Runner::new(&maze);
+        let runner = MazeRunner::new(&maze);
         let result = runner.run(&vec![
             Position { x: 2, y: 0 },
             Position { x: 2, y: 1 },
@@ -256,7 +256,7 @@ mod tests {
             }],
         })?;
 
-        let runner = Runner::new(&maze);
+        let runner = MazeRunner::new(&maze);
         let result = runner.run(&vec![
             Position { x: 2, y: 0 },
             Position { x: 2, y: 1 },
@@ -308,7 +308,7 @@ mod tests {
             ],
         })?;
 
-        let runner = Runner::new(&maze);
+        let runner = MazeRunner::new(&maze);
         let result = runner.run(&vec![])?;
 
         assert_eq!(result.as_ref().map(|res| res.get_score()), Some(18));
@@ -361,7 +361,7 @@ mod tests {
             ],
         })?;
 
-        let runner = Runner::new(&maze);
+        let runner = MazeRunner::new(&maze);
         let result = runner.run(&vec![])?;
 
         assert_eq!(result.as_ref().map(|res| res.get_score()), Some(10));
@@ -410,7 +410,7 @@ mod tests {
             ],
         })?;
 
-        let runner = Runner::new(&maze);
+        let runner = MazeRunner::new(&maze);
         let result = runner.run(&vec![])?;
 
         assert_eq!(result.as_ref().map(|res| res.get_score()), Some(10));
@@ -459,7 +459,7 @@ mod tests {
             ],
         })?;
 
-        let runner = Runner::new(&maze);
+        let runner = MazeRunner::new(&maze);
         let result = runner.run(&vec![])?;
 
         assert_eq!(result.as_ref().map(|res| res.get_score()), Some(13));
@@ -527,7 +527,7 @@ mod tests {
             ],
         })?;
 
-        let runner = Runner::new(&maze);
+        let runner = MazeRunner::new(&maze);
         let result = runner.run(&vec![Position { x: 1, y: 6 }, Position { x: 1, y: 5 }])?;
 
         assert_eq!(result.as_ref().map(|res| res.get_score()), Some(20));
@@ -602,7 +602,7 @@ mod tests {
             ],
         })?;
 
-        let runner = Runner::new(&maze);
+        let runner = MazeRunner::new(&maze);
         let result = runner.run(&vec![
             Position { x: 1, y: 6 },
             Position { x: 1, y: 5 },
@@ -662,7 +662,7 @@ mod tests {
             ],
         })?;
 
-        let runner = Runner::new(&maze);
+        let runner = MazeRunner::new(&maze);
         let result = runner.run(&vec![
             Position { x: 1, y: 6 },
             Position { x: 1, y: 5 },
@@ -810,7 +810,7 @@ mod tests {
             ],
         })?;
 
-        let runner = Runner::new(&maze);
+        let runner = MazeRunner::new(&maze);
         let result = runner.run(&vec![
             Position { x: 205, y: 1 },
             Position { x: 207, y: 1 },

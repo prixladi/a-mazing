@@ -1,5 +1,5 @@
 [package]
-name = "engine-runner"
+name = "maze-core"
 version = "0.1.0"
 authors = ["Ladislav Prix <elix78963@gmail.com>"]
 edition = "2018"
@@ -8,5 +8,4 @@ edition = "2018"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-engine-core  = { path = "../engine-core" }
 thiserror = "1.0.61"
