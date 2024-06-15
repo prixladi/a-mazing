@@ -1,6 +1,6 @@
 use std::ops::Range;
 
-use maze_core::MazeConfiguration;
+use maze_core::MazeConfig;
 
 use crate::GeneratorError;
 
@@ -28,7 +28,7 @@ impl WaterfallGenerator {
 }
 
 impl MazeGenerator for WaterfallGenerator {
-    fn generate(&self) -> Result<MazeConfiguration, GeneratorError> {
+    fn generate(&self) -> Result<MazeConfig, GeneratorError> {
         let checkpoint_count = get_random_number_in_range(CHECKPOINT_RANGE);
         let wall_count = get_random_number_in_range(WALL_RANGE);
         let max_soft_wall_count = get_random_number_in_range(MAX_SOFT_WALL_RANGE);
@@ -61,7 +61,7 @@ impl MazeGenerator for WaterfallGenerator {
 
         let checkpoints = get_checkpoints(&checkpoint_positions, &exit_positions);
 
-        let mut config = MazeConfiguration {
+        let mut config = MazeConfig {
             col_count: COL_COUNT,
             row_count: ROW_COUNT,
             max_soft_wall_count: wall_count as u32,
@@ -87,8 +87,8 @@ mod tests {
     fn test_waterfall_generator() {
         let generator = WaterfallGenerator::new();
         for _ in 0..5 {
-            let configuration = generator.generate();
-            assert!(configuration.is_ok());
+            let config = generator.generate();
+            assert!(config.is_ok());
         }
     }
 }

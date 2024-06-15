@@ -95,14 +95,14 @@ fn get_board_with_soft_walls(
 mod tests {
     use std::error::Error;
 
-    use maze_core::{Checkpoint, MazeConfiguration};
+    use maze_core::{Checkpoint, MazeConfig};
 
     // Note this useful idiom: importing names from outer (for mod tests) scope.
     use super::*;
 
     #[test]
     fn test_run_basic() -> Result<(), Box<dyn Error>> {
-        let maze = Maze::new(&MazeConfiguration {
+        let maze = Maze::new(&MazeConfig {
             col_count: 8,
             row_count: 8,
             max_soft_wall_count: 200,
@@ -145,7 +145,7 @@ mod tests {
 
     #[test]
     fn test_run_basic_with_many_walls() -> Result<(), Box<dyn Error>> {
-        let maze = Maze::new(&MazeConfiguration {
+        let maze = Maze::new(&MazeConfig {
             col_count: 8,
             row_count: 8,
             max_soft_wall_count: 200,
@@ -214,7 +214,7 @@ mod tests {
 
     #[test]
     fn test_run_basic_with_inaccessible_checkpoint() -> Result<(), Box<dyn Error>> {
-        let maze = Maze::new(&MazeConfiguration {
+        let maze = Maze::new(&MazeConfig {
             col_count: 8,
             row_count: 8,
             max_soft_wall_count: 200,
@@ -245,7 +245,7 @@ mod tests {
 
     #[test]
     fn test_run_basic_with_multiple_entrypoints() -> Result<(), Box<dyn Error>> {
-        let maze = Maze::new(&MazeConfiguration {
+        let maze = Maze::new(&MazeConfig {
             col_count: 8,
             row_count: 8,
             max_soft_wall_count: 200,
@@ -291,7 +291,7 @@ mod tests {
 
     #[test]
     fn test_run_leveled() -> Result<(), Box<dyn Error>> {
-        let maze = Maze::new(&MazeConfiguration {
+        let maze = Maze::new(&MazeConfig {
             col_count: 6,
             row_count: 8,
             max_soft_wall_count: 200,
@@ -344,7 +344,7 @@ mod tests {
 
     #[test]
     fn test_run_leveled_with_multiple_entrypoints() -> Result<(), Box<dyn Error>> {
-        let maze = Maze::new(&MazeConfiguration {
+        let maze = Maze::new(&MazeConfig {
             col_count: 6,
             row_count: 8,
             max_soft_wall_count: 200,
@@ -389,7 +389,7 @@ mod tests {
 
     #[test]
     fn test_run_leveled_with_duplicate_checkpoints_0() -> Result<(), Box<dyn Error>> {
-        let maze = Maze::new(&MazeConfiguration {
+        let maze = Maze::new(&MazeConfig {
             col_count: 7,
             row_count: 8,
             max_soft_wall_count: 200,
@@ -438,7 +438,7 @@ mod tests {
 
     #[test]
     fn test_run_leveled_with_duplicate_checkpoints_1() -> Result<(), Box<dyn Error>> {
-        let maze = Maze::new(&MazeConfiguration {
+        let maze = Maze::new(&MazeConfig {
             col_count: 7,
             row_count: 8,
             max_soft_wall_count: 200,
@@ -490,7 +490,7 @@ mod tests {
 
     #[test]
     fn test_run_leveled_many_entrypoints_checkpoints_and_walls() -> Result<(), Box<dyn Error>> {
-        let maze = Maze::new(&MazeConfiguration {
+        let maze = Maze::new(&MazeConfig {
             col_count: 9,
             row_count: 9,
             max_soft_wall_count: 200,
@@ -565,7 +565,7 @@ mod tests {
 
     #[test]
     fn test_run_leveled_inaccessible_checkpoint() -> Result<(), Box<dyn Error>> {
-        let maze = Maze::new(&MazeConfiguration {
+        let maze = Maze::new(&MazeConfig {
             col_count: 9,
             row_count: 9,
             max_soft_wall_count: 200,
@@ -621,7 +621,7 @@ mod tests {
     #[test]
     fn test_run_leveled_inaccessible_checkpoint_but_it_has_duplicate() -> Result<(), Box<dyn Error>>
     {
-        let maze = Maze::new(&MazeConfiguration {
+        let maze = Maze::new(&MazeConfig {
             col_count: 9,
             row_count: 9,
             max_soft_wall_count: 200,
@@ -705,7 +705,7 @@ mod tests {
 
     #[test]
     fn test_run_leveled_big_maze() -> Result<(), Box<dyn Error>> {
-        let maze = Maze::new(&MazeConfiguration {
+        let maze = Maze::new(&MazeConfig {
             col_count: 210,
             row_count: 26,
             max_soft_wall_count: 200,

@@ -6,14 +6,14 @@ import { MazeBoard } from '~/components/maze';
 import { useMaze, useMazer } from '~/hooks/maze';
 import { Position, TileKind } from '~/types/tile';
 
-import { MazeConfiguration } from '~/types/maze';
+import { MazeConfig } from '~/types/maze';
 import { useMazerGenerator } from '~/hooks/maze/use-mazer-generator';
 
 const tileOnHover = (kind: TileKind) =>
   kind === 'Empty' ? { kind: 'SoftWall' } : null;
 
 export default function Home() {
-  const [mazeConfiguration, setMazeConfiguration] = useState<MazeConfiguration>({
+  const [mazeConfig, setMazeConfig] = useState<MazeConfig>({
     colCount: 15,
     rowCount: 10,
     walls: [
@@ -39,9 +39,9 @@ export default function Home() {
 
   const {generateConfig} = useMazerGenerator();
   const { mazeMutations, mazeBoard, mazeLimits, mutateMazePosition, clearMutations } =
-    useMaze(mazeConfiguration);
+    useMaze(mazeConfig);
 
-  const { score } = useMazer(mazeConfiguration, mazeMutations);
+  const { score } = useMazer(mazeConfig, mazeMutations);
 
   const onTileClick = useCallback(
     (position: Position, kind: TileKind) => {
@@ -64,7 +64,7 @@ export default function Home() {
         <button onClick={() => {
           const config = generateConfig();
           clearMutations();
-          setMazeConfiguration(config);
+          setMazeConfig(config);
         }}>NEW</button>
       </div>
     </main>

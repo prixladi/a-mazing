@@ -1,7 +1,7 @@
-use maze_core::{Checkpoint, MazeConfiguration, Position};
+use maze_core::{Checkpoint, MazeConfig, Position};
 use maze_runner::MazeRunResult;
 
-use crate::models::{MazerCheckpoint, MazerConfiguration, MazerPosition, MazerRunResult};
+use crate::models::{MazerCheckpoint, MazerConfig, MazerPosition, MazerRunResult};
 
 pub(crate) fn to_mazer_position(position: &Position) -> MazerPosition {
     MazerPosition::new(position.x, position.y)
@@ -25,8 +25,8 @@ pub(crate) fn from_mazer_checkpoint(checkpoint: &MazerCheckpoint) -> Checkpoint 
     }
 }
 
-pub(crate) fn to_mazer_config(config: &MazeConfiguration) -> MazerConfiguration {
-    MazerConfiguration::new(
+pub(crate) fn to_mazer_config(config: &MazeConfig) -> MazerConfig {
+    MazerConfig::new(
         config.col_count,
         config.row_count,
         config.max_soft_wall_count,
@@ -36,8 +36,8 @@ pub(crate) fn to_mazer_config(config: &MazeConfiguration) -> MazerConfiguration 
     )
 }
 
-pub(crate) fn from_mazer_config(config: &MazerConfiguration) -> MazeConfiguration {
-    MazeConfiguration {
+pub(crate) fn from_mazer_config(config: &MazerConfig) -> MazeConfig {
+    MazeConfig {
         col_count: config.get_col_count(),
         row_count: config.get_row_count(),
         max_soft_wall_count: config.get_max_soft_wall_count(),

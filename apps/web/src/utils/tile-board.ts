@@ -1,10 +1,10 @@
-import { MazeConfiguration } from '~/types/maze';
+import { MazeConfig } from '~/types/maze';
 import { Tile, MazeTileBoard, MazeTileBoardBuilder } from '~/types/tile';
 
 export const createEmptyTileBoardBuilder = ({
   colCount,
   rowCount,
-}: Pick<MazeConfiguration, 'colCount' | 'rowCount'>): MazeTileBoardBuilder => {
+}: Pick<MazeConfig, 'colCount' | 'rowCount'>): MazeTileBoardBuilder => {
   const builder: MazeTileBoardBuilder = [];
   for (let x = 0; x < colCount; x++) {
     const row: Tile[] = [];

@@ -2,7 +2,6 @@ use crate::utils::set_panic_hook;
 
 use wasm_bindgen::prelude::*;
 
-
 #[wasm_bindgen]
 #[derive(Clone)]
 pub struct MazerPosition {
@@ -56,7 +55,7 @@ impl MazerCheckpoint {
 }
 
 #[wasm_bindgen]
-pub struct MazerConfiguration {
+pub struct MazerConfig {
     col_count: usize,
     row_count: usize,
     max_soft_wall_count: u32,
@@ -66,7 +65,7 @@ pub struct MazerConfiguration {
 }
 
 #[wasm_bindgen]
-impl MazerConfiguration {
+impl MazerConfig {
     #[wasm_bindgen]
     pub fn new(
         col_count: usize,

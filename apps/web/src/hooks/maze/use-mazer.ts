@@ -1,16 +1,16 @@
 import {
   Mazer,
-  MazerConfiguration,
+  MazerConfig,
   MazerPosition,
   MazerCheckpoint,
 } from 'mazer';
 import { useEffect, useState } from 'react';
 
-import { MazeConfiguration, MazeMutations } from '~/types/maze';
+import { MazeConfig, MazeMutations } from '~/types/maze';
 import { useMazerInitialization } from './use-mazer-initialization';
 
 export const useMazer = (
-  mazeConfiguration: MazeConfiguration,
+  mazeConfig: MazeConfig,
   mazeMutations: MazeMutations
 ) => {
   const [mazer, setMazer] = useState<Mazer | null>(null);
@@ -21,23 +21,23 @@ export const useMazer = (
   useEffect(() => {
     if (!isMazerReady) return;
 
-    const walls = mazeConfiguration.walls.map(([x, y]) =>
+    const walls = mazeConfig.walls.map(([x, y]) =>
       MazerPosition.new(x, y)
     );
-    const entrypoints = mazeConfiguration.entrypoints.map(([x, y]) =>
+    const entrypoints = mazeConfig.entrypoints.map(([x, y]) =>
       MazerPosition.new(x, y)
     );
-    const checkpoints = mazeConfiguration.checkpoints.map(
+    const checkpoints = mazeConfig.checkpoints.map(
       ({ position: [x, y], level }) => {
         const position = MazerPosition.new(x, y);
         return MazerCheckpoint.new(position, level);
       }
     );
 
-    const options = MazerConfiguration.new(
-      mazeConfiguration.colCount,
-      mazeConfiguration.rowCount,
-      mazeConfiguration.maxSoftWallCount,
+    const options = MazerConfig.new(
+      mazeConfig.colCount,
+      mazeConfig.rowCount,
+      mazeConfig.maxSoftWallCount,
       entrypoints,
       checkpoints,
       walls
@@ -45,7 +45,7 @@ export const useMazer = (
 
     const mazer = Mazer.new(options);
     setMazer(mazer);
-  }, [mazeConfiguration, isMazerReady]);
+  }, [mazeConfig, isMazerReady]);
 
   useEffect(() => {
     if (!mazer) return;

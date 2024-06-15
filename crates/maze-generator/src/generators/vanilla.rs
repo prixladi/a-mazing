@@ -1,6 +1,6 @@
 use std::ops::Range;
 
-use maze_core::MazeConfiguration;
+use maze_core::MazeConfig;
 
 use crate::GeneratorError;
 
@@ -30,7 +30,7 @@ impl VanillaGenerator {
 }
 
 impl MazeGenerator for VanillaGenerator {
-    fn generate(&self) -> Result<MazeConfiguration, GeneratorError> {
+    fn generate(&self) -> Result<MazeConfig, GeneratorError> {
         let entrypoint_count = get_random_number_in_range(ENTRYPOINT_RANGE);
         let checkpoint_count = get_random_number_in_range(CHECKPOINT_RANGE);
         let exit_count = get_random_number_in_range(EXIT_RANGE);
@@ -66,7 +66,7 @@ impl MazeGenerator for VanillaGenerator {
 
         let checkpoints = get_checkpoints(&checkpoint_positions, &exit_positions);
 
-        let mut config = MazeConfiguration {
+        let mut config = MazeConfig {
             col_count: COL_COUNT,
             row_count: ROW_COUNT,
             max_soft_wall_count: wall_count as u32,
@@ -92,8 +92,8 @@ mod tests {
     fn test_vanilla_generator() {
         let generator = VanillaGenerator::new();
         for _ in 0..5 {
-            let configuration = generator.generate();
-            assert!(configuration.is_ok());
+            let config = generator.generate();
+            assert!(config.is_ok());
         }
     }
 }

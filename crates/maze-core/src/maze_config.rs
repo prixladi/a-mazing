@@ -6,7 +6,7 @@ use super::{
 };
 
 #[derive(Debug, PartialEq)]
-pub struct MazeConfiguration {
+pub struct MazeConfig {
     pub col_count: usize,
     pub row_count: usize,
     pub max_soft_wall_count: u32,
@@ -15,7 +15,7 @@ pub struct MazeConfiguration {
     pub walls: Vec<Position>,
 }
 
-impl MazeConfiguration {
+impl MazeConfig {
     pub(crate) fn validate_and_convert_to_board(&self) -> Result<TileBoard, MazeError> {
         let maze_size = self.col_count * self.row_count;
         if maze_size < 4 {
@@ -101,7 +101,7 @@ mod tests {
 
     #[test]
     fn test_validate_and_convert_to_board_with_invalid_size() {
-        let configuration = MazeConfiguration {
+        let config = MazeConfig {
             col_count: 1,
             row_count: 0,
             max_soft_wall_count: 5,
@@ -110,7 +110,7 @@ mod tests {
             checkpoints: vec![],
         };
 
-        let board = configuration.validate_and_convert_to_board();
+        let board = config.validate_and_convert_to_board();
 
         assert_eq!(
             board,
@@ -123,7 +123,7 @@ mod tests {
 
     #[test]
     fn test_validate_and_convert_to_board_without_any_entrypoint() {
-        let configuration = MazeConfiguration {
+        let config = MazeConfig {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
@@ -132,14 +132,14 @@ mod tests {
             checkpoints: vec![],
         };
 
-        let board = configuration.validate_and_convert_to_board();
+        let board = config.validate_and_convert_to_board();
 
         assert_eq!(board, Err(MazeError::NoEntrypoint))
     }
 
     #[test]
     fn test_validate_and_convert_to_board_without_any_checkpoint() {
-        let configuration = MazeConfiguration {
+        let config = MazeConfig {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
@@ -148,14 +148,14 @@ mod tests {
             checkpoints: vec![],
         };
 
-        let board = configuration.validate_and_convert_to_board();
+        let board = config.validate_and_convert_to_board();
 
         assert_eq!(board, Err(MazeError::NoCheckpoint))
     }
 
     #[test]
     fn test_validate_and_convert_to_board_with_wall_out_of_bounds() {
-        let configuration = MazeConfiguration {
+        let config = MazeConfig {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
@@ -167,7 +167,7 @@ mod tests {
             }],
         };
 
-        let board = configuration.validate_and_convert_to_board();
+        let board = config.validate_and_convert_to_board();
 
         assert_eq!(
             board,
@@ -180,7 +180,7 @@ mod tests {
 
     #[test]
     fn test_create_with_entrypoint_out_of_bounds() {
-        let configuration = MazeConfiguration {
+        let config = MazeConfig {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
@@ -192,7 +192,7 @@ mod tests {
             }],
         };
 
-        let board = configuration.validate_and_convert_to_board();
+        let board = config.validate_and_convert_to_board();
 
         assert_eq!(
             board,
@@ -205,7 +205,7 @@ mod tests {
 
     #[test]
     fn test_validate_and_convert_to_board_with_checkpoint_out_of_bounds() {
-        let configuration = MazeConfiguration {
+        let config = MazeConfig {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
@@ -217,7 +217,7 @@ mod tests {
             }],
         };
 
-        let board = configuration.validate_and_convert_to_board();
+        let board = config.validate_and_convert_to_board();
 
         assert_eq!(
             board,
@@ -230,7 +230,7 @@ mod tests {
 
     #[test]
     fn test_validate_and_convert_to_board_with_overlapping_wall_and_entrypoint() {
-        let configuration = MazeConfiguration {
+        let config = MazeConfig {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
@@ -242,7 +242,7 @@ mod tests {
             }],
         };
 
-        let board = configuration.validate_and_convert_to_board();
+        let board = config.validate_and_convert_to_board();
 
         assert_eq!(
             board,
@@ -255,7 +255,7 @@ mod tests {
 
     #[test]
     fn test_validate_and_convert_to_board_with_overlapping_wall_and_checkpoint() {
-        let configuration = MazeConfiguration {
+        let config = MazeConfig {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 5,
@@ -267,7 +267,7 @@ mod tests {
             }],
         };
 
-        let board = configuration.validate_and_convert_to_board();
+        let board = config.validate_and_convert_to_board();
 
         assert_eq!(
             board,
@@ -280,7 +280,7 @@ mod tests {
 
     #[test]
     fn test_validate_and_convert_to_board() {
-        let configuration = MazeConfiguration {
+        let config = MazeConfig {
             col_count: 3,
             row_count: 3,
             max_soft_wall_count: 5,
@@ -298,7 +298,7 @@ mod tests {
             ],
         };
 
-        let board = configuration.validate_and_convert_to_board();
+        let board = config.validate_and_convert_to_board();
 
         assert_eq!(
             board,

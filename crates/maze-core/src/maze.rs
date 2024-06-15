@@ -1,5 +1,5 @@
 use super::{
-    maze_configuration::MazeConfiguration,
+    maze_config::MazeConfig,
     maze_error::MazeError,
     tile::{Position, TileBoard},
 };
@@ -11,7 +11,7 @@ pub struct Maze {
 }
 
 impl Maze {
-    pub fn new(config: &MazeConfiguration) -> Result<Self, MazeError> {
+    pub fn new(config: &MazeConfig) -> Result<Self, MazeError> {
         let board = config.validate_and_convert_to_board()?;
         let max_soft_wall_count = config.max_soft_wall_count;
 
@@ -44,7 +44,7 @@ mod tests {
 
     #[test]
     fn test_create_invalid() {
-        let maze = Maze::new(&MazeConfiguration {
+        let maze = Maze::new(&MazeConfig {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 7,
@@ -61,7 +61,7 @@ mod tests {
 
     #[test]
     fn test_create_basic() {
-        let maze = Maze::new(&MazeConfiguration {
+        let maze = Maze::new(&MazeConfig {
             col_count: 2,
             row_count: 2,
             max_soft_wall_count: 7,
@@ -89,7 +89,7 @@ mod tests {
 
     #[test]
     fn test_create_with_multiple_checkpoints() {
-        let maze = Maze::new(&MazeConfiguration {
+        let maze = Maze::new(&MazeConfig {
             col_count: 3,
             row_count: 3,
             max_soft_wall_count: 5,

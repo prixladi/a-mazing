@@ -1,14 +1,14 @@
 import { useMemo } from 'react';
 
-import { MazeConfiguration } from '~/types/maze';
+import { MazeConfig } from '~/types/maze';
 import {
   builderToTileBoard,
   createEmptyTileBoardBuilder,
 } from '~/utils/tile-board';
 
-export const useConfiguredMazeBoard = (configuration: MazeConfiguration) => {
+export const useConfiguredMazeBoard = (config: MazeConfig) => {
   const { exitCheckpoints, otherCheckpoints } = useMemo(() => {
-    const sortedCheckpoints = configuration.checkpoints
+    const sortedCheckpoints = config.checkpoints
       .slice()
       .sort((a, b) => b.level - a.level);
 
@@ -22,16 +22,16 @@ export const useConfiguredMazeBoard = (configuration: MazeConfiguration) => {
     );
 
     return { exitCheckpoints, otherCheckpoints };
-  }, [JSON.stringify(configuration.checkpoints)]);
+  }, [JSON.stringify(config.checkpoints)]);
 
   return useMemo(() => {
-    const builder = createEmptyTileBoardBuilder(configuration);
+    const builder = createEmptyTileBoardBuilder(config);
 
-    for (let position of configuration.walls) {
+    for (let position of config.walls) {
       const [x, y] = position;
       builder[x][y] = { kind: 'Wall' };
     }
-    for (let position of configuration.entrypoints) {
+    for (let position of config.entrypoints) {
       const [x, y] = position;
       builder[x][y] = { kind: 'Entrypoint' };
     }
@@ -45,5 +45,5 @@ export const useConfiguredMazeBoard = (configuration: MazeConfiguration) => {
     }
 
     return builderToTileBoard(builder);
-  }, [configuration, exitCheckpoints, otherCheckpoints]);
+  }, [config, exitCheckpoints, otherCheckpoints]);
 };

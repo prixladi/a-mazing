@@ -1,6 +1,6 @@
 import { Position } from './tile';
 
-export type MazeConfiguration = {
+export type MazeConfig = {
   colCount: number;
   rowCount: number;
   maxSoftWallCount: number;
@@ -13,4 +13,4 @@ export type MazeMutations = {
   softWalls: Position[];
 };
 
-export type MazeState = MazeConfiguration & MazeMutations;
+export type MazeState = MazeConfig & MazeMutations;

@@ -1,4 +1,4 @@
-use maze_core::MazeConfiguration;
+use maze_core::MazeConfig;
 
 use crate::GeneratorError;
 
@@ -8,5 +8,5 @@ pub(crate) mod vanilla;
 pub(crate) mod waterfall;
 
 pub trait MazeGenerator {
-    fn generate(&self) -> Result<MazeConfiguration, GeneratorError>;
+    fn generate(&self) -> Result<MazeConfig, GeneratorError>;
 }

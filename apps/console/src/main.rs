@@ -1,4 +1,4 @@
-use maze_core::{Checkpoint, Maze, MazeConfiguration, Position};
+use maze_core::{Checkpoint, Maze, MazeConfig, Position};
 use maze_generator::{create_generator, GeneratorType};
 use maze_runner::MazeRunner;
 
@@ -23,7 +23,7 @@ fn generator() {
 
 #[allow(dead_code)]
 fn runner() {
-    let maze = Maze::new(&MazeConfiguration {
+    let maze = Maze::new(&MazeConfig {
         col_count: 7,
         row_count: 2,
         max_soft_wall_count: 200,
@@ -59,7 +59,7 @@ fn runner() {
 
     println!("{:?}", result.get_score());
 
-    let maze = Maze::new(&MazeConfiguration {
+    let maze = Maze::new(&MazeConfig {
         col_count: 23,
         row_count: 26,
         max_soft_wall_count: 200,
@@ -102,7 +102,7 @@ fn runner() {
         .unwrap();
     println!("{:?}", result.get_score());
 
-    let maze = Maze::new(&MazeConfiguration {
+    let maze = Maze::new(&MazeConfig {
         col_count: 23,
         row_count: 26,
         max_soft_wall_count: 200,
@@ -145,7 +145,7 @@ fn runner() {
         .unwrap();
     println!("{:?}", result.get_score());
 
-    let maze = Maze::new(&MazeConfiguration {
+    let maze = Maze::new(&MazeConfig {
         col_count: 210,
         row_count: 26,
         max_soft_wall_count: 200,
@@ -272,7 +272,7 @@ fn runner() {
     let result = runner.run(&vec![Position { x: 7, y: 6 }]).unwrap().unwrap();
     println!("{:?}", result.get_score());
 
-    let maze = Maze::new(&MazeConfiguration {
+    let maze = Maze::new(&MazeConfig {
         col_count: 210,
         row_count: 26,
         max_soft_wall_count: 200,

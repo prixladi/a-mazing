@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 
-import { MazeConfiguration, MazeMutations } from '~/types/maze';
+import { MazeConfig, MazeMutations } from '~/types/maze';
 import { Position, TileKind } from '~/types/tile';
 
 import { useConfiguredMazeBoard } from './use-configured-maze-board';
@@ -11,12 +11,12 @@ const defaultMazeMutations = {
   softWalls: [],
 };
 
-export const useMaze = (configuration: MazeConfiguration) => {
+export const useMaze = (config: MazeConfig) => {
   const [mazeMutations, setMazeMutations] =
     useState<MazeMutations>(defaultMazeMutations);
 
-  const mazeLimits = useMazeLimits({ configuration, mazeMutations });
-  const configuredBoard = useConfiguredMazeBoard(configuration);
+  const mazeLimits = useMazeLimits({ config: config, mazeMutations });
+  const configuredBoard = useConfiguredMazeBoard(config);
   const mutatedMazeBoard = useMutatedMazeBoard({
     configuredBoard,
     mazeMutations,
@@ -31,7 +31,7 @@ export const useMaze = (configuration: MazeConfiguration) => {
 
         if (
           type === 'SoftWall' &&
-          softWalls.length < configuration.maxSoftWallCount
+          softWalls.length < config.maxSoftWallCount
         ) {
           softWalls.push([x, y]);
         }
@@ -39,7 +39,7 @@ export const useMaze = (configuration: MazeConfiguration) => {
         return { ...oldMutations, softWalls };
       });
     },
-    [configuration.maxSoftWallCount]
+    [config.maxSoftWallCount]
   );
 
   const clearMutations = useCallback(() => {

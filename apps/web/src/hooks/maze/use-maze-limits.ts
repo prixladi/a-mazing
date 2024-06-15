@@ -1,22 +1,22 @@
 import { useMemo } from 'react';
 
-import { MazeConfiguration, MazeMutations } from '~/types/maze';
+import { MazeConfig, MazeMutations } from '~/types/maze';
 
 type MazeLimits = {
   softWallsRemaining: number;
 };
 
 type Props = {
-  configuration: MazeConfiguration;
+  config: MazeConfig;
   mazeMutations: MazeMutations;
 };
 
-export const useMazeLimits = ({ configuration, mazeMutations }: Props) => {
+export const useMazeLimits = ({ config, mazeMutations }: Props) => {
   return useMemo<MazeLimits>(
     () => ({
       softWallsRemaining:
-        configuration.maxSoftWallCount - mazeMutations.softWalls.length,
+        config.maxSoftWallCount - mazeMutations.softWalls.length,
     }),
-    [configuration.maxSoftWallCount, mazeMutations.softWalls]
+    [config.maxSoftWallCount, mazeMutations.softWalls]
   );
 };

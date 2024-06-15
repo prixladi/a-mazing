@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use maze_core::{Checkpoint, Maze, MazeConfiguration, Position};
+use maze_core::{Checkpoint, Maze, MazeConfig, Position};
 use maze_runner::MazeRunner;
 use rand::distributions::uniform::{SampleRange, SampleUniform};
 use rand::seq::SliceRandom;
@@ -99,7 +99,7 @@ pub(super) fn get_checkpoints(
 }
 
 pub(super) fn is_solvable(
-    config: &MazeConfiguration,
+    config: &MazeConfig,
     walls: &Vec<Position>,
 ) -> Result<bool, GeneratorError> {
     let maze = Maze::new(config).map_err(GeneratorError::from_maze_error)?;
@@ -129,10 +129,10 @@ pub(super) fn get_random_positions(positions: &Vec<Position>, n: usize) -> Vec<P
 }
 
 pub(super) fn get_random_solvable_walls(
-    config: &MazeConfiguration,
+    config: &MazeConfig,
     empty_positions: &Vec<Position>,
     wall_count: usize,
-) ->  Result<Vec<Position>, GeneratorError> {
+) -> Result<Vec<Position>, GeneratorError> {
     let mut walls = vec![];
     for position in get_random_shuffle(empty_positions).into_iter() {
         if walls.len() >= wall_count {
