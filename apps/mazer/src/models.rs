@@ -2,13 +2,66 @@ use crate::utils::set_panic_hook;
 
 use wasm_bindgen::prelude::*;
 
+
+#[wasm_bindgen]
+#[derive(Clone)]
+pub struct MazerPosition {
+    x: usize,
+    y: usize,
+}
+
+#[wasm_bindgen]
+impl MazerPosition {
+    #[wasm_bindgen]
+    pub fn new(x: usize, y: usize) -> Self {
+        set_panic_hook();
+        Self { x, y }
+    }
+
+    #[wasm_bindgen(getter, js_name = x)]
+    pub fn get_x(&self) -> usize {
+        self.x
+    }
+
+    #[wasm_bindgen(getter, js_name = y)]
+    pub fn get_y(&self) -> usize {
+        self.y
+    }
+}
+
+#[wasm_bindgen]
+#[derive(Clone)]
+pub struct MazerCheckpoint {
+    position: MazerPosition,
+    level: i32,
+}
+
+#[wasm_bindgen]
+impl MazerCheckpoint {
+    #[wasm_bindgen]
+    pub fn new(position: MazerPosition, level: i32) -> Self {
+        set_panic_hook();
+        Self { position, level }
+    }
+
+    #[wasm_bindgen(getter, js_name = position)]
+    pub fn get_position(&self) -> MazerPosition {
+        self.position.clone()
+    }
+
+    #[wasm_bindgen(getter, js_name = level)]
+    pub fn get_level(&self) -> i32 {
+        self.level
+    }
+}
+
 #[wasm_bindgen]
 pub struct MazerConfiguration {
     col_count: usize,
     row_count: usize,
     max_soft_wall_count: u32,
-    checkpoints: Vec<MazerCheckpoint>,
     entrypoints: Vec<MazerPosition>,
+    checkpoints: Vec<MazerCheckpoint>,
     walls: Vec<MazerPosition>,
 }
 
@@ -85,57 +138,5 @@ impl MazerRunResult {
     #[wasm_bindgen(getter, js_name = path)]
     pub fn get_path(&self) -> Vec<MazerPosition> {
         self.path.clone()
-    }
-}
-
-#[wasm_bindgen]
-#[derive(Clone)]
-pub struct MazerPosition {
-    x: usize,
-    y: usize,
-}
-
-#[wasm_bindgen]
-impl MazerPosition {
-    #[wasm_bindgen]
-    pub fn new(x: usize, y: usize) -> Self {
-        set_panic_hook();
-        Self { x, y }
-    }
-
-    #[wasm_bindgen(getter, js_name = x)]
-    pub fn get_x(&self) -> usize {
-        self.x
-    }
-
-    #[wasm_bindgen(getter, js_name = y)]
-    pub fn get_y(&self) -> usize {
-        self.y
-    }
-}
-
-#[wasm_bindgen]
-#[derive(Clone)]
-pub struct MazerCheckpoint {
-    position: MazerPosition,
-    level: i32,
-}
-
-#[wasm_bindgen]
-impl MazerCheckpoint {
-    #[wasm_bindgen]
-    pub fn new(position: MazerPosition, level: i32) -> Self {
-        set_panic_hook();
-        Self { position, level }
-    }
-
-    #[wasm_bindgen(getter, js_name = position)]
-    pub fn get_position(&self) -> MazerPosition {
-        self.position.clone()
-    }
-
-    #[wasm_bindgen(getter, js_name = level)]
-    pub fn get_level(&self) -> i32 {
-        self.level
     }
 }

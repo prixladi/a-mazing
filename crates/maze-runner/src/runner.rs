@@ -2,7 +2,7 @@ use maze_core::{Maze, Position, TileBoard, TileKind};
 
 use crate::runner_error::RunnerError;
 
-use super::run::MazeRun;
+use super::run_result::MazeRunResult;
 
 pub struct MazeRunner<'a> {
     maze: &'a Maze,
@@ -35,23 +35,24 @@ impl<'a> MazeRunner<'a> {
         }
     }
 
-    pub fn run(&self, soft_walls: &Vec<Position>) -> Result<Option<MazeRun>, RunnerError> {
+    pub fn run(&self, soft_walls: &Vec<Position>) -> Result<Option<MazeRunResult>, RunnerError> {
         let board = get_board_with_soft_walls(&self.maze, soft_walls)?;
         let entrypoints = self.maze.get_entrypoints();
-        let mut best_run: Option<MazeRun> = None;
+        let mut best_result: Option<MazeRunResult> = None;
 
         for entrypoint in entrypoints.iter() {
-            let current_run = MazeRun::execute(&board, &self.ascending_checkpoint_levels, entrypoint);
+            let current_run =
+                MazeRunResult::execute(&board, &self.ascending_checkpoint_levels, entrypoint);
 
             if let Some(new) = current_run {
-                best_run = match best_run {
+                best_result = match best_result {
                     Some(old) if old.get_score() <= new.get_score() => Some(old),
                     _ => Some(new),
                 };
             }
         }
 
-        Ok(best_run)
+        Ok(best_result)
     }
 }
 

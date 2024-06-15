@@ -1,7 +1,28 @@
 use maze_core::{Checkpoint, Maze, MazeConfiguration, Position};
+use maze_generator::{create_generator, GeneratorType};
 use maze_runner::MazeRunner;
 
 fn main() {
+    generator();
+    runner();
+}
+
+fn generator() {
+    let generator = create_generator(GeneratorType::Vanilla);
+
+    let config = generator.generate().unwrap();
+
+    let maze = Maze::new(&config).unwrap();
+
+    let runner = MazeRunner::new(&maze);
+
+    let result = runner.run(&vec![]).unwrap().unwrap();
+
+    println!("{:?}", result.get_solved_path());
+}
+
+#[allow(dead_code)]
+fn runner() {
     let maze = Maze::new(&MazeConfiguration {
         col_count: 7,
         row_count: 2,

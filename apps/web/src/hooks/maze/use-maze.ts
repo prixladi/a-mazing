@@ -7,11 +7,13 @@ import { useConfiguredMazeBoard } from './use-configured-maze-board';
 import { useMutatedMazeBoard } from './use-mutated-maze-board';
 import { useMazeLimits } from './use-maze-limits';
 
-export const useMaze = (initConfiguration: MazeConfiguration) => {
-  const [configuration] = useState(initConfiguration);
-  const [mazeMutations, setMazeMutations] = useState<MazeMutations>({
-    softWalls: [],
-  });
+const defaultMazeMutations = {
+  softWalls: [],
+};
+
+export const useMaze = (configuration: MazeConfiguration) => {
+  const [mazeMutations, setMazeMutations] =
+    useState<MazeMutations>(defaultMazeMutations);
 
   const mazeLimits = useMazeLimits({ configuration, mazeMutations });
   const configuredBoard = useConfiguredMazeBoard(configuration);
@@ -40,8 +42,13 @@ export const useMaze = (initConfiguration: MazeConfiguration) => {
     [configuration.maxSoftWallCount]
   );
 
+  const clearMutations = useCallback(() => {
+    setMazeMutations(defaultMazeMutations);
+  }, []);
+
   return {
     mutateMazePosition,
+    clearMutations,
     mazeBoard: mutatedMazeBoard,
     mazeMutations,
     mazeLimits,

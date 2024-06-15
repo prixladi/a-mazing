@@ -4,19 +4,19 @@ use maze_core::{Position, TileBoard};
 
 use super::nodes::Nodes;
 
-pub struct MazeRun {
+pub struct MazeRunResult {
     asc_checkpoint_levels: Vec<i32>,
     exit_position: Position,
     evaluated_nodes: Nodes,
     distance: u32,
 }
 
-impl MazeRun {
+impl MazeRunResult {
     pub(crate) fn execute(
         tiles: &TileBoard,
         ascending_checkpoint_levels: &Vec<i32>,
         entrypoint_position: &Position,
-    ) -> Option<MazeRun> {
+    ) -> Option<MazeRunResult> {
         let mut nodes = Nodes::new(tiles);
         let entrypoint_node = nodes.get_node_mut(entrypoint_position);
         entrypoint_node.set_distance(ascending_checkpoint_levels[0], 0);

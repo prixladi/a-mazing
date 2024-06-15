@@ -1,9 +1,12 @@
+mod mappers;
 mod models;
 mod utils;
 
-use maze_core::{Checkpoint, Maze, MazeConfiguration, Position};
+use maze_core::Maze;
+use maze_generator::{create_generator, GeneratorType};
 use maze_runner::MazeRunner;
 
+use mappers::{from_mazer_config, from_mazer_position, to_mazer_config, to_mazer_run_result};
 use models::{MazerConfiguration, MazerPosition, MazerRunResult};
 use utils::set_panic_hook;
 use wasm_bindgen::prelude::*;
@@ -15,71 +18,32 @@ pub struct Mazer {
 
 #[wasm_bindgen]
 impl Mazer {
-    pub fn new(configuration: MazerConfiguration) -> Mazer {
+    #[wasm_bindgen]
+    pub fn new(config: MazerConfiguration) -> Mazer {
         set_panic_hook();
 
-        let maze = Maze::new(&MazeConfiguration {
-            col_count: configuration.get_col_count(),
-            row_count: configuration.get_row_count(),
-            max_soft_wall_count: configuration.get_max_soft_wall_count(),
-            walls: configuration
-                .get_walls()
-                .iter()
-                .map(|pos| Position {
-                    x: pos.get_x(),
-                    y: pos.get_y(),
-                })
-                .collect(),
-            entrypoints: configuration
-                .get_entrypoints()
-                .iter()
-                .map(|pos| Position {
-                    x: pos.get_x(),
-                    y: pos.get_y(),
-                })
-                .collect(),
-            checkpoints: configuration
-                .get_checkpoints()
-                .iter()
-                .map(|checkpoint| {
-                    let pos = checkpoint.get_position();
-                    Checkpoint {
-                        position: Position {
-                            x: pos.get_x(),
-                            y: pos.get_y(),
-                        },
-                        level: checkpoint.get_level(),
-                    }
-                })
-                .collect(),
-        })
-        .unwrap();
+        let maze = Maze::new(&from_mazer_config(&config)).unwrap();
 
         Self { maze }
     }
 
     #[wasm_bindgen]
     pub fn run(&self, soft_walls: Vec<MazerPosition>) -> Option<MazerRunResult> {
-        let walls = soft_walls
-            .iter()
-            .map(|pos| Position {
-                x: pos.get_x(),
-                y: pos.get_y(),
-            })
-            .collect();
+        let walls = soft_walls.iter().map(from_mazer_position).collect();
 
         let runner = MazeRunner::new(&self.maze);
         let result = runner.run(&walls).unwrap();
 
-        result.map(|run| {
-            MazerRunResult::new(
-                run.get_score(),
-                run.get_solved_path()
-                    .iter()
-                    .cloned()
-                    .map(|Position { x, y }| MazerPosition::new(x, y))
-                    .collect(),
-            )
-        })
+        result.map(|run| to_mazer_run_result(&run))
+    }
+
+    #[wasm_bindgen(js_name = generateConfig)]
+    pub fn generate_config() -> MazerConfiguration {
+        set_panic_hook();
+
+        let generator = create_generator(GeneratorType::Waterfall);
+        let config = generator.generate().unwrap();
+
+        to_mazer_config(&config)
     }
 }

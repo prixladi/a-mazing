@@ -1,45 +1,47 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 import { MazeBoard } from '~/components/maze';
 import { useMaze, useMazer } from '~/hooks/maze';
 import { Position, TileKind } from '~/types/tile';
 
 import { MazeConfiguration } from '~/types/maze';
-
-const config: MazeConfiguration = {
-  colCount: 15,
-  rowCount: 10,
-  walls: [
-    [5, 5],
-    [7, 7],
-  ],
-  maxSoftWallCount: 8,
-  entrypoints: [[0, 0]],
-  checkpoints: [
-    { position: [8, 8], level: 1 },
-    { position: [8, 4], level: 2 },
-    { position: [9, 9], level: 3 },
-    { position: [13, 9], level: 4 },
-    { position: [0, 9], level: 5 },
-    { position: [3, 9], level: 6 },
-    { position: [0, 6], level: 7 },
-    { position: [14, 6], level: 8 },
-    { position: [2, 2], level: 9 },
-    { position: [14, 9], level: 999 },
-    { position: [14, 2], level: 999 },
-  ],
-};
+import { useMazerGenerator } from '~/hooks/maze/use-mazer-generator';
 
 const tileOnHover = (kind: TileKind) =>
   kind === 'Empty' ? { kind: 'SoftWall' } : null;
 
 export default function Home() {
-  const { mazeMutations, mazeBoard, mazeLimits, mutateMazePosition } =
-    useMaze(config);
+  const [mazeConfiguration, setMazeConfiguration] = useState<MazeConfiguration>({
+    colCount: 15,
+    rowCount: 10,
+    walls: [
+      [5, 5],
+      [7, 7],
+    ],
+    maxSoftWallCount: 8,
+    entrypoints: [[0, 0]],
+    checkpoints: [
+      { position: [8, 8], level: 1 },
+      { position: [8, 4], level: 2 },
+      { position: [9, 9], level: 3 },
+      { position: [13, 9], level: 4 },
+      { position: [0, 9], level: 5 },
+      { position: [3, 9], level: 6 },
+      { position: [0, 6], level: 7 },
+      { position: [14, 6], level: 8 },
+      { position: [2, 2], level: 9 },
+      { position: [14, 9], level: 999 },
+      { position: [14, 2], level: 999 },
+    ],
+  });
 
-  const { score } = useMazer(config, mazeMutations);
+  const {generateConfig} = useMazerGenerator();
+  const { mazeMutations, mazeBoard, mazeLimits, mutateMazePosition, clearMutations } =
+    useMaze(mazeConfiguration);
+
+  const { score } = useMazer(mazeConfiguration, mazeMutations);
 
   const onTileClick = useCallback(
     (position: Position, kind: TileKind) => {
@@ -59,6 +61,11 @@ export default function Home() {
       <div className='flex justify-between gap-10'>
         <pre>{score}</pre>
         <pre>{mazeLimits.softWallsRemaining}</pre>
+        <button onClick={() => {
+          const config = generateConfig();
+          clearMutations();
+          setMazeConfiguration(config);
+        }}>NEW</button>
       </div>
     </main>
   );

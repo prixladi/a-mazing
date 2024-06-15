@@ -7,3 +7,4 @@ edition = "2018"
 [dependencies]
 maze-core  = { path = "../../crates/maze-core" }
 maze-runner  = { path = "../../crates/maze-runner" }
+maze-generator  = { path = "../../crates/maze-generator" }

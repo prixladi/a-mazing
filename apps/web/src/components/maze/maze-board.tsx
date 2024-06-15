@@ -16,7 +16,7 @@ export const MazeBoard: React.FC<Props> = ({
   <div className='flex justify-center'>
     <div className='flex gap-[1px] border-slate-50 border-2'>
       {tiles.map((row, x) => (
-        <div key={x} className='flex gap-[1px] flex-col'>
+        <div key={x} className='flex gap-[1px] flex-col-reverse'>
           {row.map((tile, y) => (
             <MazeTile
               x={x}
