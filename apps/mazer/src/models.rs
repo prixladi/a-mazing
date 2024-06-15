@@ -139,3 +139,9 @@ impl MazerRunResult {
         self.path.clone()
     }
 }
+
+#[wasm_bindgen]
+pub enum MazerGeneratorType {
+    Vanilla,
+    Waterfall,
+}

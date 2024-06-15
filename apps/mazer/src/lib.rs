@@ -3,11 +3,14 @@ mod models;
 mod utils;
 
 use maze_core::Maze;
-use maze_generator::{create_generator, GeneratorType};
+use maze_generator::create_generator;
 use maze_runner::MazeRunner;
 
-use mappers::{from_mazer_config, from_mazer_position, to_mazer_config, to_mazer_run_result};
-use models::{MazerConfig, MazerPosition, MazerRunResult};
+use mappers::{
+    from_mazer_config, from_mazer_generator_type, from_mazer_position, to_mazer_config,
+    to_mazer_run_result,
+};
+use models::{MazerConfig, MazerGeneratorType, MazerPosition, MazerRunResult};
 use utils::set_panic_hook;
 use wasm_bindgen::prelude::*;
 
@@ -38,10 +41,10 @@ impl Mazer {
     }
 
     #[wasm_bindgen(js_name = generateConfig)]
-    pub fn generate_config() -> MazerConfig {
+    pub fn generate_config(generator_type: MazerGeneratorType) -> MazerConfig {
         set_panic_hook();
 
-        let generator = create_generator(GeneratorType::Waterfall);
+        let generator = create_generator(from_mazer_generator_type(generator_type));
         let config = generator.generate().unwrap();
 
         to_mazer_config(&config)

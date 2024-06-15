@@ -8,6 +8,7 @@ import { Position, TileKind } from '~/types/tile';
 
 import { MazeConfig } from '~/types/maze';
 import { useMazerGenerator } from '~/hooks/maze/use-mazer-generator';
+import { MazerGeneratorType } from 'mazer';
 
 const tileOnHover = (kind: TileKind) =>
   kind === 'Empty' ? { kind: 'SoftWall' } : null;
@@ -62,10 +63,15 @@ export default function Home() {
         <pre>{score}</pre>
         <pre>{mazeLimits.softWallsRemaining}</pre>
         <button onClick={() => {
-          const config = generateConfig();
+          const config = generateConfig(MazerGeneratorType.Waterfall);
           clearMutations();
           setMazeConfig(config);
-        }}>NEW</button>
+        }}>Waterfall</button>
+        <button onClick={() => {
+          const config = generateConfig(MazerGeneratorType.Vanilla);
+          clearMutations();
+          setMazeConfig(config);
+        }}>Vanilla</button>
       </div>
     </main>
   );

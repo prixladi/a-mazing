@@ -1,7 +1,10 @@
 use maze_core::{Checkpoint, MazeConfig, Position};
+use maze_generator::GeneratorType;
 use maze_runner::MazeRunResult;
 
-use crate::models::{MazerCheckpoint, MazerConfig, MazerPosition, MazerRunResult};
+use crate::models::{
+    MazerCheckpoint, MazerConfig, MazerGeneratorType, MazerPosition, MazerRunResult,
+};
 
 pub(crate) fn to_mazer_position(position: &Position) -> MazerPosition {
     MazerPosition::new(position.x, position.y)
@@ -64,4 +67,11 @@ pub(crate) fn to_mazer_run_result(run_result: &MazeRunResult) -> MazerRunResult 
             .map(to_mazer_position)
             .collect(),
     )
+}
+
+pub(crate) fn from_mazer_generator_type(generator_type: MazerGeneratorType) -> GeneratorType {
+    match generator_type {
+        MazerGeneratorType::Vanilla => GeneratorType::Vanilla,
+        MazerGeneratorType::Waterfall => GeneratorType::Waterfall,
+    }
 }

@@ -1,14 +1,14 @@
 import { useCallback } from 'react';
 
 import { useMazerInitialization } from './use-mazer-initialization';
-import { Mazer } from 'mazer';
+import { Mazer, MazerGeneratorType } from 'mazer';
 import { MazeConfig } from '~/types/maze';
 
 export const useMazerGenerator = () => {
   const { isMazerReady } = useMazerInitialization();
 
-  const generateConfig = useCallback((): MazeConfig => {
-    const mazerConfig = Mazer.generateConfig();
+  const generateConfig = useCallback((type: MazerGeneratorType): MazeConfig => {
+    const mazerConfig = Mazer.generateConfig(type);
 
     return {
       colCount: mazerConfig.colCount,
