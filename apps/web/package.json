@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "clsx": "^2.1.1",
-    "mazer": "file:../mazer/pkg",
+    "mazer": "file:../../crates/mazer/pkg",
     "lucide-react": "^0.390.0",
     "next": "14.2.3",
     "react": "^18",

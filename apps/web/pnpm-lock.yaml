@@ -12,8 +12,8 @@ dependencies:
     specifier: ^0.390.0
     version: 0.390.0(react@18.3.1)
   mazer:
-    specifier: file:../mazer/pkg
-    version: file:../mazer/pkg
+    specifier: file:../../crates/mazer/pkg
+    version: file:../../crates/mazer/pkg
   next:
     specifier: 14.2.3
     version: 14.2.3(react-dom@18.3.1)(react@18.3.1)
@@ -2862,7 +2862,7 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  file:../mazer/pkg:
-    resolution: {directory: ../mazer/pkg, type: directory}
+  file:../../crates/mazer/pkg:
+    resolution: {directory: ../../crates/mazer/pkg, type: directory}
     name: mazer
     dev: false
