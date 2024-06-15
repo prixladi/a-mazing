@@ -10,7 +10,7 @@ pub enum TileKind {
 
 pub type TileBoard = Vec<Vec<TileKind>>;
 
-#[derive(Clone, Copy, PartialEq, Debug)]
+#[derive(Clone, Copy, PartialEq, Debug, Eq, Hash)]
 pub struct Position {
     pub x: usize,
     pub y: usize,

@@ -10,6 +10,3 @@ opt-level = 0
 
 [profile.release]
 opt-level = 3
-
-[profile.release.package.engine-wasm]
-opt-level = 's'

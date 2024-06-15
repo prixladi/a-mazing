@@ -4,6 +4,7 @@
     "bindgen",
     "clsx",
     "Deque",
+    "getrandom",
     "lucide",
     "tailwindcss",
     "thiserror"
