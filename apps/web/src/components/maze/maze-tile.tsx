@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react';
 
 import { Position, Tile, TileKind } from '~/types/tile';
 import { MazeTileContent } from './maze-tile-content';
-
+import clsx from 'clsx';
 
 type Props = {
   tile: Tile;
@@ -11,7 +11,6 @@ type Props = {
   tileOnHover?: (tileKind: TileKind) => Tile | null;
   onClick: (position: Position, tileKind: TileKind) => any;
 };
-
 
 const MazeTileComponent: React.FC<Props> = ({ tile, x, y, ...props }) => {
   const onClick = useCallback(
@@ -23,9 +22,17 @@ const MazeTileComponent: React.FC<Props> = ({ tile, x, y, ...props }) => {
     () => (props.tileOnHover ? props.tileOnHover(tile.kind) : undefined),
     [props.tileOnHover, tile.kind]
   );
-  
+
   return (
-    <div onClick={onClick} className='w-10 h-10 group'>
+    <div onClick={onClick} className='w-10 h-10 group relative'>
+      <div
+        className={clsx(
+          'z-50 absolute w-full h-full bg-amber-800 rounded-full',
+          tile.highlighted
+            ? `opacity-${tile.highlighted?.significancy * 10}`
+            : 'opacity-0'
+        )}
+      />
       {tileOnHover ? (
         <>
           <div className='h-full w-full block group-hover:hidden bg-slate-100'>

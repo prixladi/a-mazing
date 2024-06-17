@@ -1,1 +1,1 @@
-pub const MIN_MAZE_SIZE: usize = 4;
+pub const MIN_MAZE_SIZE: usize = 16;

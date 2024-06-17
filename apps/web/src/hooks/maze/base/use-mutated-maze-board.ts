@@ -21,5 +21,10 @@ export const useMutatedMazeBoard = ({
       builder[x][y] = { kind: 'SoftWall' };
     }
 
+    for (let { position, significancy } of mazeMutations.highlighted) {
+      const [x, y] = position;
+      builder[x][y] = { ...builder[x][y], highlighted: { significancy } };
+    }
+
     return builderToTileBoard(builder);
   }, [configuredBoard, mazeMutations]);
