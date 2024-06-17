@@ -1,13 +1,9 @@
-import {
-  Mazer,
-  MazerConfig,
-  MazerPosition,
-  MazerCheckpoint,
-} from 'mazer';
+import { Mazer, MazerConfig, MazerPosition, MazerCheckpoint } from 'mazer';
 import { useEffect, useState } from 'react';
 
 import { MazeConfig, MazeMutations } from '~/types/maze';
-import { useMazerInitialization } from './use-mazer-initialization';
+import { useMazerInitialization } from './base';
+import { Position } from '~/types/tile';
 
 export const useMazer = (
   mazeConfig: MazeConfig,
@@ -15,15 +11,14 @@ export const useMazer = (
 ) => {
   const [mazer, setMazer] = useState<Mazer | null>(null);
   const [score, setScore] = useState<number | null>(null);
+  const [path, setPath] = useState<Position[] | null>(null);
 
   const { isMazerReady } = useMazerInitialization();
 
   useEffect(() => {
     if (!isMazerReady) return;
 
-    const walls = mazeConfig.walls.map(([x, y]) =>
-      MazerPosition.new(x, y)
-    );
+    const walls = mazeConfig.walls.map(([x, y]) => MazerPosition.new(x, y));
     const entrypoints = mazeConfig.entrypoints.map(([x, y]) =>
       MazerPosition.new(x, y)
     );
@@ -54,8 +49,10 @@ export const useMazer = (
       MazerPosition.new(x, y)
     );
     const result = mazer.run(softWalls);
+
     setScore(result?.score ?? null);
+    setPath(result?.path?.map((pos) => [pos.x, pos.y]) ?? null);
   }, [JSON.stringify(mazeMutations), mazer]);
 
-  return { score };
+  return { score, path };
 };

@@ -38,11 +38,17 @@ export default function Home() {
     ],
   });
 
-  const {generateConfig} = useMazerGenerator();
-  const { mazeMutations, mazeBoard, mazeLimits, mutateMazePosition, clearMutations } =
-    useMaze(mazeConfig);
+  const { generateConfig } = useMazerGenerator();
+  const {
+    mazeMutations,
+    mazeBoard,
+    mazeLimits,
+    mutateMazePosition,
+    clearMutations,
+    animatePath,
+  } = useMaze(mazeConfig);
 
-  const { score } = useMazer(mazeConfig, mazeMutations);
+  const { score, path } = useMazer(mazeConfig, mazeMutations);
 
   const onTileClick = useCallback(
     (position: Position, kind: TileKind) => {
@@ -62,16 +68,29 @@ export default function Home() {
       <div className='flex justify-between gap-10'>
         <pre>{score}</pre>
         <pre>{mazeLimits.softWallsRemaining}</pre>
-        <button onClick={() => {
-          const config = generateConfig(MazerGeneratorType.Waterfall);
-          clearMutations();
-          setMazeConfig(config);
-        }}>Waterfall</button>
-        <button onClick={() => {
-          const config = generateConfig(MazerGeneratorType.Vanilla);
-          clearMutations();
-          setMazeConfig(config);
-        }}>Vanilla</button>
+        <button
+          onClick={() => {
+            const config = generateConfig(MazerGeneratorType.Waterfall);
+            setMazeConfig(config);
+          }}
+        >
+          Waterfall
+        </button>
+        <button
+          onClick={() => {
+            const config = generateConfig(MazerGeneratorType.Vanilla);
+            setMazeConfig(config);
+          }}
+        >
+          Vanilla
+        </button>
+        <button
+          onClick={() => {
+            if (path) animatePath(path);
+          }}
+        >
+          RUN
+        </button>
       </div>
     </main>
   );

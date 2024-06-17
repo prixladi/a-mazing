@@ -1,5 +1,7 @@
 import React from 'react';
+
 import { Position, Tile, MazeTileBoard, TileKind } from '~/types/tile';
+
 import { MazeTile } from './maze-tile';
 
 type Props = {

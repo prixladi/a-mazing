@@ -1,4 +1,4 @@
-import { Position } from './tile';
+import { Position, TileHighlight } from './tile';
 
 export type MazeConfig = {
   colCount: number;
@@ -11,6 +11,10 @@ export type MazeConfig = {
 
 export type MazeMutations = {
   softWalls: Position[];
+  highlighted: {
+    position: Position;
+    significancy: TileHighlight['significancy'];
+  }[];
 };
 
 export type MazeState = MazeConfig & MazeMutations;
