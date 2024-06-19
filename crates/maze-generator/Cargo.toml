@@ -1,6 +1,6 @@
 [package]
 name = "maze-generator"
-version = "0.1.0"
+version = "0.0.0"
 authors = ["Ladislav Prix <elix78963@gmail.com>"]
 edition = "2018"
 
@@ -8,8 +8,9 @@ edition = "2018"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-maze-core  = { path = "../maze-core" }
-maze-runner  = { path = "../maze-runner" }
 rand = "0.8.5"
 getrandom = { version = "0.2", features = ["js"] }
 thiserror = "1.0.61"
+# local crates
+maze-core.workspace = true
+maze-runner.workspace = true

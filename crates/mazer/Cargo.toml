@@ -1,6 +1,6 @@
 [package]
 name = "mazer"
-version = "0.1.0"
+version = "0.0.0"
 authors = ["Ladislav Prix <elix78963@gmail.com>"]
 edition = "2018"
 
@@ -13,9 +13,10 @@ default = ["console_error_panic_hook"]
 [dependencies]
 wasm-bindgen = "0.2.84"
 console_error_panic_hook = { version = "0.1.7", optional = true }
-maze-core  = { path = "../maze-core" }
-maze-runner  = { path = "../maze-runner" }
-maze-generator  = { path = "../maze-generator" }
+# local crates
+maze-core.workspace = true
+maze-runner.workspace = true
+maze-generator.workspace = true
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.34"

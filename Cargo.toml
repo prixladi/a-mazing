@@ -10,3 +10,10 @@ opt-level = 0
 
 [profile.release]
 opt-level = 3
+
+[workspace.dependencies]
+# local crates
+maze-core = { path = "./crates/maze-core", version = "0.0.0" }
+maze-runner = { path = "./crates/maze-runner", version = "0.0.0" }
+maze-generator = { path = "./crates/maze-generator", version = "0.0.0" }
+mazer = { path = "./crates/mazer", version = "0.0.0" }
