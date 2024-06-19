@@ -11,12 +11,10 @@ type Props = {
   mazeMutations: MazeMutations;
 };
 
-export const useMazeLimits = ({ config, mazeMutations }: Props) => {
-  return useMemo<MazeLimits>(
+export const useMazeLimits = ({ config, mazeMutations }: Props) =>
+  useMemo<MazeLimits>(
     () => ({
-      softWallsRemaining:
-        config.maxSoftWallCount - mazeMutations.softWalls.length,
+      softWallsRemaining: config.maxSoftWallCount - mazeMutations.softWalls.length,
     }),
-    [config.maxSoftWallCount, mazeMutations.softWalls]
+    [config.maxSoftWallCount, mazeMutations.softWalls],
   );
-};

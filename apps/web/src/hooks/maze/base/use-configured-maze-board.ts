@@ -1,28 +1,19 @@
 import { useMemo } from 'react';
 
 import { MazeConfig } from '~/types/maze';
-import {
-  builderToTileBoard,
-  createEmptyTileBoardBuilder,
-} from '~/utils/tile-board';
+import { builderToTileBoard, createEmptyTileBoardBuilder } from '~/utils/tile-board';
 
 export const useConfiguredMazeBoard = (config: MazeConfig) => {
   const { exitCheckpoints, otherCheckpoints } = useMemo(() => {
-    const sortedCheckpoints = config.checkpoints
-      .slice()
-      .sort((a, b) => b.level - a.level);
+    const sortedCheckpoints = config.checkpoints.slice().sort((a, b) => b.level - a.level);
 
     const [first] = sortedCheckpoints;
 
-    const exitCheckpoints = sortedCheckpoints.filter(
-      ({ level }) => level === first.level
-    );
-    const otherCheckpoints = sortedCheckpoints.filter(
-      ({ level }) => level !== first.level
-    );
+    const exitCheckpoints = sortedCheckpoints.filter(({ level }) => level === first.level);
+    const otherCheckpoints = sortedCheckpoints.filter(({ level }) => level !== first.level);
 
     return { exitCheckpoints, otherCheckpoints };
-  }, [JSON.stringify(config.checkpoints)]);
+  }, [config.checkpoints]);
 
   return useMemo(() => {
     const builder = createEmptyTileBoardBuilder(config);

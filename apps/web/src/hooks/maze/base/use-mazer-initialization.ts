@@ -1,5 +1,6 @@
-import init from 'mazer';
 import { useEffect, useRef, useState } from 'react';
+
+import init from 'mazer';
 
 export const useMazerInitialization = () => {
   const initStarted = useRef(false);

@@ -10,15 +10,11 @@ type Props = {
   onTileClick: (position: Position, kind: TileKind) => any;
 };
 
-export const MazeBoard: React.FC<Props> = ({
-  tiles,
-  tileOnHover,
-  onTileClick,
-}) => (
-  <div className='flex justify-center'>
-    <div className='flex gap-[1px] border-slate-50 border-2'>
+export const MazeBoard: React.FC<Props> = ({ tiles, tileOnHover, onTileClick }) => (
+  <div className="flex justify-center">
+    <div className="flex gap-[1px] border-2 border-slate-50">
       {tiles.map((row, x) => (
-        <div key={x} className='flex gap-[1px] flex-col-reverse'>
+        <div key={x} className="flex flex-col-reverse gap-[1px]">
           {row.map((tile, y) => (
             <MazeTile
               x={x}

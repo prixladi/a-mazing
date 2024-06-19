@@ -2,16 +2,15 @@
 
 import { useCallback, useState } from 'react';
 
-import { MazeBoard } from '~/components/maze';
-import { useMaze, useMazer } from '~/hooks/maze';
-import { Position, TileKind } from '~/types/tile';
-
-import { MazeConfig } from '~/types/maze';
-import { useMazerGenerator } from '~/hooks/maze/use-mazer-generator';
 import { MazerGeneratorType } from 'mazer';
 
-const tileOnHover = (kind: TileKind) =>
-  kind === 'Empty' ? { kind: 'SoftWall' } : null;
+import { MazeBoard } from '~/components/maze';
+import { useMaze, useMazer } from '~/hooks/maze';
+import { useMazerGenerator } from '~/hooks/maze/use-mazer-generator';
+import { MazeConfig } from '~/types/maze';
+import { Position, TileKind } from '~/types/tile';
+
+const tileOnHover = (kind: TileKind) => (kind === 'Empty' ? { kind: 'SoftWall' } : null);
 
 export default function Home() {
   const [mazeConfig, setMazeConfig] = useState<MazeConfig>({
@@ -39,14 +38,8 @@ export default function Home() {
   });
 
   const { generateConfig } = useMazerGenerator();
-  const {
-    mazeMutations,
-    mazeBoard,
-    mazeLimits,
-    mutateMazePosition,
-    clearMutations,
-    animatePath,
-  } = useMaze(mazeConfig);
+  const { mazeMutations, mazeBoard, mazeLimits, mutateMazePosition, clearMutations, animatePath } =
+    useMaze(mazeConfig);
 
   const { score, path } = useMazer(mazeConfig, mazeMutations);
 
@@ -55,17 +48,13 @@ export default function Home() {
       if (kind === 'Empty') return mutateMazePosition(position, 'SoftWall');
       if (kind === 'SoftWall') return mutateMazePosition(position, 'Empty');
     },
-    [mutateMazePosition]
+    [mutateMazePosition],
   );
 
   return (
-    <main className='max-w-screen-lg mx-auto'>
-      <MazeBoard
-        tiles={mazeBoard}
-        onTileClick={onTileClick}
-        tileOnHover={tileOnHover as any}
-      />
-      <div className='flex justify-between gap-10'>
+    <main className="mx-auto max-w-screen-lg">
+      <MazeBoard tiles={mazeBoard} onTileClick={onTileClick} tileOnHover={tileOnHover as any} />
+      <div className="flex justify-between gap-10">
         <pre>{score}</pre>
         <pre>{mazeLimits.softWallsRemaining}</pre>
         <button

@@ -6,12 +6,15 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "format": "prettier --check ./src/**/*.{js,ts,jsx,tsx,json}",
+    "format:fix": "prettier --write ./src/**/*.{js,ts,jsx,tsx,json}"
   },
   "dependencies": {
     "clsx": "^2.1.1",
-    "mazer": "file:../../crates/mazer/pkg",
     "lucide-react": "^0.390.0",
+    "mazer": "file:../../crates/mazer/pkg",
     "next": "14.2.3",
     "react": "^18",
     "react-dom": "^18"
@@ -22,7 +25,10 @@
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
+    "eslint-plugin-filenames": "^1.3.2",
     "postcss": "^8",
+    "prettier": "^3.3.2",
+    "prettier-plugin-tailwindcss": "^0.6.5",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   }

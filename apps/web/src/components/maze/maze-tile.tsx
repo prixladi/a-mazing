@@ -1,8 +1,10 @@
 import React, { useCallback, useMemo } from 'react';
 
-import { Position, Tile, TileKind } from '~/types/tile';
-import { MazeTileContent } from './maze-tile-content';
 import clsx from 'clsx';
+
+import { Position, Tile, TileKind } from '~/types/tile';
+
+import { MazeTileContent } from './maze-tile-content';
 
 type Props = {
   tile: Tile;
@@ -12,38 +14,42 @@ type Props = {
   onClick: (position: Position, tileKind: TileKind) => any;
 };
 
-const MazeTileComponent: React.FC<Props> = ({ tile, x, y, ...props }) => {
+const MazeTileComponent: React.FC<Props> = ({
+  tile,
+  x,
+  y,
+  onClick: inputOnClick,
+  tileOnHover: inputTileOnHover,
+}) => {
   const onClick = useCallback(
-    () => props.onClick([x, y], tile.kind),
-    [x, y, tile.kind, props.onClick]
+    () => inputOnClick([x, y], tile.kind),
+    [x, y, tile.kind, inputOnClick],
   );
 
   const tileOnHover = useMemo(
-    () => (props.tileOnHover ? props.tileOnHover(tile.kind) : undefined),
-    [props.tileOnHover, tile.kind]
+    () => (inputTileOnHover ? inputTileOnHover(tile.kind) : undefined),
+    [inputTileOnHover, tile.kind],
   );
 
   return (
-    <div onClick={onClick} className='w-10 h-10 group relative'>
+    <div onClick={onClick} className="group relative h-10 w-10">
       <div
         className={clsx(
-          'z-50 absolute w-full h-full bg-amber-800 rounded-full',
-          tile.highlighted
-            ? `opacity-${tile.highlighted?.significancy * 10}`
-            : 'opacity-0'
+          'absolute z-50 h-full w-full rounded-full bg-amber-800',
+          tile.highlighted ? `opacity-${tile.highlighted?.significancy * 10}` : 'opacity-0',
         )}
       />
       {tileOnHover ? (
         <>
-          <div className='h-full w-full block group-hover:hidden bg-slate-100'>
+          <div className="block h-full w-full bg-slate-100 group-hover:hidden">
             <MazeTileContent tile={tile} />
           </div>
-          <div className='opacity-30 h-full w-full hidden group-hover:block bg-slate-100'>
+          <div className="hidden h-full w-full bg-slate-100 opacity-30 group-hover:block">
             <MazeTileContent tile={tileOnHover} />
           </div>
         </>
       ) : (
-        <div className='h-full w-full bg-slate-100'>
+        <div className="h-full w-full bg-slate-100">
           <MazeTileContent tile={tile} />
         </div>
       )}
@@ -57,13 +63,9 @@ const propsAreEqual = (p1: Props, p2: Props) => {
 
   const { tile: _, ...compareData } = p1;
   return (
-    Object.entries(compareData).filter(([key, value]) => {
-      return value !== p2[key as keyof Props];
-    }).length === 0
+    Object.entries(compareData).filter(([key, value]) => value !== p2[key as keyof Props])
+      .length === 0
   );
 };
 
-export const MazeTile: React.FC<Props> = React.memo(
-  MazeTileComponent,
-  propsAreEqual
-);
+export const MazeTile: React.FC<Props> = React.memo(MazeTileComponent, propsAreEqual);

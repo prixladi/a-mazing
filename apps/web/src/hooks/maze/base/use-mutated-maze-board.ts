@@ -9,10 +9,7 @@ type Props = {
   mazeMutations: MazeMutations;
 };
 
-export const useMutatedMazeBoard = ({
-  configuredBoard,
-  mazeMutations,
-}: Props) =>
+export const useMutatedMazeBoard = ({ configuredBoard, mazeMutations }: Props) =>
   useMemo(() => {
     const builder = createTileBoardBuilder(configuredBoard);
 

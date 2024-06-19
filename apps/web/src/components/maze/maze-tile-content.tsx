@@ -17,35 +17,29 @@ export const MazeTileContent: React.FC<Props> = ({ tile }) => {
 };
 
 const EntrypointTile: React.FC = () => (
-  <div className='w-full flex h-full justify-center items-center bg-emerald-50 shadow-md'>
-    <LogIn className='text-emerald-500' />
+  <div className="flex h-full w-full items-center justify-center bg-emerald-50 shadow-md">
+    <LogIn className="text-emerald-500" />
   </div>
 );
 
 const ExitTile: React.FC = () => (
-  <div className='w-full flex h-full justify-center items-center bg-red-100 shadow-md'>
-    <LogOut className='text-red-600' />
+  <div className="flex h-full w-full items-center justify-center bg-red-100 shadow-md">
+    <LogOut className="text-red-600" />
   </div>
 );
 
-const WallTile: React.FC = () => (
-  <div className='w-full h-full bg-amber-900 rounded-md' />
-);
+const WallTile: React.FC = () => <div className="h-full w-full rounded-md bg-amber-900" />;
 
-const SoftWallTile: React.FC = () => (
-  <div className='w-full h-full bg-yellow-600 rounded-md' />
-);
+const SoftWallTile: React.FC = () => <div className="h-full w-full rounded-md bg-yellow-600" />;
 
-const EmptyTile: React.FC = () => (
-  <div className='w-full h-full bg-slate-100' />
-);
+const EmptyTile: React.FC = () => <div className="h-full w-full bg-slate-100" />;
 
 const CheckpointTile: React.FC<{ level: number }> = ({ level }) => (
-  <div className='w-full flex h-full bg-slate-100'>
+  <div className="flex h-full w-full bg-slate-100">
     <span
       className={clsx(
-        'w-full flex h-full justify-center items-center rounded-full font-bold text-lg',
-        getCheckpointColors(level)
+        'flex h-full w-full items-center justify-center rounded-full text-lg font-bold',
+        getCheckpointColors(level),
       )}
     >
       {level}

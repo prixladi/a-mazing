@@ -4,11 +4,7 @@ import { MazeConfig, MazeMutations } from '~/types/maze';
 import { Position, TileHighlight, TileKind } from '~/types/tile';
 import { delay } from '~/utils/delay';
 
-import {
-  useConfiguredMazeBoard,
-  useMutatedMazeBoard,
-  useMazeLimits,
-} from './base';
+import { useConfiguredMazeBoard, useMutatedMazeBoard, useMazeLimits } from './base';
 
 const defaultMazeMutations: MazeMutations = {
   softWalls: [],
@@ -18,8 +14,7 @@ const defaultMazeMutations: MazeMutations = {
 export const useMaze = (inputConfig: MazeConfig) => {
   const [config, setConfig] = useState(inputConfig);
 
-  const [mazeMutations, setMazeMutations] =
-    useState<MazeMutations>(defaultMazeMutations);
+  const [mazeMutations, setMazeMutations] = useState<MazeMutations>(defaultMazeMutations);
 
   const pathAnimationId = useRef<number | null>(null);
 
@@ -30,6 +25,10 @@ export const useMaze = (inputConfig: MazeConfig) => {
     mazeMutations,
   });
 
+  const clearMutations = useCallback(() => {
+    setMazeMutations(defaultMazeMutations);
+  }, []);
+
   // Need to do it like this because when configuration changes
   // we need to clear all mutations and only after that can use that new config
   // without it some mutation can be out of bounds of the new board
@@ -38,13 +37,13 @@ export const useMaze = (inputConfig: MazeConfig) => {
     clearMutations();
     pathAnimationId.current = null;
     setConfig(inputConfig);
-  }, [inputConfig]);
+  }, [inputConfig, clearMutations]);
 
   const mutateMazePosition = useCallback(
     ([x, y]: Position, type: Extract<TileKind, 'SoftWall' | 'Empty'>) => {
       setMazeMutations((oldMutations) => {
         const softWalls = oldMutations.softWalls.filter(
-          (position) => position[0] !== x || position[1] !== y
+          (position) => position[0] !== x || position[1] !== y,
         );
 
         if (type === 'SoftWall' && softWalls.length < config.maxSoftWallCount) {
@@ -54,51 +53,44 @@ export const useMaze = (inputConfig: MazeConfig) => {
         return { ...oldMutations, softWalls };
       });
     },
-    [config.maxSoftWallCount]
+    [config.maxSoftWallCount],
   );
 
-  const clearMutations = useCallback(() => {
-    setMazeMutations(defaultMazeMutations);
+  const animatePath = useCallback(async (pathInput: Position[], animationId: number) => {
+    const path = [...pathInput];
+
+    let end = false;
+    while (!end && pathAnimationId.current === animationId) {
+      const position = path.shift();
+      setMazeMutations((oldMutations) => {
+        const highlighted = [...oldMutations.highlighted]
+          .filter(({ significancy }) => significancy > 0)
+          .map((old) => {
+            const significancy = old.significancy - 1;
+            return {
+              ...old,
+              significancy: significancy as TileHighlight['significancy'],
+            };
+          });
+
+        if (position) {
+          highlighted.push({
+            position,
+            significancy: 7,
+          });
+        }
+
+        if (highlighted.length === 0) end = true;
+
+        return {
+          ...oldMutations,
+          highlighted: highlighted,
+        };
+      });
+
+      await delay(75);
+    }
   }, []);
-
-  const animatePath = useCallback(
-    async (pathInput: Position[], animationId: number) => {
-      const path = [...pathInput];
-
-      let end = false;
-      while (!end && pathAnimationId.current === animationId) {
-        const position = path.shift();
-        setMazeMutations((oldMutations) => {
-          const highlighted = [...oldMutations.highlighted]
-            .filter(({ significancy }) => significancy > 0)
-            .map((old) => {
-              const significancy = old.significancy - 1;
-              return {
-                ...old,
-                significancy: significancy as TileHighlight['significancy'],
-              };
-            });
-
-          if (position) {
-            highlighted.push({
-              position,
-              significancy: 7,
-            });
-          }
-
-          if (highlighted.length === 0) end = true;
-
-          return {
-            ...oldMutations,
-            highlighted: highlighted,
-          };
-        });
-
-        await delay(75);
-      }
-    },
-    []
-  );
 
   const tryAnimatePath = useCallback(
     async (path: Position[]) => {
@@ -107,7 +99,7 @@ export const useMaze = (inputConfig: MazeConfig) => {
       setMazeMutations((old) => ({ ...old, highlighted: [] }));
       await animatePath(path, animationId);
     },
-    [animatePath]
+    [animatePath],
   );
 
   return {
