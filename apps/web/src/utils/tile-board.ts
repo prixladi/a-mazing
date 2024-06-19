@@ -17,9 +17,8 @@ export const createEmptyTileBoardBuilder = ({
   return builder;
 };
 
-export const createTileBoardBuilder = (
-  tileBoard: MazeTileBoard
-): MazeTileBoardBuilder => tileBoard.map((row) => row.map((tile) => ({ ...tile })));
+export const createTileBoardBuilder = (tileBoard: MazeTileBoard): MazeTileBoardBuilder =>
+  tileBoard.map((row) => row.map((tile) => ({ ...tile })));
 
 export const builderToTileBoard = (builder: MazeTileBoardBuilder): MazeTileBoard =>
   Object.freeze(builder.map((row) => Object.freeze(row)));

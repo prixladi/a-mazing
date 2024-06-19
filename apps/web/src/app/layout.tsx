@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
-import clsx from 'clsx';
 import { Inter } from 'next/font/google';
+
+import clsx from 'clsx';
 
 import './globals.css';
 
@@ -20,13 +21,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang='en'>
-      <body
-        className={clsx(
-          'min-h-screen bg-background font-sans antialiased',
-          fontSans.variable
-        )}
-      >
+    <html lang="en">
+      <body className={clsx('bg-background min-h-screen font-sans antialiased', fontSans.variable)}>
         {children}
       </body>
     </html>

@@ -1,7 +1,9 @@
 import { useCallback } from 'react';
 
 import { Mazer, MazerGeneratorType } from 'mazer';
+
 import { MazeConfig } from '~/types/maze';
+
 import { useMazerInitialization } from './base';
 
 export const useMazerGenerator = () => {
@@ -9,16 +11,15 @@ export const useMazerGenerator = () => {
 
   const generateConfig = useCallback(
     (type: MazerGeneratorType): MazeConfig => {
+      if (!isMazerReady) throw new Error('Mazer is not initialized!');
+
       const mazerConfig = Mazer.generateConfig(type);
 
       return {
         colCount: mazerConfig.colCount,
         rowCount: mazerConfig.rowCount,
         maxSoftWallCount: mazerConfig.maxSoftWallCount,
-        entrypoints: mazerConfig.entrypoints.map((position) => [
-          position.x,
-          position.y,
-        ]),
+        entrypoints: mazerConfig.entrypoints.map((position) => [position.x, position.y]),
         checkpoints: mazerConfig.checkpoints.map((checkpoint) => ({
           position: [checkpoint.position.x, checkpoint.position.y],
           level: checkpoint.level,
@@ -26,7 +27,7 @@ export const useMazerGenerator = () => {
         walls: mazerConfig.walls.map((position) => [position.x, position.y]),
       };
     },
-    [isMazerReady]
+    [isMazerReady],
   );
 
   return { generateConfig };
