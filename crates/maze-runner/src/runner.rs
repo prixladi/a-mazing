@@ -1,8 +1,8 @@
 use maze_core::{Maze, Position, TileBoard, TileKind};
 
-use crate::runner_error::RunnerError;
+use crate::{run::run_maze, runner_error::MazeRunnerError};
 
-use super::run_result::MazeRunResult;
+use super::run::MazeRunResult;
 
 pub struct MazeRunner<'a> {
     maze: &'a Maze,
@@ -35,14 +35,16 @@ impl<'a> MazeRunner<'a> {
         }
     }
 
-    pub fn run(&self, soft_walls: &Vec<Position>) -> Result<Option<MazeRunResult>, RunnerError> {
+    pub fn run(
+        &self,
+        soft_walls: &Vec<Position>,
+    ) -> Result<Option<MazeRunResult>, MazeRunnerError> {
         let board = get_board_with_soft_walls(&self.maze, soft_walls)?;
         let entrypoints = self.maze.get_entrypoints();
         let mut best_result: Option<MazeRunResult> = None;
 
         for entrypoint in entrypoints.iter() {
-            let current_run =
-                MazeRunResult::execute(&board, &self.ascending_checkpoint_levels, entrypoint);
+            let current_run = run_maze(&board, &self.ascending_checkpoint_levels, entrypoint);
 
             if let Some(new) = current_run {
                 best_result = match best_result {
@@ -59,10 +61,10 @@ impl<'a> MazeRunner<'a> {
 fn get_board_with_soft_walls(
     maze: &Maze,
     soft_walls: &Vec<Position>,
-) -> Result<TileBoard, RunnerError> {
+) -> Result<TileBoard, MazeRunnerError> {
     let max_soft_wall_count = maze.get_max_soft_wall_count();
     if max_soft_wall_count < soft_walls.len() as u32 {
-        return Err(RunnerError::TooManySoftWalls {
+        return Err(MazeRunnerError::TooManySoftWalls {
             limit: max_soft_wall_count,
         });
     }
@@ -70,17 +72,17 @@ fn get_board_with_soft_walls(
     let mut tiles: TileBoard = maze.get_board().clone();
     for &Position { x, y } in soft_walls {
         if x >= tiles.len() {
-            return Err(RunnerError::WallOutOfBounds {
+            return Err(MazeRunnerError::WallOutOfBounds {
                 position: Position { x, y },
             });
         }
         if y >= tiles[x].len() {
-            return Err(RunnerError::WallOutOfBounds {
+            return Err(MazeRunnerError::WallOutOfBounds {
                 position: Position { x, y },
             });
         }
         if tiles[x][y] != TileKind::Empty {
-            return Err(RunnerError::OverlappingWall {
+            return Err(MazeRunnerError::OverlappingWall {
                 position: Position { x, y },
             });
         }

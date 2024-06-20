@@ -2,7 +2,7 @@ use maze_core::Position;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
-pub enum RunnerError {
+pub enum MazeRunnerError {
     #[error("Too many soft walls provided, limit is {limit}")]
     TooManySoftWalls { limit: u32 },
     #[error("Wall out of bound at position {position}")]

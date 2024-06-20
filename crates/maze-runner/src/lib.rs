@@ -1,9 +1,9 @@
 mod node;
 mod nodes;
-mod run_result;
+mod run;
 mod runner;
 mod runner_error;
 
-pub use run_result::MazeRunResult;
+pub use run::MazeRunResult;
 pub use runner::MazeRunner;
-pub use runner_error::RunnerError;
+pub use runner_error::MazeRunnerError;

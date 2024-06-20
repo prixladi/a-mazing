@@ -1,7 +1,7 @@
 use std::error::Error;
 
 use maze_core::MazeError;
-use maze_runner::RunnerError;
+use maze_runner::MazeRunnerError;
 
 #[derive(Debug, thiserror::Error)]
 pub enum GeneratorError {
@@ -14,7 +14,7 @@ impl GeneratorError {
         Self::InternalError(Box::new(maze_error))
     }
 
-    pub(crate) fn from_runner_error(runner_error: RunnerError) -> Self {
+    pub(crate) fn from_runner_error(runner_error: MazeRunnerError) -> Self {
         Self::InternalError(Box::new(runner_error))
     }
 }
