@@ -18,7 +18,7 @@ fn generator() {
 
     let result = runner.run(&vec![]).unwrap().unwrap();
 
-    println!("{:?}", result.get_solved_path());
+    println!("{:?}", result.solved_path());
 }
 
 #[allow(dead_code)]
@@ -57,7 +57,7 @@ fn runner() {
     let runner = MazeRunner::new(&maze);
     let result = runner.run(&vec![]).unwrap().unwrap();
 
-    println!("{:?}", result.get_score());
+    println!("{:?}", result.score());
 
     let maze = Maze::new(&MazeConfig {
         col_count: 23,
@@ -88,7 +88,7 @@ fn runner() {
 
     let runner = MazeRunner::new(&maze);
     let result = runner.run(&vec![]).unwrap().unwrap();
-    println!("{:?}", result.get_score());
+    println!("{:?}", result.score());
 
     let runner = MazeRunner::new(&maze);
     let result = runner
@@ -100,7 +100,7 @@ fn runner() {
         ])
         .unwrap()
         .unwrap();
-    println!("{:?}", result.get_score());
+    println!("{:?}", result.score());
 
     let maze = Maze::new(&MazeConfig {
         col_count: 23,
@@ -131,7 +131,7 @@ fn runner() {
 
     let runner = MazeRunner::new(&maze);
     let result = runner.run(&vec![]).unwrap().unwrap();
-    println!("{:?}", result.get_score());
+    println!("{:?}", result.score());
 
     let runner = MazeRunner::new(&maze);
     let result = runner
@@ -143,7 +143,7 @@ fn runner() {
         ])
         .unwrap()
         .unwrap();
-    println!("{:?}", result.get_score());
+    println!("{:?}", result.score());
 
     let maze = Maze::new(&MazeConfig {
         col_count: 210,
@@ -254,7 +254,7 @@ fn runner() {
 
     let runner = MazeRunner::new(&maze);
     let result = runner.run(&vec![]).unwrap().unwrap();
-    println!("{:?}", result.get_score());
+    println!("{:?}", result.score());
 
     let runner = MazeRunner::new(&maze);
     let result = runner
@@ -266,11 +266,11 @@ fn runner() {
         ])
         .unwrap()
         .unwrap();
-    println!("{:?}", result.get_score());
+    println!("{:?}", result.score());
 
     let runner = MazeRunner::new(&maze);
     let result = runner.run(&vec![Position { x: 7, y: 6 }]).unwrap().unwrap();
-    println!("{:?}", result.get_score());
+    println!("{:?}", result.score());
 
     let maze = Maze::new(&MazeConfig {
         col_count: 210,
@@ -381,7 +381,7 @@ fn runner() {
 
     let runner = MazeRunner::new(&maze);
     let result = runner.run(&vec![]).unwrap().unwrap();
-    println!("{:?}", result.get_score());
+    println!("{:?}", result.score());
 
     let runner = MazeRunner::new(&maze);
     let result = runner
@@ -393,11 +393,11 @@ fn runner() {
         ])
         .unwrap()
         .unwrap();
-    println!("{:?}", result.get_score());
+    println!("{:?}", result.score());
 
     let runner = MazeRunner::new(&maze);
     let result = runner.run(&vec![Position { x: 7, y: 6 }]).unwrap().unwrap();
-    println!("{:?}", result.get_score());
+    println!("{:?}", result.score());
 
     let runner = MazeRunner::new(&maze);
     let result = runner
@@ -415,5 +415,5 @@ fn runner() {
         ])
         .unwrap()
         .unwrap();
-    println!("{:?}", result.get_score());
+    println!("{:?}", result.score());
 }

@@ -37,7 +37,7 @@ impl Node {
         self.distances.contains_key(&checkpoint_level)
     }
 
-    pub(crate) fn get_distance(&self, checkpoint_level: i32) -> Option<u32> {
+    pub(crate) fn distance(&self, checkpoint_level: i32) -> Option<u32> {
         self.distances.get(&checkpoint_level).copied()
     }
 
@@ -51,7 +51,7 @@ impl Node {
         }
     }
 
-    pub(crate) fn get_position(&self) -> &Position {
+    pub(crate) fn position(&self) -> &Position {
         &self.position
     }
 }
@@ -64,10 +64,10 @@ mod tests {
     fn test_empty_node_methods() {
         let node = Node::new(TileKind::Empty, Position { x: 1, y: 1 });
 
-        assert_eq!(node.get_position(), &Position { x: 1, y: 1 });
+        assert_eq!(node.position(), &Position { x: 1, y: 1 });
         assert_eq!(node.can_enter(), true);
         assert_eq!(node.has_distance(1), false);
-        assert_eq!(node.get_distance(1), None);
+        assert_eq!(node.distance(1), None);
         assert_eq!(node.is_checkpoint(1), false);
         assert_eq!(node.is_entrypoint(), false);
     }
@@ -76,10 +76,10 @@ mod tests {
     fn test_entrypoint_node_methods() {
         let node = Node::new(TileKind::Entrypoint, Position { x: 2, y: 2 });
 
-        assert_eq!(node.get_position(), &Position { x: 2, y: 2 });
+        assert_eq!(node.position(), &Position { x: 2, y: 2 });
         assert_eq!(node.can_enter(), true);
         assert_eq!(node.has_distance(1), false);
-        assert_eq!(node.get_distance(1), None);
+        assert_eq!(node.distance(1), None);
         assert_eq!(node.is_checkpoint(1), false);
         assert_eq!(node.is_entrypoint(), true);
     }
@@ -88,10 +88,10 @@ mod tests {
     fn test_checkpoint_node_methods() {
         let node = Node::new(TileKind::Checkpoint { level: 1 }, Position { x: 2, y: 2 });
 
-        assert_eq!(node.get_position(), &Position { x: 2, y: 2 });
+        assert_eq!(node.position(), &Position { x: 2, y: 2 });
         assert_eq!(node.can_enter(), true);
         assert_eq!(node.has_distance(1), false);
-        assert_eq!(node.get_distance(1), None);
+        assert_eq!(node.distance(1), None);
         assert_eq!(node.is_checkpoint(1), true);
         assert_eq!(node.is_checkpoint(2), false);
         assert_eq!(node.is_entrypoint(), false);
@@ -101,10 +101,10 @@ mod tests {
     fn test_node_wall_node_methods() {
         let node = Node::new(TileKind::Wall, Position { x: 2, y: 2 });
 
-        assert_eq!(node.get_position(), &Position { x: 2, y: 2 });
+        assert_eq!(node.position(), &Position { x: 2, y: 2 });
         assert_eq!(node.can_enter(), false);
         assert_eq!(node.has_distance(1), false);
-        assert_eq!(node.get_distance(1), None);
+        assert_eq!(node.distance(1), None);
         assert_eq!(node.is_checkpoint(1), false);
         assert_eq!(node.is_entrypoint(), false);
     }
@@ -114,11 +114,11 @@ mod tests {
         let mut node = Node::new(TileKind::Empty, Position { x: 2, y: 2 });
 
         assert_eq!(node.has_distance(1), false);
-        assert_eq!(node.get_distance(1), None);
+        assert_eq!(node.distance(1), None);
         node.set_distance(1, 5);
         assert_eq!(node.has_distance(1), true);
-        assert_eq!(node.get_distance(1), Some(5));
+        assert_eq!(node.distance(1), Some(5));
         assert_eq!(node.has_distance(2), false);
-        assert_eq!(node.get_distance(2), None);
+        assert_eq!(node.distance(2), None);
     }
 }

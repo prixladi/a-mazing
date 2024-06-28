@@ -70,7 +70,7 @@ pub struct MazeRunResult {
 }
 
 impl MazeRunResult {
-    pub fn get_solved_path(&self) -> Vec<Position> {
+    pub fn solved_path(&self) -> Vec<Position> {
         let mut best_path = Vec::with_capacity(self.distance as usize + 1);
         best_path.push(self.evaluated_nodes.get_node(&self.exit_position));
 
@@ -86,10 +86,7 @@ impl MazeRunResult {
                 panic!("Unable to get solved path for solved maze run! Too many iterations.");
             }
 
-            let current_node = best_path
-                .last()
-                // this unwrap will never panic because best_path path will always have at least one element
-                .unwrap();
+            let current_node = best_path[best_path.len() - 1];
 
             match current_level {
                 Some(level) if current_node.is_checkpoint(level) => {
@@ -102,7 +99,7 @@ impl MazeRunResult {
 
             let neighbor = self
                 .evaluated_nodes
-                .get_lowest_distance_neighbor(&current_node.get_position(), previous_level.unwrap())
+                .get_lowest_distance_neighbor(&current_node.position(), previous_level.unwrap())
                 .expect("Expected to find lowest distance neighbor for solved maze run!");
 
             best_path.push(neighbor);
@@ -111,13 +108,13 @@ impl MazeRunResult {
         best_path
             .iter()
             .rev()
-            .map(|node| node.get_position())
+            .map(|node| node.position())
             .copied()
             .collect()
     }
 
-    pub fn get_score(&self) -> u32 {
-        // now score equates to distance but in the future it could deviate with modifiers usage
+    pub fn score(&self) -> u32 {
+        // currently score equates to distance but in the future it could deviate with modifiers usage
         self.distance
     }
 }

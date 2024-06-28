@@ -12,7 +12,7 @@ pub struct MazeRunner<'a> {
 impl<'a> MazeRunner<'a> {
     pub fn new(maze: &'a Maze) -> Self {
         let mut checkpoint_levels: Vec<i32> = maze
-            .get_board()
+            .board()
             .iter()
             .flat_map(|row| {
                 row.iter()
@@ -39,15 +39,15 @@ impl<'a> MazeRunner<'a> {
         &self,
         soft_walls: &Vec<Position>,
     ) -> Result<Option<MazeRunResult>, MazeRunnerError> {
-        let board = get_board_with_soft_walls(&self.maze, soft_walls)?;
+        let board = create_board_with_soft_walls(&self.maze, soft_walls)?;
         let mut best_result: Option<MazeRunResult> = None;
 
-        for entrypoint in self.maze.get_entrypoints().iter() {
+        for entrypoint in self.maze.entrypoints().iter() {
             let current_run = run_maze(&board, &self.ascending_checkpoint_levels, entrypoint);
 
             if let Some(new) = current_run {
                 best_result = match best_result {
-                    Some(old) if old.get_score() <= new.get_score() => Some(old),
+                    Some(old) if old.score() <= new.score() => Some(old),
                     _ => Some(new),
                 };
             }
@@ -57,18 +57,18 @@ impl<'a> MazeRunner<'a> {
     }
 }
 
-fn get_board_with_soft_walls(
+fn create_board_with_soft_walls(
     maze: &Maze,
     soft_walls: &Vec<Position>,
 ) -> Result<TileBoard, MazeRunnerError> {
-    let max_soft_wall_count = maze.get_max_soft_wall_count();
+    let max_soft_wall_count = maze.max_soft_wall_count();
     if max_soft_wall_count < soft_walls.len() as u32 {
         return Err(MazeRunnerError::TooManySoftWalls {
             limit: max_soft_wall_count,
         });
     }
 
-    let mut tiles: TileBoard = maze.get_board().clone();
+    let mut tiles: TileBoard = maze.board().clone();
     for &Position { x, y } in soft_walls {
         if x >= tiles.len() {
             return Err(MazeRunnerError::WallOutOfBounds {
@@ -118,10 +118,10 @@ mod tests {
         let runner = MazeRunner::new(&maze);
         let result = runner.run(&vec![])?;
 
-        assert_eq!(result.as_ref().map(|res| res.get_score()), Some(14));
+        assert_eq!(result.as_ref().map(|res| res.score()), Some(14));
 
         assert_eq!(
-            result.map(|res| res.get_solved_path()),
+            result.map(|res| res.solved_path()),
             Some(vec![
                 Position { x: 0, y: 0 },
                 Position { x: 1, y: 0 },
@@ -175,10 +175,10 @@ mod tests {
             Position { x: 4, y: 2 },
         ])?;
 
-        assert_eq!(result.as_ref().map(|res| res.get_score()), Some(26));
+        assert_eq!(result.as_ref().map(|res| res.score()), Some(26));
 
         assert_eq!(
-            result.map(|res| res.get_solved_path()),
+            result.map(|res| res.solved_path()),
             Some(vec![
                 Position { x: 0, y: 0 },
                 Position { x: 1, y: 0 },
@@ -275,9 +275,9 @@ mod tests {
             Position { x: 4, y: 2 },
         ])?;
 
-        assert_eq!(result.as_ref().map(|res| res.get_score()), Some(4));
+        assert_eq!(result.as_ref().map(|res| res.score()), Some(4));
         assert_eq!(
-            result.as_ref().map(|res| res.get_solved_path()),
+            result.as_ref().map(|res| res.solved_path()),
             Some(vec![
                 Position { x: 5, y: 5 },
                 Position { x: 6, y: 5 },
@@ -313,10 +313,10 @@ mod tests {
         let runner = MazeRunner::new(&maze);
         let result = runner.run(&vec![])?;
 
-        assert_eq!(result.as_ref().map(|res| res.get_score()), Some(18));
+        assert_eq!(result.as_ref().map(|res| res.score()), Some(18));
 
         assert_eq!(
-            result.as_ref().map(|res| res.get_solved_path()),
+            result.as_ref().map(|res| res.solved_path()),
             Some(vec![
                 Position { x: 0, y: 0 },
                 Position { x: 1, y: 0 },
@@ -366,10 +366,10 @@ mod tests {
         let runner = MazeRunner::new(&maze);
         let result = runner.run(&vec![])?;
 
-        assert_eq!(result.as_ref().map(|res| res.get_score()), Some(10));
+        assert_eq!(result.as_ref().map(|res| res.score()), Some(10));
 
         assert_eq!(
-            result.as_ref().map(|res| res.get_solved_path()),
+            result.as_ref().map(|res| res.solved_path()),
             Some(vec![
                 Position { x: 4, y: 4 },
                 Position { x: 5, y: 4 },
@@ -415,10 +415,10 @@ mod tests {
         let runner = MazeRunner::new(&maze);
         let result = runner.run(&vec![])?;
 
-        assert_eq!(result.as_ref().map(|res| res.get_score()), Some(10));
+        assert_eq!(result.as_ref().map(|res| res.score()), Some(10));
 
         assert_eq!(
-            result.as_ref().map(|res| res.get_solved_path()),
+            result.as_ref().map(|res| res.solved_path()),
             Some(vec![
                 Position { x: 0, y: 0 },
                 Position { x: 1, y: 0 },
@@ -464,10 +464,10 @@ mod tests {
         let runner = MazeRunner::new(&maze);
         let result = runner.run(&vec![])?;
 
-        assert_eq!(result.as_ref().map(|res| res.get_score()), Some(13));
+        assert_eq!(result.as_ref().map(|res| res.score()), Some(13));
 
         assert_eq!(
-            result.as_ref().map(|res| res.get_solved_path()),
+            result.as_ref().map(|res| res.solved_path()),
             Some(vec![
                 Position { x: 0, y: 0 },
                 Position { x: 1, y: 0 },
@@ -532,10 +532,10 @@ mod tests {
         let runner = MazeRunner::new(&maze);
         let result = runner.run(&vec![Position { x: 1, y: 6 }, Position { x: 1, y: 5 }])?;
 
-        assert_eq!(result.as_ref().map(|res| res.get_score()), Some(20));
+        assert_eq!(result.as_ref().map(|res| res.score()), Some(20));
 
         assert_eq!(
-            result.as_ref().map(|res| res.get_solved_path()),
+            result.as_ref().map(|res| res.solved_path()),
             Some(vec![
                 Position { x: 0, y: 0 },
                 Position { x: 0, y: 1 },
@@ -674,10 +674,10 @@ mod tests {
             Position { x: 4, y: 3 },
         ])?;
 
-        assert_eq!(result.as_ref().map(|res| res.get_score()), Some(18));
+        assert_eq!(result.as_ref().map(|res| res.score()), Some(18));
 
         assert_eq!(
-            result.as_ref().map(|res| res.get_solved_path()),
+            result.as_ref().map(|res| res.solved_path()),
             Some(vec![
                 Position { x: 0, y: 0 },
                 Position { x: 0, y: 1 },
@@ -820,7 +820,7 @@ mod tests {
             Position { x: 205, y: 2 },
         ])?;
 
-        assert_eq!(result.as_ref().map(|res| res.get_score()), Some(1985));
+        assert_eq!(result.as_ref().map(|res| res.score()), Some(1985));
 
         Ok(())
     }

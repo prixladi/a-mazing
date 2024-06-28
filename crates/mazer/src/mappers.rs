@@ -12,8 +12,8 @@ pub(crate) fn to_mazer_position(position: &Position) -> MazerPosition {
 
 pub(crate) fn from_mazer_position(position: &MazerPosition) -> Position {
     Position {
-        x: position.get_x(),
-        y: position.get_y(),
+        x: position.x(),
+        y: position.y(),
     }
 }
 
@@ -23,8 +23,8 @@ pub(crate) fn to_mazer_checkpoint(checkpoint: &Checkpoint) -> MazerCheckpoint {
 
 pub(crate) fn from_mazer_checkpoint(checkpoint: &MazerCheckpoint) -> Checkpoint {
     Checkpoint {
-        position: from_mazer_position(&checkpoint.get_position()),
-        level: checkpoint.get_level(),
+        position: from_mazer_position(&checkpoint.position()),
+        level: checkpoint.level(),
     }
 }
 
@@ -41,28 +41,28 @@ pub(crate) fn to_mazer_config(config: &MazeConfig) -> MazerConfig {
 
 pub(crate) fn from_mazer_config(config: &MazerConfig) -> MazeConfig {
     MazeConfig {
-        col_count: config.get_col_count(),
-        row_count: config.get_row_count(),
-        max_soft_wall_count: config.get_max_soft_wall_count(),
+        col_count: config.col_count(),
+        row_count: config.row_count(),
+        max_soft_wall_count: config.max_soft_wall_count(),
         entrypoints: config
-            .get_entrypoints()
+            .entrypoints()
             .iter()
             .map(from_mazer_position)
             .collect(),
         checkpoints: config
-            .get_checkpoints()
+            .checkpoints()
             .iter()
             .map(from_mazer_checkpoint)
             .collect(),
-        walls: config.get_walls().iter().map(from_mazer_position).collect(),
+        walls: config.walls().iter().map(from_mazer_position).collect(),
     }
 }
 
 pub(crate) fn to_mazer_run_result(run_result: &MazeRunResult) -> MazerRunResult {
     MazerRunResult::new(
-        run_result.get_score(),
+        run_result.score(),
         run_result
-            .get_solved_path()
+            .solved_path()
             .iter()
             .map(to_mazer_position)
             .collect(),

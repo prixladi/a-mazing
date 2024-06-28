@@ -61,8 +61,8 @@ impl Nodes {
         for neighbor_position in self.get_neighbors_positions(position) {
             let neighbor = self.get_node(&neighbor_position);
 
-            if let Some(neighbor_distance) = neighbor.get_distance(checkpoint_level) {
-                let lowest_dist = lowest.and_then(|node| node.get_distance(checkpoint_level));
+            if let Some(neighbor_distance) = neighbor.distance(checkpoint_level) {
+                let lowest_dist = lowest.and_then(|node| node.distance(checkpoint_level));
                 lowest = match lowest_dist {
                     Some(lowest_distance) if lowest_distance <= neighbor_distance => lowest,
                     _ => Some(neighbor),
@@ -70,7 +70,7 @@ impl Nodes {
             }
         }
 
-        lowest.filter(|node| node.get_distance(checkpoint_level).is_some())
+        lowest.filter(|node| node.distance(checkpoint_level).is_some())
     }
 }
 

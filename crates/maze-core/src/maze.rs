@@ -22,15 +22,15 @@ impl Maze {
         })
     }
 
-    pub fn get_board(&self) -> &TileBoard {
+    pub fn board(&self) -> &TileBoard {
         &self.board
     }
 
-    pub fn get_entrypoints(&self) -> &Vec<Position> {
+    pub fn entrypoints(&self) -> &Vec<Position> {
         &self.entrypoints
     }
 
-    pub fn get_max_soft_wall_count(&self) -> u32 {
+    pub fn max_soft_wall_count(&self) -> u32 {
         self.max_soft_wall_count
     }
 }
@@ -73,13 +73,10 @@ mod tests {
             }],
         });
 
-        assert_eq!(
-            maze.as_ref().map(|maze| maze.get_max_soft_wall_count()),
-            Ok(7)
-        );
+        assert_eq!(maze.as_ref().map(|maze| maze.max_soft_wall_count()), Ok(7));
 
         assert_eq!(
-            maze.as_ref().map(|maze| maze.get_board()),
+            maze.as_ref().map(|maze| maze.board()),
             Ok(&vec![
                 vec![TileKind::Empty, TileKind::Wall],
                 vec![TileKind::Entrypoint, TileKind::Checkpoint { level: 1 }]
@@ -107,13 +104,10 @@ mod tests {
             ],
         });
 
-        assert_eq!(
-            maze.as_ref().map(|maze| maze.get_max_soft_wall_count()),
-            Ok(5)
-        );
+        assert_eq!(maze.as_ref().map(|maze| maze.max_soft_wall_count()), Ok(5));
 
         assert_eq!(
-            maze.as_ref().map(|maze| maze.get_board()),
+            maze.as_ref().map(|maze| maze.board()),
             Ok(&vec![
                 vec![TileKind::Empty, TileKind::Wall, TileKind::Empty],
                 vec![

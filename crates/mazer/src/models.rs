@@ -17,13 +17,13 @@ impl MazerPosition {
         Self { x, y }
     }
 
-    #[wasm_bindgen(getter, js_name = x)]
-    pub fn get_x(&self) -> usize {
+    #[wasm_bindgen(getter)]
+    pub fn x(&self) -> usize {
         self.x
     }
 
-    #[wasm_bindgen(getter, js_name = y)]
-    pub fn get_y(&self) -> usize {
+    #[wasm_bindgen(getter)]
+    pub fn y(&self) -> usize {
         self.y
     }
 }
@@ -43,13 +43,13 @@ impl MazerCheckpoint {
         Self { position, level }
     }
 
-    #[wasm_bindgen(getter, js_name = position)]
-    pub fn get_position(&self) -> MazerPosition {
+    #[wasm_bindgen(getter)]
+    pub fn position(&self) -> MazerPosition {
         self.position.clone()
     }
 
-    #[wasm_bindgen(getter, js_name = level)]
-    pub fn get_level(&self) -> i32 {
+    #[wasm_bindgen(getter)]
+    pub fn level(&self) -> i32 {
         self.level
     }
 }
@@ -87,32 +87,32 @@ impl MazerConfig {
     }
 
     #[wasm_bindgen(getter, js_name = colCount)]
-    pub fn get_col_count(&self) -> usize {
+    pub fn col_count(&self) -> usize {
         self.col_count
     }
 
     #[wasm_bindgen(getter, js_name = rowCount)]
-    pub fn get_row_count(&self) -> usize {
+    pub fn row_count(&self) -> usize {
         self.row_count
     }
 
     #[wasm_bindgen(getter, js_name = maxSoftWallCount)]
-    pub fn get_max_soft_wall_count(&self) -> u32 {
+    pub fn max_soft_wall_count(&self) -> u32 {
         self.max_soft_wall_count
     }
 
     #[wasm_bindgen(getter, js_name = entrypoints)]
-    pub fn get_entrypoints(&self) -> Vec<MazerPosition> {
+    pub fn entrypoints(&self) -> Vec<MazerPosition> {
         self.entrypoints.clone()
     }
 
     #[wasm_bindgen(getter, js_name = checkpoints)]
-    pub fn get_checkpoints(&self) -> Vec<MazerCheckpoint> {
+    pub fn checkpoints(&self) -> Vec<MazerCheckpoint> {
         self.checkpoints.clone()
     }
 
     #[wasm_bindgen(getter, js_name = walls)]
-    pub fn get_walls(&self) -> Vec<MazerPosition> {
+    pub fn walls(&self) -> Vec<MazerPosition> {
         self.walls.clone()
     }
 }
@@ -129,13 +129,13 @@ impl MazerRunResult {
         Self { score, path }
     }
 
-    #[wasm_bindgen(getter, js_name = score)]
-    pub fn get_score(&self) -> u32 {
+    #[wasm_bindgen(getter)]
+    pub fn score(&self) -> u32 {
         self.score
     }
 
-    #[wasm_bindgen(getter, js_name = path)]
-    pub fn get_path(&self) -> Vec<MazerPosition> {
+    #[wasm_bindgen(getter)]
+    pub fn path(&self) -> Vec<MazerPosition> {
         self.path.clone()
     }
 }
