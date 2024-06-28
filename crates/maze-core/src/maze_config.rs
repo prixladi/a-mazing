@@ -53,7 +53,7 @@ impl MazeConfig {
             board[x][y] = TileKind::Entrypoint;
         }
 
-        for Checkpoint { position, level } in self.checkpoints.iter().cloned() {
+        for &Checkpoint { position, level } in self.checkpoints.iter() {
             let Position { x, y } = position;
             if x >= self.col_count || y >= self.row_count {
                 return Err(MazeError::TileOutOfBounds(

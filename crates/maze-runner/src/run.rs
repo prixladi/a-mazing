@@ -5,11 +5,11 @@ use maze_core::{Position, TileBoard};
 use super::nodes::Nodes;
 
 pub(super) fn run_maze(
-    tiles: &TileBoard,
+    board: &TileBoard,
     ascending_checkpoint_levels: &Vec<i32>,
     entrypoint_position: &Position,
 ) -> Option<MazeRunResult> {
-    let mut nodes = Nodes::new(tiles);
+    let mut nodes = Nodes::new(board);
     let entrypoint_node = nodes.get_node_mut(entrypoint_position);
     entrypoint_node.set_distance(ascending_checkpoint_levels[0], 0);
 

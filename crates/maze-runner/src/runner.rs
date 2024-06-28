@@ -40,10 +40,9 @@ impl<'a> MazeRunner<'a> {
         soft_walls: &Vec<Position>,
     ) -> Result<Option<MazeRunResult>, MazeRunnerError> {
         let board = get_board_with_soft_walls(&self.maze, soft_walls)?;
-        let entrypoints = self.maze.get_entrypoints();
         let mut best_result: Option<MazeRunResult> = None;
 
-        for entrypoint in entrypoints.iter() {
+        for entrypoint in self.maze.get_entrypoints().iter() {
             let current_run = run_maze(&board, &self.ascending_checkpoint_levels, entrypoint);
 
             if let Some(new) = current_run {
