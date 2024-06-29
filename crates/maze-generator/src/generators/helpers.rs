@@ -107,7 +107,7 @@ pub(super) fn is_solvable(
         .run(&walls)
         .map_err(GeneratorError::from_runner_error)?;
 
-    return Ok(run.is_some());
+    Ok(run.is_some())
 }
 
 pub(super) fn get_random_number_in_range<T, R>(range: R) -> T

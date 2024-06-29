@@ -48,7 +48,7 @@ impl Nodes {
             neighbors.push(Position { x: x - 1, y });
         }
 
-        return neighbors;
+        neighbors
     }
 
     pub(crate) fn get_lowest_distance_neighbor(
