@@ -26,16 +26,11 @@ pub(super) fn run_maze(
         }
 
         let current_level = ascending_checkpoint_levels[current_level_index];
-        nodes
-            .get_neighbors_positions(&current_position)
-            .iter()
-            .cloned()
+
+        get_eligible_neighbors(&nodes, &current_position, current_level)
+            .into_iter()
             .for_each(|neighbor_pos| {
                 let neighbor = nodes.get_node_mut(&neighbor_pos);
-                if !neighbor.can_enter() || neighbor.has_distance(current_level) {
-                    return;
-                }
-
                 let mut neighbor_level_index = current_level_index;
                 let neighbor_distance = current_distance + 1;
 
@@ -60,6 +55,22 @@ pub(super) fn run_maze(
         evaluated_nodes: nodes,
         distance,
     })
+}
+
+fn get_eligible_neighbors(
+    nodes: &Nodes,
+    current_position: &Position,
+    current_level: i32,
+) -> Vec<Position> {
+    nodes
+        .get_neighbors_positions(&current_position)
+        .iter()
+        .cloned()
+        .filter(|neighbor_pos| {
+            let neighbor = nodes.get_node(&neighbor_pos);
+            neighbor.can_enter() && !neighbor.has_distance(current_level)
+        })
+        .collect()
 }
 
 pub struct MazeRunResult {

@@ -45,18 +45,15 @@ pub(super) fn get_empty_positions_in_rectangle(
 ) -> Vec<Position> {
     let used: HashSet<&Position> = used_positions.iter().cloned().flatten().collect();
 
-    let mut empty_positions = vec![];
-
-    for x in top_left.x..bottom_right.x {
-        for y in bottom_right.y..top_left.y {
-            let position = Position { x, y };
-            if !used.contains(&position) {
-                empty_positions.push(position);
-            }
-        }
-    }
-
-    empty_positions
+    let x_line = top_left.x..bottom_right.x;
+    x_line
+        .flat_map(|x| {
+            let y_line = bottom_right.y..top_left.y;
+            y_line
+                .map(move |y| Position { x, y })
+                .filter(|pos| !used.contains(pos))
+        })
+        .collect()
 }
 
 pub(super) fn get_empty_positions_with_padding(
@@ -102,11 +99,8 @@ pub(super) fn is_solvable(
     config: &MazeConfig,
     walls: &Vec<Position>,
 ) -> Result<bool, GeneratorError> {
-    let maze = Maze::new(config).map_err(GeneratorError::from_maze_error)?;
-    let run = MazeRunner::new(&maze)
-        .run(&walls)
-        .map_err(GeneratorError::from_runner_error)?;
-
+    let maze = Maze::new(config)?;
+    let run = MazeRunner::new(&maze).run(&walls)?;
     Ok(run.is_some())
 }
 
@@ -119,9 +113,9 @@ where
 }
 
 pub(super) fn get_random_shuffle(positions: &Vec<Position>) -> Vec<Position> {
-    let mut copy: Vec<Position> = positions.clone();
+    let mut copy = positions.clone();
     copy.shuffle(&mut thread_rng());
-    copy.into_iter().collect()
+    copy
 }
 
 pub(super) fn get_random_positions(positions: &Vec<Position>, n: usize) -> Vec<Position> {

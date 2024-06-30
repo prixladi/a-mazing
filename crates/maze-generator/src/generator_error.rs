@@ -9,12 +9,14 @@ pub enum GeneratorError {
     AggregatedError(Box<dyn Error>),
 }
 
-impl GeneratorError {
-    pub(crate) fn from_maze_error(maze_error: MazeError) -> Self {
-        Self::AggregatedError(Box::new(maze_error))
+impl From<MazeError> for GeneratorError {
+    fn from(value: MazeError) -> Self {
+        Self::AggregatedError(Box::new(value))
     }
+}
 
-    pub(crate) fn from_runner_error(runner_error: MazeRunnerError) -> Self {
-        Self::AggregatedError(Box::new(runner_error))
+impl From<MazeRunnerError> for GeneratorError {
+    fn from(value: MazeRunnerError) -> Self {
+        Self::AggregatedError(Box::new(value))
     }
 }
