@@ -1,4 +1,4 @@
-pub enum GeneratorType {
+pub enum MazeGeneratorType {
     Vanilla,
     Waterfall,
 }

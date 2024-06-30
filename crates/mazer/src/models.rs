@@ -1,5 +1,8 @@
 use crate::utils::set_panic_hook;
 
+use maze_core::{Checkpoint, MazeConfig, Position};
+use maze_generator::MazeGeneratorType;
+use maze_runner::MazeRunResult;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -28,6 +31,21 @@ impl MazerPosition {
     }
 }
 
+impl From<Position> for MazerPosition {
+    fn from(position: Position) -> Self {
+        MazerPosition::new(position.x, position.y)
+    }
+}
+
+impl Into<Position> for MazerPosition {
+    fn into(self) -> Position {
+        Position {
+            x: self.x,
+            y: self.y,
+        }
+    }
+}
+
 #[wasm_bindgen]
 #[derive(Clone)]
 pub struct MazerCheckpoint {
@@ -51,6 +69,21 @@ impl MazerCheckpoint {
     #[wasm_bindgen(getter)]
     pub fn level(&self) -> i32 {
         self.level
+    }
+}
+
+impl From<Checkpoint> for MazerCheckpoint {
+    fn from(checkpoint: Checkpoint) -> Self {
+        MazerCheckpoint::new(checkpoint.position.into(), checkpoint.level)
+    }
+}
+
+impl Into<Checkpoint> for MazerCheckpoint {
+    fn into(self) -> Checkpoint {
+        Checkpoint {
+            position: self.position.into(),
+            level: self.level,
+        }
     }
 }
 
@@ -117,6 +150,32 @@ impl MazerConfig {
     }
 }
 
+impl From<MazeConfig> for MazerConfig {
+    fn from(config: MazeConfig) -> Self {
+        MazerConfig::new(
+            config.col_count,
+            config.row_count,
+            config.max_soft_wall_count,
+            config.entrypoints.into_iter().map(|x| x.into()).collect(),
+            config.checkpoints.into_iter().map(|x| x.into()).collect(),
+            config.walls.into_iter().map(|x| x.into()).collect(),
+        )
+    }
+}
+
+impl Into<MazeConfig> for MazerConfig {
+    fn into(self) -> MazeConfig {
+        MazeConfig {
+            col_count: self.col_count,
+            row_count: self.row_count,
+            max_soft_wall_count: self.max_soft_wall_count,
+            entrypoints: self.entrypoints().into_iter().map(|x| x.into()).collect(),
+            checkpoints: self.checkpoints().into_iter().map(|x| x.into()).collect(),
+            walls: self.walls().into_iter().map(|x| x.into()).collect(),
+        }
+    }
+}
+
 #[wasm_bindgen]
 pub struct MazerRunResult {
     score: u32,
@@ -140,8 +199,26 @@ impl MazerRunResult {
     }
 }
 
+impl From<MazeRunResult> for MazerRunResult {
+    fn from(result: MazeRunResult) -> Self {
+        MazerRunResult::new(
+            result.score(),
+            result.solved_path().into_iter().map(|x| x.into()).collect(),
+        )
+    }
+}
+
 #[wasm_bindgen]
 pub enum MazerGeneratorType {
     Vanilla,
     Waterfall,
+}
+
+impl Into<MazeGeneratorType> for MazerGeneratorType {
+    fn into(self) -> MazeGeneratorType {
+        match self {
+            MazerGeneratorType::Vanilla => MazeGeneratorType::Vanilla,
+            MazerGeneratorType::Waterfall => MazeGeneratorType::Waterfall,
+        }
+    }
 }

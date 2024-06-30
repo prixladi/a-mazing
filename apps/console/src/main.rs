@@ -1,5 +1,5 @@
 use maze_core::{Checkpoint, Maze, MazeConfig, Position};
-use maze_generator::{create_generator, GeneratorType};
+use maze_generator::{create_generator, MazeGeneratorType};
 use maze_runner::MazeRunner;
 
 fn main() {
@@ -8,7 +8,7 @@ fn main() {
 }
 
 fn generator() {
-    let generator = create_generator(GeneratorType::Vanilla);
+    let generator = create_generator(MazeGeneratorType::Vanilla);
 
     let config = generator.generate().unwrap();
 
