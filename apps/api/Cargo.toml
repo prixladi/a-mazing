@@ -1,0 +1,18 @@
+[package]
+name = "api"
+version = "0.0.0"
+authors = ["Ladislav Prix <elix78963@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+# local crates
+maze-core.workspace = true
+# external crates
+thiserror = "1.0.61"
+sea-orm = { version = "0.12", features = [ 'sqlx-sqlite', 'runtime-tokio-rustls', "macros" ] }
+axum = "0.7.5"
+tokio = { version = "1.38.0", features = ['full']}
+tracing = "0.1.40"
+tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
+serde = { version = "1.0.204", features = ["derive"] }
+validator = { version = "0.18.1", features = ["derive"] }
