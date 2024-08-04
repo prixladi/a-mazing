@@ -4,6 +4,23 @@ Amazing is a game loosely based on the [Longest path problem](https://en.wikiped
 
 The core of the game is written in Rust and is exposed to the web through WebAssembly. In the future API is planned for most of the game features but WebAssembly runtime will stay to offload most of the work from the server.
 
+## Runing the project
+
+### Build Crates & WebAssembly bindings
+
+```sh
+cargo build
+bash ./crates/mazer/pack.sh
+```
+
+### Run Website in dev mode
+
+```sh
+cd ./apps/web
+pnpm install
+pnpm dev
+```
+
 ## Project structure
 
 - `/apps`
@@ -13,7 +30,7 @@ The core of the game is written in Rust and is exposed to the web through WebAss
   - `maze-core` - Crate defining core maze structures and validations
   - `maze-runner` - Engine for maze evaluation
   - `maze-generator` - Generator of maze boards from defined presets
-  - `mazer` - Webssemly binding
+  - `mazer` - WebAssembly bindings
 
 ## WIP
 
