@@ -6,7 +6,7 @@ use super::nodes::Nodes;
 
 pub(super) fn run_maze(
     board: &TileBoard,
-    ascending_checkpoint_levels: &Vec<i32>,
+    ascending_checkpoint_levels: &[i32],
     entrypoint_position: &Position,
 ) -> Option<MazeRunResult> {
     let mut nodes = Nodes::new(board);
@@ -50,7 +50,7 @@ pub(super) fn run_maze(
     };
 
     Some(MazeRunResult {
-        asc_checkpoint_levels: ascending_checkpoint_levels.clone(),
+        asc_checkpoint_levels: ascending_checkpoint_levels.to_vec(),
         exit_position,
         evaluated_nodes: nodes,
         distance,
@@ -63,11 +63,11 @@ fn get_eligible_neighbors(
     current_level: i32,
 ) -> Vec<Position> {
     nodes
-        .get_neighbors_positions(&current_position)
+        .get_neighbors_positions(current_position)
         .iter()
         .cloned()
         .filter(|neighbor_pos| {
-            let neighbor = nodes.get_node(&neighbor_pos);
+            let neighbor = nodes.get_node(neighbor_pos);
             neighbor.can_enter() && !neighbor.has_distance(current_level)
         })
         .collect()
@@ -93,7 +93,7 @@ impl MazeRunResult {
         let mut iterations_remaining = self.distance + 2;
         loop {
             iterations_remaining -= 1;
-            if iterations_remaining <= 0 {
+            if iterations_remaining == 0 {
                 panic!("Unable to get solved path for solved maze run! Too many iterations.");
             }
 
@@ -110,7 +110,7 @@ impl MazeRunResult {
 
             let neighbor = self
                 .evaluated_nodes
-                .get_lowest_distance_neighbor(&current_node.position(), previous_level.unwrap())
+                .get_lowest_distance_neighbor(current_node.position(), previous_level.unwrap())
                 .expect("Expected to find lowest distance neighbor for solved maze run!");
 
             best_path.push(neighbor);

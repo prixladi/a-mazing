@@ -2,9 +2,9 @@ use std::collections::HashSet;
 
 use maze_core::{Checkpoint, Maze, MazeConfig, Position};
 use maze_runner::MazeRunner;
-use rand::distributions::uniform::{SampleRange, SampleUniform};
+use rand::distr::uniform::{SampleRange, SampleUniform};
 use rand::seq::SliceRandom;
-use rand::{thread_rng, Rng};
+use rand::{rng, Rng};
 
 use crate::GeneratorError;
 
@@ -77,8 +77,8 @@ pub(super) fn get_empty_positions_with_padding(
 }
 
 pub(super) fn get_checkpoints(
-    checkpoint_positions: &Vec<Position>,
-    exit_positions: &Vec<Position>,
+    checkpoint_positions: &[Position],
+    exit_positions: &[Position],
 ) -> Vec<Checkpoint> {
     checkpoint_positions
         .iter()
@@ -100,7 +100,7 @@ pub(super) fn is_solvable(
     walls: &Vec<Position>,
 ) -> Result<bool, GeneratorError> {
     let maze = Maze::new(config)?;
-    let run = MazeRunner::new(&maze).run(&walls)?;
+    let run = MazeRunner::new(&maze).run(walls)?;
     Ok(run.is_some())
 }
 
@@ -109,22 +109,22 @@ where
     T: SampleUniform,
     R: SampleRange<T>,
 {
-    thread_rng().gen_range(range)
+    rng().random_range(range)
 }
 
-pub(super) fn get_random_shuffle(positions: &Vec<Position>) -> Vec<Position> {
-    let mut copy = positions.clone();
-    copy.shuffle(&mut thread_rng());
+pub(super) fn get_random_shuffle(positions: &[Position]) -> Vec<Position> {
+    let mut copy = positions.to_vec();
+    copy.shuffle(&mut rng());
     copy
 }
 
-pub(super) fn get_random_positions(positions: &Vec<Position>, n: usize) -> Vec<Position> {
+pub(super) fn get_random_positions(positions: &[Position], n: usize) -> Vec<Position> {
     get_random_shuffle(positions).into_iter().take(n).collect()
 }
 
 pub(super) fn get_random_solvable_walls(
     config: &MazeConfig,
-    empty_positions: &Vec<Position>,
+    empty_positions: &[Position],
     wall_count: usize,
 ) -> Result<Vec<Position>, GeneratorError> {
     let mut walls = vec![];
@@ -134,7 +134,7 @@ pub(super) fn get_random_solvable_walls(
         }
 
         walls.push(position);
-        if !is_solvable(&config, &walls)? {
+        if !is_solvable(config, &walls)? {
             walls.pop();
         }
     }

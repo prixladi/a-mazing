@@ -11,7 +11,7 @@ crate-type = ["cdylib", "rlib"]
 default = ["console_error_panic_hook"]
 
 [dependencies]
-wasm-bindgen = "0.2.84"
+wasm-bindgen = "0.2.100"
 console_error_panic_hook = { version = "0.1.7", optional = true }
 # local crates
 maze-core.workspace = true
@@ -19,5 +19,5 @@ maze-runner.workspace = true
 maze-generator.workspace = true
 
 [dev-dependencies]
-wasm-bindgen-test = "0.3.34"
+wasm-bindgen-test = "0.3.50"
 

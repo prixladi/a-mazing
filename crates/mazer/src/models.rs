@@ -37,11 +37,11 @@ impl From<Position> for MazerPosition {
     }
 }
 
-impl Into<Position> for MazerPosition {
-    fn into(self) -> Position {
+impl From<MazerPosition> for Position {
+    fn from(val: MazerPosition) -> Self {
         Position {
-            x: self.x,
-            y: self.y,
+            x: val.x,
+            y: val.y,
         }
     }
 }
@@ -78,11 +78,11 @@ impl From<Checkpoint> for MazerCheckpoint {
     }
 }
 
-impl Into<Checkpoint> for MazerCheckpoint {
-    fn into(self) -> Checkpoint {
+impl From<MazerCheckpoint> for Checkpoint {
+    fn from(val: MazerCheckpoint) -> Self {
         Checkpoint {
-            position: self.position.into(),
-            level: self.level,
+            position: val.position.into(),
+            level: val.level,
         }
     }
 }
@@ -163,15 +163,15 @@ impl From<MazeConfig> for MazerConfig {
     }
 }
 
-impl Into<MazeConfig> for MazerConfig {
-    fn into(self) -> MazeConfig {
+impl From<MazerConfig> for MazeConfig {
+    fn from(val: MazerConfig) -> Self {
         MazeConfig {
-            col_count: self.col_count,
-            row_count: self.row_count,
-            max_soft_wall_count: self.max_soft_wall_count,
-            entrypoints: self.entrypoints().into_iter().map(|x| x.into()).collect(),
-            checkpoints: self.checkpoints().into_iter().map(|x| x.into()).collect(),
-            walls: self.walls().into_iter().map(|x| x.into()).collect(),
+            col_count: val.col_count,
+            row_count: val.row_count,
+            max_soft_wall_count: val.max_soft_wall_count,
+            entrypoints: val.entrypoints().into_iter().map(|x| x.into()).collect(),
+            checkpoints: val.checkpoints().into_iter().map(|x| x.into()).collect(),
+            walls: val.walls().into_iter().map(|x| x.into()).collect(),
         }
     }
 }
@@ -214,9 +214,9 @@ pub enum MazerGeneratorType {
     Waterfall,
 }
 
-impl Into<MazeGeneratorType> for MazerGeneratorType {
-    fn into(self) -> MazeGeneratorType {
-        match self {
+impl From<MazerGeneratorType> for MazeGeneratorType {
+    fn from(val: MazerGeneratorType) -> Self {
+        match val {
             MazerGeneratorType::Vanilla => MazeGeneratorType::Vanilla,
             MazerGeneratorType::Waterfall => MazeGeneratorType::Waterfall,
         }

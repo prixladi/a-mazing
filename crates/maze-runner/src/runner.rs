@@ -16,17 +16,14 @@ impl<'a> MazeRunner<'a> {
             .iter()
             .flat_map(|row| {
                 row.iter()
-                    .filter(|kind| match kind {
-                        TileKind::Checkpoint { level: _ } => true,
-                        _ => false,
-                    })
+                    .filter(|kind| matches!(kind, TileKind::Checkpoint { level: _ }))
                     .map(|kind| match kind {
                         TileKind::Checkpoint { level } => *level,
                         _ => todo!(),
                     })
             })
             .collect();
-        checkpoint_levels.sort_by(|a, b| a.cmp(b));
+        checkpoint_levels.sort();
         checkpoint_levels.dedup();
 
         Self {
@@ -39,7 +36,7 @@ impl<'a> MazeRunner<'a> {
         &self,
         soft_walls: &Vec<Position>,
     ) -> Result<Option<MazeRunResult>, MazeRunnerError> {
-        let board = create_board_with_soft_walls(&self.maze, soft_walls)?;
+        let board = create_board_with_soft_walls(self.maze, soft_walls)?;
         let mut best_result: Option<MazeRunResult> = None;
 
         for entrypoint in self.maze.entrypoints().iter() {

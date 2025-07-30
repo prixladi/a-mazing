@@ -8,4 +8,4 @@ edition = "2018"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-thiserror = "1.0.61"
+thiserror = "2.0.12"

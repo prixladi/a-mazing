@@ -25,11 +25,11 @@ impl MazeConfig {
             });
         }
 
-        if self.entrypoints.len() == 0 {
+        if self.entrypoints.is_empty() {
             return Err(MazeError::NoEntrypoint);
         }
 
-        if self.checkpoints.len() == 0 {
+        if self.checkpoints.is_empty() {
             return Err(MazeError::NoCheckpoint);
         }
 

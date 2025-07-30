@@ -80,6 +80,13 @@ export default function Home() {
         >
           RUN
         </button>
+        <button
+          onClick={() => {
+            clearMutations();
+          }}
+        >
+          CLEAR
+        </button>
       </div>
     </main>
   );
